@@ -1,0 +1,22 @@
+# Ingestion and structuring
+pdfplumber==0.11.10
+pydantic==2.13.4
+
+# Vector and sparse indexes
+chromadb==1.5.9
+rank-bm25==0.2.2
+sentence-transformers==5.6.0
+
+# Topological analysis
+networkx==3.6.1
+
+# Agentic logic engine
+langgraph==1.2.7
+groq==1.5.0
+ollama==0.6.2
+
+# Evaluation framework
+ragas==0.4.3
+
+# Ragas compatibility: 0.4.2 removed the Vertex AI import used by Ragas 0.4.3
+langchain-community==0.4.1
