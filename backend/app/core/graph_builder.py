@@ -1,5 +1,7 @@
 import networkx as nx
 import pickle
+import json
+
 
 G = nx.DiGraph()
 
@@ -39,6 +41,41 @@ edges = [
 ]
 
 G.add_edges_from(edges)
+
+with open("data/processed/parent_chunks.json","r") as file:
+    parent_json = json.load(file)
+
+#Adding chunks as attributes
+
+G.nodes["Internal Policy"]["chunks"] = [ 
+    doc for doc in parent_json 
+    if doc["metadata"]["source_document"] == "nexus_holdings_global_inc.pdf"
+]
+
+G.nodes["RBI KYC"]["chunks"] = [
+    doc for doc in parent_json 
+    if doc["metadata"]["source_document"] == "kyc_rbi.pdf"
+]
+
+G.nodes["RBI Credit Risk"]["chunks"] = [
+    doc for doc in parent_json 
+    if doc["metadata"]["source_document"] == "credit_Risk_RBI.pdf"
+]
+
+G.nodes["Foreign Investment"]["chunks"] = [
+    doc for doc in parent_json 
+    if doc["metadata"]["source_document"] == "foreign_Investement_rbi.pdf"
+]
+
+G.nodes["Apple SEC Filings"]["chunks"] = [
+    doc for doc in parent_json 
+    if doc["metadata"]["source_document"] == "apple-SEC.pdf"
+]
+
+G.nodes["Microsoft SEC Filings"]["chunks"] = [
+    doc for doc in parent_json 
+    if doc["metadata"]["source_document"] == "microsoft-SEC.pdf"
+]
 
 with open("data/processed/knowledge_graph.pkl", "wb") as file:
     pickle.dump(G, file)
