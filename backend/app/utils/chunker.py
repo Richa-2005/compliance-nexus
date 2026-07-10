@@ -1,8 +1,22 @@
 import tiktoken
 import json
+import re
 from pathlib import Path
 
-encoder = tiktoken.get_encoding("cl100k_base")
+class FallbackEncoder:
+    def encode(self, text):
+        return re.findall(r"\S+\s*", text)
+
+    def decode(self, tokens):
+        return "".join(tokens)
+
+def get_encoder():
+    try:
+        return tiktoken.get_encoding("cl100k_base")
+    except Exception:
+        return FallbackEncoder()
+
+encoder = get_encoder()
 
 def normalize_content(raw_content):
     if isinstance(raw_content, list):
@@ -107,6 +121,28 @@ class Chunker:
                 ongoing_source
             )
 
+    def store_parent_chunks(self):
+        output_path = Path("data/processed/parent_chunks.json")
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        if output_path.exists():
+            with output_path.open("r", encoding="utf-8") as file:
+                existing_data = json.load(file)
+        else:
+            existing_data = []
+
+        parent_data = [
+            {
+                "parent_id": parent_id,
+                "text_content": value["text_content"],
+                "metadata": value["metadata"]
+            }
+            for parent_id, value in self.parent_tokens.items()
+        ]
+
+        existing_data.extend(parent_data)
+        with output_path.open("w", encoding="utf-8") as json_file:
+            json.dump(existing_data, json_file, indent=4)
+
     def child_chunker(self):
         p = 0
         source_stem = Path(self.file_path).stem
@@ -166,14 +202,19 @@ if __name__ == "__main__":
         "data/processed/nexus_holdings_global_inc.json"
     ]
 
-    output_path = Path("data/processed/child_chunks.json")
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    with output_path.open("w", encoding="utf-8") as json_file:
-        json.dump([], json_file, indent=4)
+    for output_file in [
+        "data/processed/parent_chunks.json",
+        "data/processed/child_chunks.json"
+    ]:
+        output_path = Path(output_file)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        with output_path.open("w", encoding="utf-8") as json_file:
+            json.dump([], json_file, indent=4)
 
     for file in pdf_list:
         par = Chunker(file)
         par.parent_chunker()
+        par.store_parent_chunks()
         par.child_chunker()
     
     print("\nChunking and Storing complete!\n")
