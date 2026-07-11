@@ -1,9 +1,9 @@
 from typing import TypedDict, List
 from langgraph.graph import StateGraph, START, END
-from app.core.retriever import get_retriever
+from ..core.retriever import get_retriever
 import pickle 
 import networkx as nx
-from app.core.llm_factory import get_chat_model
+from ..core.llm_factory import get_chat_model
 from langchain_core.messages import SystemMessage, HumanMessage
 
 #In memory global setup to optimize each query processing speed
@@ -19,7 +19,6 @@ COMPLIANCE_AUDIT_PROMPT = """
 
     Analyze the raw textual data and topological rules provided below to generate a formal compliance verdict.
 
-    ========================================================================
     INPUT LAYER 1: UNIFIED TEXTUAL CONTEXT CORPORES
     These text chunks represent the uncorrupted 512-token Parent Context blocks retrieved from relevant files:
     {context_blocks_text}
@@ -30,8 +29,7 @@ COMPLIANCE_AUDIT_PROMPT = """
 
     ACTIVE AUDIT USER QUERY:
     {user_query}
-    ========================================================================
-
+    
     CRITICAL EXECUTION CONSTRAINTS & GUARDRUILS:
     1. DETERMINISM OVERALL: Evaluate numbers, dates, ownership stakes, and currency ceilings with mathematical accuracy. Do not expand or loosely interpret thresholds.
     2. ZERO HALLUCINATION RULE: Rely strictly on the provided input layers. If a threshold or citation is absent, state that explicitly. Do not assume or extrapolate parameters.
@@ -117,7 +115,7 @@ def traverse_graph_entities(state: AgentState) -> AgentState:
     )
     
     lineage = "[LINEAGE]"
-    contraint = "[CONSTRAINT]"
+    constraint = "[CONSTRAINT]"
     overlay = "[OVERLAY]"
     cnt = 0
 
@@ -128,45 +126,85 @@ def traverse_graph_entities(state: AgentState) -> AgentState:
         outgoing = list(G.successors(node))
         
         for succ_node in outgoing:
-            attrs = G[node][succ_node]
-            lineage += f"\n- {node} ──({attrs['relation']})──► {succ_node}"
+            attributes = G[node][succ_node]
+            lineage += f"\n- {node} ──({attributes['relation']})──► {succ_node}"
 
             
             for key,value in attributes.items():
                 if key != "relation":
                     cnt += 1
                     constraint += f"\n {cnt}) {node}->{succ_node} [{key}: {value}]"
-        
+
             if "chunks" in G.nodes[succ_node]:
                 for chunk in G.nodes[succ_node]["chunks"]:
                     if chunk["parent_id"] not in existing_parent_ids:
                         state["context_blocks"].append(chunk)
                         existing_parent_ids.add(chunk["parent_id"])
-
+        
         #Tracking predecessors
         ingoing = list(G.predecessors(node))
         
         for pred_node in ingoing:
             attributes = G[pred_node][node]
-            overlay += f"\n- {pred_node} ──({attrs['relation']})──► {node}" 
-            if len(attrs) > 1:
+            overlay += f"\n- {pred_node} ──({attributes['relation']})──► {node}" 
+            if len(attributes) > 1:
                 overlay += " ["
-                item_details = [f"{k}: {v}" for k, v in attrs.items() if k != "relation"]
+                item_details = [f"{k}: {v}" for k, v in attributes.items() if k != "relation"]
                 overlay += ", ".join(item_details) + "] "
-            
+
             if "chunks" in G.nodes[pred_node]:
                 for chunk in G.nodes[pred_node]["chunks"]:
                     if chunk["parent_id"] not in existing_parent_ids:
                         state["context_blocks"].append(chunk)
                         existing_parent_ids.add(chunk["parent_id"])
-        
+            
     state["graph_entities"] = f"SYSTEM TOPOLOGY MAP\n\n{lineage}\n\n{constraint}\n\n{overlay}"
     return state
         
 
 def analyze_compliance(state: AgentState) -> AgentState:
+    query_terms = set(retriever._tokenize(state["query"]))
+
+    def relevance(block):
+        block_terms = set(retriever._tokenize(block["text_content"]))
+        return len(query_terms & block_terms)
+
+    blocks_by_source = {}
+    for block in state["context_blocks"]:
+        source = block["metadata"].get("source_document", "Unknown")
+        blocks_by_source.setdefault(source, []).append(block)
+
+    for blocks in blocks_by_source.values():
+        blocks.sort(key=relevance, reverse=True)
+
+    selected_blocks = []
+    selected_parent_ids = set()
+    context_characters = 0
+    max_context_characters = 180_000
+
+    while blocks_by_source:
+        for source in list(blocks_by_source):
+            blocks = blocks_by_source[source]
+            if not blocks:
+                del blocks_by_source[source]
+                continue
+
+            block = blocks.pop(0)
+            parent_id = block["parent_id"]
+            block_size = len(block["text_content"])
+
+            if parent_id in selected_parent_ids:
+                continue
+            if context_characters + block_size > max_context_characters:
+                del blocks_by_source[source]
+                continue
+
+            selected_blocks.append(block)
+            selected_parent_ids.add(parent_id)
+            context_characters += block_size
+
     formatted_context = ""
-    for idx, block in enumerate(state["context_blocks"], 1):
+    for idx, block in enumerate(selected_blocks, 1):
         src = block["metadata"].get("source_document", "Unknown")
         pg = block["metadata"].get("page_number", "Unknown")
         sec = block["metadata"].get("section_inferred", "Unknown Section")
@@ -188,7 +226,7 @@ def analyze_compliance(state: AgentState) -> AgentState:
     response = llm.invoke(messages)
 
     unique_citations = set()
-    for block in state["context_blocks"]:
+    for block in selected_blocks:
         src = block["metadata"].get("source_document")
         pg = block["metadata"].get("page_number")
         if src and pg:
@@ -199,3 +237,33 @@ def analyze_compliance(state: AgentState) -> AgentState:
     state["audit_verdict"] = response.content
     return state
 
+graph = StateGraph(AgentState)
+
+graph.add_node("fetch_context",fetch_context)
+graph.add_node("traverse_graph_entities",traverse_graph_entities)
+graph.add_node("analyze_compliance",analyze_compliance)
+
+graph.add_edge(START,"fetch_context")
+graph.add_edge("fetch_context","traverse_graph_entities")
+graph.add_edge("traverse_graph_entities","analyze_compliance")
+graph.add_edge("analyze_compliance",END)
+
+audit_graph = graph.compile()
+
+if __name__ == "__main__":
+    
+    inputs = {
+        "query": """
+        Verify if a technology software licensing transaction of 
+        $1,800,000 USD initiated by Nexus India violates internal
+        cross-border limits.
+        """
+    }
+    
+    print("\nInitializing multi-agent graph audit pass...\n")
+    final_output = audit_graph.invoke(inputs)
+    
+    print("FINAL COMPLIANCE REPORT")
+    print(final_output.get("audit_verdict"))
+    print("\nVerified Source Citations Document Registry:")
+    print(final_output.get("citations"))
