@@ -3,11 +3,70 @@ from langgraph.graph import StateGraph, START, END
 from app.core.retriever import get_retriever
 import pickle 
 import networkx as nx
+from app.core.llm_factory import get_chat_model
+from langchain_core.messages import SystemMessage, HumanMessage
 
 #In memory global setup to optimize each query processing speed
 retriever = get_retriever()
+
 with open("data/processed/knowledge_graph.pkl", "rb") as file:
     G = pickle.load(file)
+
+llm = get_chat_model(temperature=0.0)
+
+COMPLIANCE_AUDIT_PROMPT = """
+    You are the core enterprise analytics brain of ComplianceNexus, a state-of-the-art multi-document automated regulatory auditing system. Your objective is to perform a rigorous, deterministic multi-criteria compliance evaluation of an operational transaction query against fetched multi-source corporate policy files and central banking statutory directions.
+
+    Analyze the raw textual data and topological rules provided below to generate a formal compliance verdict.
+
+    ========================================================================
+    INPUT LAYER 1: UNIFIED TEXTUAL CONTEXT CORPORES
+    These text chunks represent the uncorrupted 512-token Parent Context blocks retrieved from relevant files:
+    {context_blocks_text}
+
+    INPUT LAYER 2: SYSTEM TOPOLOGY MATRIX
+    These represent the corporate inheritance lineage paths, edge parameters, and compliance constraints extracted dynamically from the NetworkX knowledge graph:
+    {graph_entities_text}
+
+    ACTIVE AUDIT USER QUERY:
+    {user_query}
+    ========================================================================
+
+    CRITICAL EXECUTION CONSTRAINTS & GUARDRUILS:
+    1. DETERMINISM OVERALL: Evaluate numbers, dates, ownership stakes, and currency ceilings with mathematical accuracy. Do not expand or loosely interpret thresholds.
+    2. ZERO HALLUCINATION RULE: Rely strictly on the provided input layers. If a threshold or citation is absent, state that explicitly. Do not assume or extrapolate parameters.
+    3. INHERITANCE EVALUATION: Evaluate if corporate ownership paths dictate policy inheritance (e.g., if a subsidiary inherits a parent policy requirement or must yield to a localized central banking ceiling).
+    4. STRICT ANCHORING: Every analytical claim or metric match must be appended with an explicit layout citation indicating the exactly referenced source document name and page number.
+
+    Your response must strictly utilize the following markdown hierarchy template. Do not deviate from these section headers:
+
+    ## 1. OFFICIAL COMPLIANCE AUDIT VERDICT
+    [Declare one of these precise tokens: **COMPLIANT**, **NON_COMPLIANT**, or **ACTION_REQUIRED**]
+    *Summary Sentence*: Provide a direct, single-sentence operational summary detailing exactly why this transaction state was approved or flagged.
+
+    ## 2. SYSTEMIC LINEAGE & JURISDICTION EVALUATION
+    * Trace the corporate genealogy extracted from the topology map (e.g., identifying parent-subsidiary structures).
+    * Define the geographic and statutory boundaries governing the active entity (e.g., matching the Indian entity to RBI circular frameworks).
+    * Document which internal policy structures are inherited by this operating unit.
+
+    ## 3. MULTI-CRITERIA COMPLIANCE EVALUATION MATRIX
+    Provide a systematic evaluation cross-referencing the query metrics against individual operational bounds:
+
+    | Compliance Dimension | Internal Corporate Rule | External Statutory Rule | Actual Query Metric | Variance / Evaluation |
+    | :--- | :--- | :--- | :--- | :--- |
+    | **Transactional Exposure** | [Internal spend limits / rules] | [Statutory banking limits] | [Query parameters] | [Pass/Fail Analysis] |
+    | **Credential Verification** | [Required KYC mandates] | [Statutory KYC rules] | [Query attributes] | [Pass/Fail Analysis] |
+    | **Governance / Exposure** | [Director ownership ceilings] | [Statutory exposure caps] | [Query context] | [Pass/Fail Analysis] |
+
+    ## 4. DETAILED COMPLIANCE DEFICIENCY FINDINGS
+    *If any dimension is NON_COMPLIANT or requires ACTION_REQUIRED, list the structural gaps sequentially. If completely COMPLIANT, explicitly state that no structural variance gaps were detected.*
+    * **Finding 1**: [Describe the gap, the expected threshold, and the actual query metric value].
+
+    ## 5. SOURCE CITATION FRAMEWORK
+    List all specific source materials referenced to validate this verdict. Formulate each line strictly using this layout structure:
+    * **[Citation Anchor]** - `document_name.pdf`, Page # (Section Reference)
+    
+    """
 
 class AgentState(TypedDict):
     query : str
@@ -105,10 +164,38 @@ def traverse_graph_entities(state: AgentState) -> AgentState:
     return state
         
 
-        
+def analyze_compliance(state: AgentState) -> AgentState:
+    formatted_context = ""
+    for idx, block in enumerate(state["context_blocks"], 1):
+        src = block["metadata"].get("source_document", "Unknown")
+        pg = block["metadata"].get("page_number", "Unknown")
+        sec = block["metadata"].get("section_inferred", "Unknown Section")
+        formatted_context += f"\n--- Document {idx}: {src} | Page {pg} | Section: {sec} ---\n"
+        formatted_context += f"{block['text_content']}\n"
 
+    # Inject parameters into the prompt
+    sys_prompt = COMPLIANCE_AUDIT_PROMPT.format(
+        context_blocks_text=formatted_context,
+        graph_entities_text=state["graph_entities"],
+        user_query=state["query"]
+    )
+    
+    messages = [
+        SystemMessage(content=sys_prompt),
+        HumanMessage(content=f"Execute compliance audit pass for: {state['query']}")
+    ]
 
+    response = llm.invoke(messages)
 
+    unique_citations = set()
+    for block in state["context_blocks"]:
+        src = block["metadata"].get("source_document")
+        pg = block["metadata"].get("page_number")
+        if src and pg:
+            unique_citations.add(f"{src} (Page {pg})")
+            
+    state["citations"] = list(unique_citations)
 
-
+    state["audit_verdict"] = response.content
+    return state
 
