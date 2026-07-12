@@ -7,6 +7,9 @@ from ..core.llm_factory import get_chat_model
 from langchain_core.messages import SystemMessage, HumanMessage
 from pydantic import BaseModel, Field
 
+
+flagged_citation = False
+
 class ComplianceExtractionSchema(BaseModel):
     transaction_value: float = Field(
         description="The specific numeric numerical dollar value of the transaction parsed out of the query (e.g., 1800000.0)"
@@ -27,65 +30,6 @@ retriever = get_retriever()
 with open("data/processed/knowledge_graph.pkl", "rb") as file:
     G = pickle.load(file)
 
-COMPLIANCE_AUDIT_PROMPT = """
-    You are the core enterprise analytics brain of ComplianceNexus, a state-of-the-art multi-document automated regulatory auditing system. Your objective is to perform a rigorous, deterministic multi-criteria compliance evaluation of an operational transaction query against fetched multi-source corporate policy files and central banking statutory directions.
-
-    Analyze the raw textual data and topological rules provided below to generate a formal compliance verdict.
-
-    INPUT LAYER 1: UNIFIED TEXTUAL CONTEXT CORPORES
-    These text chunks represent the uncorrupted 512-token Parent Context blocks retrieved from relevant files:
-    {context_blocks_text}
-
-    INPUT LAYER 2: SYSTEM TOPOLOGY MATRIX
-    These represent the corporate inheritance lineage paths, edge parameters, and compliance constraints extracted dynamically from the NetworkX knowledge graph:
-    {graph_entities_text}
-
-    ACTIVE AUDIT USER QUERY:
-    {user_query}
-    
-    CRITICAL EXECUTION CONSTRAINTS & GUARDRUILS:
-    1. DETERMINISM OVERALL: Evaluate numbers, dates, ownership stakes, and currency ceilings with mathematical accuracy. Do not expand or loosely interpret thresholds.
-    2. ZERO HALLUCINATION RULE: Rely strictly on the provided input layers. If a threshold or citation is absent, state that explicitly. Do not assume or extrapolate parameters.
-    3. INHERITANCE EVALUATION: Evaluate if corporate ownership paths dictate policy inheritance (e.g., if a subsidiary inherits a parent policy requirement or must yield to a localized central banking ceiling).
-    4. STRICT ANCHORING: Every analytical claim or metric match must be appended with an explicit layout citation indicating the exactly referenced source document name and page number.
-
-    Your response must strictly utilize the following markdown hierarchy template. Do not deviate from these section headers:
-
-    ## 1. OFFICIAL COMPLIANCE AUDIT VERDICT
-    [Declare one of these precise tokens: **COMPLIANT**, **NON_COMPLIANT**, or **ACTION_REQUIRED**]
-    *Summary Sentence*: Provide a direct, single-sentence operational summary detailing exactly why this transaction state was approved or flagged.
-
-    ## 2. SYSTEMIC LINEAGE & JURISDICTION EVALUATION
-    * Trace the corporate genealogy extracted from the topology map (e.g., identifying parent-subsidiary structures).
-    * Define the geographic and statutory boundaries governing the active entity (e.g., matching the Indian entity to RBI circular frameworks).
-    * Document which internal policy structures are inherited by this operating unit.
-
-    ## 3. MULTI-CRITERIA COMPLIANCE EVALUATION MATRIX
-    Provide a systematic evaluation cross-referencing the query metrics against individual operational bounds:
-
-    | Compliance Dimension | Internal Corporate Rule | External Statutory Rule | Actual Query Metric | Variance / Evaluation |
-    | :--- | :--- | :--- | :--- | :--- |
-    | **Transactional Exposure** | [Internal spend limits / rules] | [Statutory banking limits] | [Query parameters] | [Pass/Fail Analysis] |
-    | **Credential Verification** | [Required KYC mandates] | [Statutory KYC rules] | [Query attributes] | [Pass/Fail Analysis] |
-    | **Governance / Exposure** | [Director ownership ceilings] | [Statutory exposure caps] | [Query context] | [Pass/Fail Analysis] |
-
-    ## 4. DETAILED COMPLIANCE DEFICIENCY FINDINGS
-    *If any dimension is NON_COMPLIANT or requires ACTION_REQUIRED, list the structural gaps sequentially. If completely COMPLIANT, explicitly state that no structural variance gaps were detected.*
-    * **Finding 1**: [Describe the gap, the expected threshold, and the actual query metric value].
-
-    ## 5. SOURCE CITATION FRAMEWORK
-    List all specific source materials referenced to validate this verdict. Formulate each line strictly using this layout structure:
-    * **[Citation Anchor]** - `document_name.pdf`, Page # (Section Reference)
-    
-    ##6. NUMERICAL CRITERIA MATHEMATICAL STEP: 
-    Before filling out the Evaluation Matrix table or choosing a Verdict tag, you MUST execute a literal scratchpad comparison step:
-    - Define: [TRANSACTION VALUE] = Insert the query value (e.g., $1,800,000)
-    - Define: [ALLOWED MAXIMUM CEILING] = Insert the strict document constraint value (e.g., $1,500,000)
-    - Compute: Is [TRANSACTION VALUE] > [ALLOWED MAXIMUM CEILING]?
-    If the transaction value is strictly greater than the allowed ceiling value, the evaluation result is mathematically a FAILURE. You are legally required to declare the official status as NON_COMPLIANT.
-
-    """
-
 class AgentState(TypedDict):
     query : str
     retrieved_child_ids: List[str]
@@ -94,10 +38,15 @@ class AgentState(TypedDict):
     extracted_metrics: Dict[str, Any]
     audit_verdict: str
     citations: List[str]
+    retry_count: int
+    citation_status: str
 
 
 def fetch_context(state : AgentState) -> AgentState:
     """Surfaces semantic child contexts and resolves parent pay-load anchors."""
+    if "retry_count" not in state or state["retry_count"] is None:
+        state["retry_count"] = 0
+
     query = state["query"]
     chroma_results, bm25_results = (
         retriever.vector_semantic_results(query)
@@ -288,18 +237,87 @@ def evaluate_compliance_engine(state: AgentState) -> AgentState:
     return state
 
 
+def validate_citations(state: AgentState) -> AgentState:
+    """Algorithmic checkpoint loop validating LLM extraction consistency with a circuit breaker state-overwrite guardrail."""
+    metrics = state.get("extracted_metrics", {})
+    extracted_doc = metrics.get("source_doc")
+    current_retries = state.get("retry_count", 0)
+    
+    valid_context_docs = {block["metadata"].get("source_document") for block in state["context_blocks"]}
+    
+    if extracted_doc not in valid_context_docs:
+        print(f"\n[CITATION FAULT]: Extractor referenced {extracted_doc}, which is absent from context.")
+        
+        if current_retries >= 1:
+            print("[CIRCUIT BREAKER TRIPPED]: Forcing controlled failure state override.")
+            
+            # Wipe out the hallucinated data to keep the database completely clean
+            state["extracted_metrics"] = {
+                "transaction_value": 0.0,
+                "allowed_ceiling": 0.0,
+                "lineage": "UNKNOWN - CITATION MISMATCH EXCEPTION DETECTED",
+                "source_doc": "N/A"
+            }
+            
+            state["audit_verdict"] = """## 1. OFFICIAL COMPLIANCE AUDIT VERDICT
+**ACTION_REQUIRED**
+
+*Summary Sentence*: The automated audit framework has flagged this transaction assignment for human review due to an internal multi-document citation verification variance anomaly.
+
+## 2. SYSTEMIC LINEAGE & JURISDICTION EVALUATION
+The system matched the transaction semantic profile against our regulatory indexes, but the metric extraction phase failed to validate its structural source document references within the current execution thread context.
+
+## 3. MULTI-CRITERIA COMPLIANCE EVALUATION MATRIX
+| Compliance Dimension | Internal Corporate Rule | External Statutory Rule | Actual Query Metric | Variance / Evaluation |
+| :--- | :--- | :--- | :--- | :--- |
+| **Transactional Exposure** | UNDER REVIEW | UNDER REVIEW | EXCEPTION DETECTED | FLAG FOR HUMAN AUDIT |
+
+## 4. DETAILED COMPLIANCE DEFICIENCY FINDINGS
+* **Finding 1**: Algorithmic Checkpoint Fault. The LLM extraction pipeline returned document parameters that failed our deterministic string verification constraints.
+
+## 5. SOURCE CITATION FRAMEWORK
+* **[SYSTEM EXCEPTION CORRUPTION ISOLATION]** - Ref: `audit_graph.py:validate_citations`
+"""
+            state["citation_status"] = "complete"
+            return state
+            
+        state["retry_count"] = current_retries + 1
+        state["citation_status"] = "retry"
+        return state
+        
+    print("\n[CITATION PASS]: Extracted file source successfully verified against context footprint.")
+    state["citation_status"] = "complete"
+    return state
+
+def route_checkpoint(state: AgentState):
+    if state["citation_status"] == "retry":
+        return "fetch_context"
+    
+    # If circuit breaker has tripped or citations passed, exit directly to finish lines
+    return END
+
 graph = StateGraph(AgentState)
 
 graph.add_node("fetch_context",fetch_context)
 graph.add_node("traverse_graph_entities",traverse_graph_entities)
 graph.add_node("extract_audit_json", extract_audit_json)
 graph.add_node("evaluate_compliance_engine", evaluate_compliance_engine)
+graph.add_node("validate_citations", validate_citations)
 
 graph.add_edge(START,"fetch_context")
 graph.add_edge("fetch_context","traverse_graph_entities")
 graph.add_edge("traverse_graph_entities","extract_audit_json")
 graph.add_edge("extract_audit_json", "evaluate_compliance_engine")
-graph.add_edge("evaluate_compliance_engine",END)
+graph.add_edge("evaluate_compliance_engine", "validate_citations")
+
+graph.add_conditional_edges(
+    "validate_citations",
+    route_checkpoint,
+    {
+        "fetch_context": "fetch_context",
+        END: END
+    }
+)
 
 audit_graph = graph.compile()
 
