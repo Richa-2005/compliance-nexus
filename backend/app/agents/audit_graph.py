@@ -42,12 +42,15 @@ class AgentState(TypedDict):
     citations: List[str]
     retry_count: int
     citation_status: str
+    error_feedback: str
 
 
 def fetch_context(state : AgentState) -> AgentState:
     """Surfaces semantic child contexts and resolves parent pay-load anchors."""
     if "retry_count" not in state or state["retry_count"] is None:
         state["retry_count"] = 0
+    if "error_feedback" not in state or state["error_feedback"] is None:
+        state["error_feedback"] = ""  
 
     query = state["query"]
     chroma_results, bm25_results = (
@@ -159,6 +162,8 @@ def extract_audit_json(state: AgentState) -> AgentState:
         src = block["metadata"].get("source_document", "Unknown Document")
         pg = block["metadata"].get("page_number", "Unknown")
         formatted_context += f"\n--- Doc {idx}: {src} (Page {pg}) ---\n{block['text_content']}\n"
+    
+    feedback_note = state.get("error_feedback", "")
 
     extraction_prompt = f"""
     You are an enterprise parameter extraction layer. 
@@ -173,6 +178,8 @@ def extract_audit_json(state: AgentState) -> AgentState:
     
     USER TRANSACTION QUERY:
     {state["query"]}
+
+    {feedback_note}
     """
     
     messages = [
@@ -281,11 +288,19 @@ The system matched the transaction semantic profile against our regulatory index
 * **[SYSTEM EXCEPTION CORRUPTION ISOLATION]** - Ref: `audit_graph.py:validate_citations`
 """
             state["citation_status"] = "complete"
-            return state
-            
+            return {"next_node": "finalize"}
+        
+        state["error_feedback"] = f"""
+        CRITICAL FAILURE NOTICE FROM PREVIOUS ATTEMPT:
+        In your previous execution pass, you hallucinated and extracted 'source_doc' as '{extracted_doc}'. 
+        This file or reference is strictly ABSENT from the provided Textual Context! 
+        Do NOT reference this document name again. Re-inspect the available documents and page footprints carefully, 
+        and only extract metrics that exist literally in the provided layers.
+        """
+        
         state["retry_count"] = current_retries + 1
-        state["citation_status"] = "retry"
-        return state
+        return {"next_node": "retry_search"}
+        
         
     print("\n[CITATION PASS]: Extracted file source successfully verified against context footprint.")
     state["citation_status"] = "complete"
