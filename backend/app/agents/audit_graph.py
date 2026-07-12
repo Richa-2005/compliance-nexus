@@ -6,6 +6,8 @@ import networkx as nx
 from ..core.llm_factory import get_chat_model
 from langchain_core.messages import SystemMessage, HumanMessage
 from pydantic import BaseModel, Field
+from pathlib import Path
+import datetime
 
 
 flagged_citation = False
@@ -335,6 +337,27 @@ if __name__ == "__main__":
     final_output = audit_graph.invoke(inputs)
     
     print("FINAL COMPLIANCE REPORT")
-    print(final_output.get("audit_verdict"))
-    print("\nVerified Source Citations Document Registry:")
-    print(final_output.get("citations"))
+    report_content = final_output.get("audit_verdict")
+    print(report_content)
+
+    log_dir = Path("data/processed")
+    log_dir.mkdir(parents=True, exist_ok=True)
+    log_file = log_dir / "compliance_audit.log"
+    
+    # Assemble a professional, unique text boundary indicator block
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    log_boundary_entry = f"""
+---
+
+AUDIT RECORD TIMESTAMP: {timestamp}
+TARGET QUERY ASSIGNMENT: {inputs['query']}
+{report_content}
+
+--
+"""
+    
+    # Append the transaction history entry onto local disk array blocks safely
+    with open(log_file, "a", encoding="utf-8") as file:
+        file.write(log_boundary_entry)
+        
+    print(f"\n[SYSTEM LOG ASSEMBLED]: Audit record successfully written to {log_file}\n")
