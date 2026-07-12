@@ -1,4 +1,4 @@
-from config import settings
+from .config import settings
 from langchain_ollama import ChatOllama
 from langchain_groq import ChatGroq
 from langchain_core.language_models.chat_models import BaseChatModel
@@ -23,7 +23,3 @@ def get_chat_model(temperature: float = 0.0) -> BaseChatModel:
         f"Unsupported LLM_PROVIDER: {settings.LLM_PROVIDER!r}. "
         "Expected 'OLLAMA' or 'GROQ'."
     )
-
-llm = get_chat_model()
-response = llm.invoke("Hi! who are you!")
-print(response.content + f"\n {settings.LLM_PROVIDER.strip().upper()}")

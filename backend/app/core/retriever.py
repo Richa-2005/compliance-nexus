@@ -1,14 +1,12 @@
 import chromadb
 import json
-import tiktoken
+import re
 from functools import lru_cache
 from pathlib import Path
 from rank_bm25 import BM25Okapi
 
 CHROMA_DIR = "data/processed/chroma_db/"
 chroma_client = chromadb.PersistentClient(path=CHROMA_DIR)
-
-encoder = tiktoken.get_encoding("cl100k_base")
 
 def clean_metadata(metadata):
     return {
@@ -46,7 +44,7 @@ class Retriever:
 
     @staticmethod
     def _tokenize(text: str):
-        return [str(token_id) for token_id in encoder.encode(text.lower())]
+        return re.findall(r"\b\w+\b", text.lower())
 
     def _build_bm25(self, child_chunks):
         tokenized_contents = [
