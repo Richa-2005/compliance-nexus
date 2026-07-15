@@ -1,5 +1,6 @@
 # Ingestion and structuring
 pdfplumber==0.11.10
+reportlab
 pydantic==2.13.4
 
 # Vector and sparse indexes
