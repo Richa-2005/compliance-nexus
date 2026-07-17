@@ -8,6 +8,7 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from pydantic import BaseModel, Field
 from pathlib import Path
 import datetime
+from typing import Literal
 
 
 flagged_citation = False
@@ -22,8 +23,15 @@ class ComplianceExtractionSchema(BaseModel):
     corporate_lineage_summary: str = Field(
         description="A concise summary mapping the parent company structure and jurisdictional boundaries parsed from the topology."
     )
-    policy_source_document: str = Field(
-        description="The string filename of the file providing the threshold parameter (e.g., 'nexus_holdings_global_inc.pdf')."
+    source_doc: Literal[
+        "Internal Policy", 
+        "Foreign Investment", 
+        "RBI KYC", 
+        "RBI Credit Risk",
+        "Apple SEC Filings",
+        "Microsoft SEC Filings"
+    ] = Field(
+        description="Select EXACTLY ONE strict matching token string corresponding to the primary governing framework node establishing this limit."
     )
 
 #In memory global setup to optimize each query processing speed
@@ -88,6 +96,7 @@ def traverse_graph_entities(state: AgentState) -> AgentState:
     retrieved_nodes = set(
         mapping_docs_nodes[record["metadata"]["source_document"]]
         for record in state["context_blocks"]
+        if record["metadata"].get("source_document") in mapping_docs_nodes
     )
 
     CRITICAL_COMPLIANCE_SIGNATURES = {"remittance", "ceiling", "licensing", "software fees", "vendor", "ubo", "directors"}
@@ -167,9 +176,12 @@ def extract_audit_json(state: AgentState) -> AgentState:
 
     extraction_prompt = f"""
     You are an enterprise parameter extraction layer. 
-    Your objective is to read the provided Context and Topology,
-      isolate the metrics requested, and map them to the structural JSON keys.
+    Your objective is to read the provided Context and Topology, isolate the metrics requested, and map them to the structural JSON keys.
     
+    CRITICAL CONSTRAINT FOR 'source_doc':
+    You MUST isolate and return EXACTLY ONE single, definitive primary source document name or topology node description anchor (e.g., 'Internal Policy' or 'nexus_holdings_global_inc.pdf') that directly establishes the threshold ceiling metric rule. 
+    DO NOT output comma-separated lists, multiple document names, or arrays of multiple nodes. Choose the single most relevant governing anchor.
+
     TEXTUAL CONTEXT:
     {formatted_context}
     
@@ -193,7 +205,7 @@ def extract_audit_json(state: AgentState) -> AgentState:
         "transaction_value": extracted_data.transaction_value,
         "allowed_ceiling": extracted_data.allowed_ceiling,
         "lineage": extracted_data.corporate_lineage_summary,
-        "source_doc": extracted_data.policy_source_document
+        "source_doc": extracted_data.source_doc
     }
     
     unique_citations = set(
@@ -247,20 +259,28 @@ def evaluate_compliance_engine(state: AgentState) -> AgentState:
 
 
 def validate_citations(state: AgentState) -> AgentState:
-    """Algorithmic checkpoint loop validating LLM extraction consistency with a circuit breaker state-overwrite guardrail."""
+    """Algorithmic checkpoint loop translating node descriptions down to exact PDF files."""
     metrics = state.get("extracted_metrics", {})
-    extracted_doc = metrics.get("source_doc")
+    extracted_doc = metrics.get("source_doc", "")
     current_retries = state.get("retry_count", 0)
-    
+
+    mapping_nodes_to_docs = {
+        "Apple SEC Filings": "apple-SEC.pdf",
+        "RBI Credit Risk": "credit_Risk_RBI.pdf",
+        "Foreign Investment": "foreign_Investement_rbi.pdf",
+        "RBI KYC": "kyc_rbi.pdf",
+        "Microsoft SEC Filings": "microsoft-SEC.pdf",
+        "Internal Policy": "nexus_holdings_global_inc.pdf"
+    }
+
+    normalized_extracted = mapping_nodes_to_docs.get(extracted_doc, "N/A")
     valid_context_docs = {block["metadata"].get("source_document") for block in state["context_blocks"]}
     
-    if extracted_doc not in valid_context_docs:
-        print(f"\n[CITATION FAULT]: Extractor referenced {extracted_doc}, which is absent from context.")
+    if normalized_extracted not in valid_context_docs:
+        print(f"\n[CITATION FAULT]: Extractor returned '{extracted_doc}' (Resolved to: '{normalized_extracted}'), which is missing from context docs: {valid_context_docs}")
         
         if current_retries >= 1:
             print("[CIRCUIT BREAKER TRIPPED]: Forcing controlled failure state override.")
-            
-            # Wipe out the hallucinated data to keep the database completely clean
             state["extracted_metrics"] = {
                 "transaction_value": 0.0,
                 "allowed_ceiling": 0.0,
@@ -288,29 +308,26 @@ The system matched the transaction semantic profile against our regulatory index
 * **[SYSTEM EXCEPTION CORRUPTION ISOLATION]** - Ref: `audit_graph.py:validate_citations`
 """
             state["citation_status"] = "complete"
-            return {"next_node": "finalize"}
+            return state
         
         state["error_feedback"] = f"""
-        CRITICAL FAILURE NOTICE FROM PREVIOUS ATTEMPT:
-        In your previous execution pass, you hallucinated and extracted 'source_doc' as '{extracted_doc}'. 
-        This file or reference is strictly ABSENT from the provided Textual Context! 
-        Do NOT reference this document name again. Re-inspect the available documents and page footprints carefully, 
-        and only extract metrics that exist literally in the provided layers.
+        CRITICAL RETRY NOTICE: Your previous choice 
+        '{extracted_doc}' could not be matched. You MUST select 
+        a value from your schema options that matches a document 
+        in this list: {valid_context_docs}
         """
-        
+
         state["retry_count"] = current_retries + 1
-        return {"next_node": "retry_search"}
+        state["citation_status"] = "retry"
+        return state
         
-        
-    print("\n[CITATION PASS]: Extracted file source successfully verified against context footprint.")
+    print(f"\n[CITATION PASS]: Verified target source reference '{normalized_extracted}'.")
     state["citation_status"] = "complete"
     return state
 
 def route_checkpoint(state: AgentState):
-    if state["citation_status"] == "retry":
+    if state.get("citation_status") == "retry":
         return "fetch_context"
-    
-    # If circuit breaker has tripped or citations passed, exit directly to finish lines
     return END
 
 graph = StateGraph(AgentState)
