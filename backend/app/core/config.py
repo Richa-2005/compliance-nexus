@@ -7,7 +7,8 @@ class Settings(BaseSettings):
     LLM_PROVIDER: str
     GROQ_API_KEY: SecretStr  # Hides the value when printed or dumped to logs
     OLLAMA_BASE_URL: str
-
+    JWT_SECRET_KEY : SecretStr
+    JWT_ALGORITHM:str
     model_config = SettingsConfigDict(
         env_file="/Users/richagupta/Documents/compliance-nexus/backend/.env",
         env_file_encoding="utf-8",
@@ -23,6 +24,7 @@ class Settings(BaseSettings):
     PROGRESS_FILE : Path = PROJECT_ROOT / "data" / "processed" / "eval_progress.json"
     REPORT_OUTPUT_FILE : Path = PROJECT_ROOT / "data" / "processed" / "eval_results.md"
 
+    API_V1_PREFIX: str = "/api/v1"
 
 settings = Settings()
 
