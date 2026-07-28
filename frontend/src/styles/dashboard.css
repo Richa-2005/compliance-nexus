@@ -1,0 +1,437 @@
+/* Dashboard */
+.dashboard-page {
+  min-height: 100vh;
+}
+
+.dash-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: auto minmax(160px, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  padding: 14px clamp(18px, 4vw, 48px);
+  border-bottom: 1px solid rgba(215, 168, 75, 0.14);
+  background: rgba(16, 16, 15, 0.88);
+  backdrop-filter: blur(16px);
+}
+
+.telemetry-pill {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 0 12px;
+  border-left: 2px solid var(--amber);
+  color: #ffd080;
+  font-size: 0.76rem;
+  font-weight: 820;
+  letter-spacing: 0.06em;
+}
+
+.telemetry-pill.live {
+  border-left-color: var(--emerald);
+  color: var(--emerald);
+}
+
+.persona-switcher {
+  display: flex;
+  gap: 8px;
+}
+
+.persona-switcher button {
+  min-height: 38px;
+  border: 1px solid rgba(244, 241, 234, 0.12);
+  background: rgba(244, 241, 234, 0.045);
+  color: var(--text);
+  font-size: 0.82rem;
+}
+
+.persona-switcher button.active {
+  border-color: rgba(215, 168, 75, 0.55);
+  background: rgba(215, 168, 75, 0.1);
+}
+
+.persona-switcher em {
+  color: var(--amber);
+  font-style: normal;
+  font-size: 0.72rem;
+}
+
+.dashboard-role-band {
+  padding: 26px clamp(18px, 4vw, 48px);
+  border-bottom: 1px solid rgba(244, 241, 234, 0.08);
+}
+
+.dashboard-role-band h1 {
+  margin: 8px 0 0;
+  max-width: 760px;
+  font-size: clamp(1.75rem, 2.6vw, 2.7rem);
+  line-height: 1.08;
+}
+
+.dashboard-role-band p,
+.tab-intro p,
+.drawer-note {
+  max-width: 780px;
+  color: var(--muted);
+  line-height: 1.62;
+}
+
+.dash-warning {
+  margin-top: 14px;
+  color: #ffd080;
+  font-size: 0.9rem;
+}
+
+.evaluator-banner,
+.risk-summary,
+.audit-grid-section {
+  padding: 24px clamp(18px, 4vw, 48px);
+  border-bottom: 1px solid rgba(244, 241, 234, 0.08);
+}
+
+.evaluator-banner {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.32fr) minmax(420px, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.evaluator-banner h2,
+.tab-intro h2,
+.drawer-top h2 {
+  margin: 6px 0 0;
+  font-size: clamp(1.2rem, 1.7vw, 1.7rem);
+  line-height: 1.15;
+}
+
+.evaluator-banner form {
+  display: grid;
+  grid-template-columns: minmax(320px, 1fr) auto;
+  gap: 12px;
+}
+
+.evaluator-banner textarea {
+  min-height: 78px;
+  resize: vertical;
+  border: 1px solid rgba(244, 241, 234, 0.12);
+  border-radius: 6px;
+  padding: 13px;
+  background: rgba(16, 16, 15, 0.78);
+  color: var(--text);
+  line-height: 1.55;
+}
+
+.evaluator-banner button,
+.l2-controls button,
+.pdf-download {
+  border: 1px solid rgba(244, 241, 234, 0.12);
+  background: rgba(244, 241, 234, 0.06);
+  color: var(--text);
+}
+
+.risk-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(160px, 1fr));
+}
+
+.risk-summary div {
+  padding: 8px 18px 8px 0;
+  border-right: 1px solid rgba(244, 241, 234, 0.1);
+}
+
+.risk-summary span,
+.metric-callouts span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.risk-summary strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 1.45rem;
+}
+
+.audit-grid-section {
+  display: grid;
+  gap: 18px;
+}
+
+.audit-grid {
+  overflow-x: auto;
+  border-top: 1px solid rgba(244, 241, 234, 0.12);
+}
+
+.audit-row {
+  display: grid;
+  grid-template-columns: 140px 180px 120px 150px 170px 150px 130px;
+  gap: 14px;
+  align-items: center;
+  min-width: 1080px;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 10px;
+  border: 0;
+  border-bottom: 1px solid rgba(244, 241, 234, 0.08);
+  border-radius: 0;
+  background: transparent;
+  color: #d8d1c5;
+  text-align: left;
+}
+
+button.audit-row {
+  cursor: pointer;
+}
+
+button.audit-row:hover {
+  box-shadow: inset 3px 0 0 var(--amber);
+  background: rgba(215, 168, 75, 0.045);
+}
+
+.audit-head {
+  min-height: 38px;
+  color: var(--amber);
+  font-size: 0.7rem;
+  font-weight: 820;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.audit-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 40;
+  width: min(550px, 45vw);
+  height: 100vh;
+  overflow-y: auto;
+  border-left: 1px solid rgba(215, 168, 75, 0.28);
+  background: rgba(16, 16, 15, 0.98);
+  box-shadow: -26px 0 70px rgba(0, 0, 0, 0.5);
+  animation: drawerIn 180ms ease-out;
+}
+
+.drawer-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px;
+  border-bottom: 1px solid rgba(244, 241, 234, 0.1);
+}
+
+.drawer-top button {
+  align-self: start;
+  min-height: 34px;
+  width: 34px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+}
+
+.drawer-tabs {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  gap: 4px;
+  padding: 12px 18px;
+  border-bottom: 1px solid rgba(244, 241, 234, 0.08);
+  background: rgba(16, 16, 15, 0.96);
+}
+
+.drawer-tabs button {
+  min-height: 34px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+}
+
+.drawer-tabs button.active {
+  color: var(--text);
+  border-bottom-color: var(--amber);
+}
+
+.drawer-body {
+  display: grid;
+  gap: 18px;
+  padding: 20px 22px 28px;
+}
+
+.metric-callouts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid rgba(244, 241, 234, 0.1);
+  border-bottom: 1px solid rgba(244, 241, 234, 0.1);
+}
+
+.metric-callouts div {
+  padding: 14px 12px 14px 0;
+  border-right: 1px solid rgba(244, 241, 234, 0.08);
+}
+
+.metric-callouts strong {
+  display: block;
+  margin-top: 6px;
+}
+
+.markdown-verdict {
+  display: grid;
+  gap: 8px;
+  color: #d8d1c5;
+}
+
+.markdown-verdict h3 {
+  margin: 8px 0 0;
+  color: var(--text);
+  font-size: 1.05rem;
+}
+
+.markdown-verdict p {
+  margin: 0;
+  line-height: 1.55;
+}
+
+.l2-controls {
+  display: grid;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(244, 241, 234, 0.1);
+}
+
+.topology-canvas {
+  min-height: 340px;
+  border: 1px solid rgba(244, 241, 234, 0.1);
+  border-radius: 6px;
+  background:
+    linear-gradient(90deg, rgba(244, 241, 234, 0.03) 1px, transparent 1px),
+    linear-gradient(rgba(244, 241, 234, 0.025) 1px, transparent 1px),
+    rgba(23, 22, 20, 0.48);
+  background-size: 34px 34px;
+}
+
+.topology-canvas svg {
+  width: 100%;
+  height: 340px;
+}
+
+.topology-canvas line {
+  stroke: rgba(215, 168, 75, 0.5);
+  stroke-width: 2;
+}
+
+.topology-node circle {
+  fill: #171614;
+  stroke: rgba(244, 241, 234, 0.4);
+  stroke-width: 2;
+}
+
+.topology-node.policy circle {
+  stroke: var(--amber);
+}
+
+.topology-node.warning circle,
+.topology-node.action_required circle {
+  stroke: var(--crimson);
+}
+
+.topology-node text {
+  fill: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.citation-vault {
+  display: grid;
+  gap: 0;
+  border-top: 1px solid rgba(244, 241, 234, 0.1);
+}
+
+.citation-vault div {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  min-height: 44px;
+  border-bottom: 1px solid rgba(244, 241, 234, 0.08);
+  color: #d8d1c5;
+}
+
+.citation-vault svg {
+  color: var(--amber);
+}
+
+.pdf-download {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 6px;
+  font-weight: 760;
+}
+
+.drawer-body iframe {
+  width: 100%;
+  min-height: 360px;
+  border: 1px solid rgba(244, 241, 234, 0.1);
+  background: #10100f;
+}
+
+.skeleton {
+  color: var(--muted);
+}
+
+.spin {
+  animation: spin 900ms linear infinite;
+}
+
+@keyframes drawerIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@media (max-width: 1100px) {
+  .dash-header,
+  .evaluator-banner {
+    grid-template-columns: 1fr;
+  }
+
+  .persona-switcher {
+    flex-wrap: wrap;
+  }
+
+  .evaluator-banner form {
+    grid-template-columns: 1fr;
+  }
+
+  .audit-drawer {
+    width: min(620px, 88vw);
+  }
+}
+
+@media (max-width: 720px) {
+  .risk-summary,
+  .metric-callouts {
+    grid-template-columns: 1fr;
+  }
+}

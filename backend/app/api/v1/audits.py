@@ -60,7 +60,7 @@ async def evaluate_transaction(
     pdf_filename = f"{transaction_id}.pdf"
     pdf_file_path = OUTPUT_DIR / pdf_filename
 
-    generate_compliance_pdf(graph_output, pdf_file_path)
+    generate_compliance_pdf(graph_output, str(pdf_file_path))
 
     citations_list = graph_output.get("citations", [])
 
