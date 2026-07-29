@@ -150,7 +150,7 @@ export function LandingPage() {
         </div>
       </BrandNav>
 
-      <section className="hero">
+      <section className="hero hero-expanded">
         <div className="hero-copy">
           <span className="eyebrow"><LockKeyhole size={14} /> RegTech Operations Center</span>
           <h1>Compliance decisions with source-backed proof.</h1>
@@ -159,7 +159,6 @@ export function LandingPage() {
             internal corporate policy, and entity lineage. Each verdict is supported by extracted metrics,
             page-level citations, and an exportable evidence certificate.
           </p>
-          <ComplianceConstellation />
           <div className="hero-actions">
             <a href="/dashboard?role=analyst" className="primary">Launch Demo Console <ArrowRight size={17} /></a>
             <a href="#flow" className="secondary">Review Audit Flow</a>
@@ -171,6 +170,7 @@ export function LandingPage() {
             <span><FileCheck2 size={15} /> PDF Ready</span>
           </div>
         </div>
+        <ComplianceConstellation />
       </section>
 
       <Pipeline />

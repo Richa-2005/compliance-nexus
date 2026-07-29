@@ -46,6 +46,21 @@ class AuditRecord(Base):
         self.citations_json = json.dumps(value)
 
 
+class AuditAssignment(Base):
+    __tablename__ = "audit_assignments"
+
+    id = Column(Integer, primary_key=True, index=True)
+    audit_record_id = Column(Integer, ForeignKey("audit_records.id"), nullable=False)
+    transaction_id = Column(String(50), index=True, nullable=False)
+    assigned_by_user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    assigned_to_user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    action_type = Column(String(40), nullable=False)
+    note = Column(Text, nullable=False)
+    status = Column(String(30), default="OPEN", index=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    resolved_at = Column(DateTime, nullable=True)
+
+
 class Users(Base):
     __tablename__ = "users"
 

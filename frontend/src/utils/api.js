@@ -46,6 +46,40 @@ export async function getAuditTopology(token, transactionId) {
   return response.json();
 }
 
+export async function createAuditAssignment(token, transactionId, payload) {
+  const response = await fetch(`${API_BASE}/api/v1/audits/${transactionId}/assignments`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) throw new Error("Assignment creation failed");
+  return response.json();
+}
+
+export async function getAssignmentInbox(token) {
+  const response = await fetch(`${API_BASE}/api/v1/audits/assignments/inbox`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) throw new Error("Assignment inbox unavailable");
+  return response.json();
+}
+
+export async function updateAssignment(token, assignmentId, payload) {
+  const response = await fetch(`${API_BASE}/api/v1/audits/assignments/${assignmentId}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) throw new Error("Assignment update failed");
+  return response.json();
+}
+
 export function getPdfUrl(transactionId) {
   return `${API_BASE}/api/v1/audits/${transactionId}/pdf`;
 }

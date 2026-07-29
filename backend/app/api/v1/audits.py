@@ -11,7 +11,7 @@ from app.agents.audit_graph import audit_graph
 from app.api.dependencies import get_current_user
 from app.core.config import settings
 from app.core.database import get_db
-from app.core.models import AuditRecord, Users
+from app.core.models import AuditAssignment, AuditRecord, Roles, Users
 from app.utils.pdf_generator import generate_compliance_pdf
 
 audits_router = APIRouter(prefix="/audits")
@@ -147,6 +147,84 @@ def get_history(
     return response_data
 
 
+@audits_router.post("/{transaction_id}/assignments")
+def create_assignment(
+    transaction_id: str,
+    payload: dict,
+    db: Session = Depends(get_db),
+    current_user: Users = Depends(get_current_user),
+):
+    if current_user.role != Roles.L2_RISK_OFFICER:
+        raise HTTPException(status_code=403, detail="Only L2 risk officers can assign audit actions.")
+
+    audit = db.scalar(select(AuditRecord).where(AuditRecord.transaction_id == transaction_id))
+    if not audit:
+        raise HTTPException(status_code=404, detail=f"Audit record '{transaction_id}' not found.")
+
+    assignee_email = payload.get("assignee_email", "analyst@compliancenexus.com")
+    assignee = db.scalar(select(Users).where(Users.email == assignee_email))
+    if not assignee:
+        raise HTTPException(status_code=404, detail=f"Assignee '{assignee_email}' not found.")
+
+    action_type = str(payload.get("action_type") or "REQUEST_EVIDENCE").upper()
+    note = str(payload.get("note") or "L2 review requested additional analyst action.")
+
+    assignment = AuditAssignment(
+        audit_record_id=audit.id,
+        transaction_id=audit.transaction_id,
+        assigned_by_user_id=current_user.id,
+        assigned_to_user_id=assignee.id,
+        action_type=action_type,
+        note=note,
+        status="OPEN",
+    )
+
+    db.add(assignment)
+    db.commit()
+    db.refresh(assignment)
+
+    return serialize_assignment(assignment, audit)
+
+
+@audits_router.get("/assignments/inbox")
+def get_assignment_inbox(
+    db: Session = Depends(get_db),
+    current_user: Users = Depends(get_current_user),
+):
+    stmt = (
+        select(AuditAssignment, AuditRecord)
+        .join(AuditRecord, AuditRecord.id == AuditAssignment.audit_record_id)
+        .where(AuditAssignment.assigned_to_user_id == current_user.id)
+        .order_by(AuditAssignment.created_at.desc())
+    )
+    rows = db.execute(stmt).all()
+    return [serialize_assignment(assignment, audit) for assignment, audit in rows]
+
+
+@audits_router.patch("/assignments/{assignment_id}")
+def update_assignment(
+    assignment_id: int,
+    payload: dict,
+    db: Session = Depends(get_db),
+    current_user: Users = Depends(get_current_user),
+):
+    assignment = db.scalar(select(AuditAssignment).where(AuditAssignment.id == assignment_id))
+    if not assignment:
+        raise HTTPException(status_code=404, detail="Assignment not found.")
+    if assignment.assigned_to_user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Assignment is not assigned to this user.")
+
+    next_status = str(payload.get("status") or "RESOLVED").upper()
+    assignment.status = next_status
+    if next_status in {"RESOLVED", "CLOSED"}:
+        assignment.resolved_at = datetime.datetime.utcnow()
+
+    audit = db.scalar(select(AuditRecord).where(AuditRecord.id == assignment.audit_record_id))
+    db.commit()
+    db.refresh(assignment)
+    return serialize_assignment(assignment, audit)
+
+
 @audits_router.get("/topology/{transaction_id}")
 def get_topology(
     transaction_id: str,
@@ -231,3 +309,28 @@ def download_pdf(
         media_type="application/pdf",
         filename=f"Compliance_Certificate_{transaction_id}.pdf",
     )
+
+
+def serialize_assignment(assignment: AuditAssignment, audit: AuditRecord | None) -> dict:
+    return {
+        "id": assignment.id,
+        "transaction_id": assignment.transaction_id,
+        "action_type": assignment.action_type,
+        "note": assignment.note,
+        "status": assignment.status,
+        "created_at": assignment.created_at.isoformat() if assignment.created_at else "",
+        "resolved_at": assignment.resolved_at.isoformat() if assignment.resolved_at else "",
+        "audit": {
+            "id": audit.id,
+            "transaction_id": audit.transaction_id,
+            "transaction_value": audit.transaction_value,
+            "allowed_ceiling": audit.allowed_ceiling,
+            "status": audit.status,
+            "source_doc": audit.source_doc,
+            "audit_verdict_markdown": audit.audit_verdict_markdown,
+            "citations": audit.citations,
+            "created_at": audit.timestamp.isoformat() if audit.timestamp else "",
+        }
+        if audit
+        else None,
+    }
