@@ -4,6 +4,7 @@ import pickle
 from typing import  Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import FileResponse
+import networkx as nx
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -19,6 +20,17 @@ audits_router = APIRouter(prefix="/audits")
 OUTPUT_DIR = settings.DB_DIR / "certificates"
 GRAPH_PATH = settings.DB_DIR / "knowledge_graph.pkl"
 
+DOC_TO_GRAPH_NODE = {
+    "apple-SEC.pdf": "Apple SEC Filings",
+    "credit_Risk_RBI.pdf": "RBI Credit Risk",
+    "foreign_Investement_rbi.pdf": "Foreign Investment",
+    "kyc_rbi.pdf": "RBI KYC",
+    "microsoft-SEC.pdf": "Microsoft SEC Filings",
+    "nexus_holdings_global_inc.pdf": "Internal Policy",
+}
+
+GRAPH_NODE_TO_DOC = {node: doc for doc, node in DOC_TO_GRAPH_NODE.items()}
+
 
 def compute_status(extracted: dict, verdict: str) -> str:
     """Calculates status based on ceiling and graph outputs."""
@@ -31,6 +43,50 @@ def compute_status(extracted: dict, verdict: str) -> str:
     if ceiling > 0 and val > ceiling:
         return "NON_COMPLIANT"
     return "COMPLIANT"
+
+
+def node_group(node: str, audit: AuditRecord | None = None) -> str:
+    if audit and node == audit.transaction_id:
+        return "TRANSACTION"
+    if node in DOC_TO_GRAPH_NODE.values():
+        return "POLICY"
+    if "breach" in node.lower() or "warning" in node.lower():
+        return "WARNING"
+    return "CORPORATE_ENTITY"
+
+
+def citation_nodes(citations_json: str | None) -> set[str]:
+    try:
+        citations = json.loads(citations_json or "[]")
+    except Exception:
+        citations = []
+
+    nodes = set()
+    for citation in citations:
+        citation_text = citation if isinstance(citation, str) else json.dumps(citation)
+        for doc, node in DOC_TO_GRAPH_NODE.items():
+            if doc in citation_text:
+                nodes.add(node)
+    return nodes
+
+
+def transaction_focus_nodes(G, audit: AuditRecord) -> set[str]:
+    focus = {"Nexus Holdings", "Nexus India"}
+    if audit.source_doc in GRAPH_NODE_TO_DOC:
+        focus.add(audit.source_doc)
+    focus.update(citation_nodes(audit.citations_json))
+
+    path_nodes = set(focus)
+    for source in ("Nexus Holdings", "Nexus India"):
+        for target in focus:
+            if source == target or source not in G or target not in G:
+                continue
+            try:
+                path_nodes.update(nx.shortest_path(G, source=source, target=target))
+            except Exception:
+                continue
+
+    return path_nodes
 
 
 @audits_router.post("/evaluate")
@@ -231,23 +287,27 @@ def get_topology(
     db: Session = Depends(get_db),
     current_user: Users = Depends(get_current_user),
 ):
-    """Parses NetworkX graph topology binary for interactive React D3 UI visualizer."""
+    """Return the evidence topology used by one audit transaction."""
+    audit = db.scalar(select(AuditRecord).where(AuditRecord.transaction_id == transaction_id))
+    if not audit:
+        raise HTTPException(status_code=404, detail=f"Audit record '{transaction_id}' not found.")
+
     if not GRAPH_PATH.exists():
         return {
             "nodes": [
-                {"id": "Nexus Holdings", "group": "PARENT_ENTITY"},
-                {"id": "Nexus India", "group": "OPERATING_SUB"},
-                {"id": "RBI Regulatory Ceiling", "group": "POLICY"},
+                {"id": audit.transaction_id, "group": "TRANSACTION"},
+                {"id": "Nexus India", "group": "CORPORATE_ENTITY"},
+                {"id": audit.source_doc or "Unresolved Policy", "group": "POLICY"},
             ],
             "edges": [
                 {
-                    "source": "Nexus Holdings",
+                    "source": audit.transaction_id,
                     "target": "Nexus India",
-                    "label": "OWNERSHIP_100",
+                    "label": "INITIATED_BY",
                 },
                 {
                     "source": "Nexus India",
-                    "target": "RBI Regulatory Ceiling",
+                    "target": audit.source_doc or "Unresolved Policy",
                     "label": "GOVERNED_BY",
                 },
             ],
@@ -257,19 +317,41 @@ def get_topology(
         with open(GRAPH_PATH, "rb") as f:
             G = pickle.load(f)
 
-        nodes = []
-        for n in G.nodes():
-            n_str = str(n)
-            node_type = (
-                "POLICY" if n_str.endswith(".pdf") else "CORPORATE_ENTITY"
-            )
-            nodes.append({"id": n_str, "group": node_type})
+        focus_nodes = transaction_focus_nodes(G, audit)
+        if audit.source_doc and audit.source_doc not in G:
+            focus_nodes.add(audit.source_doc)
+
+        nodes = [{"id": audit.transaction_id, "group": "TRANSACTION"}]
+        nodes.extend(
+            {"id": str(n), "group": node_group(str(n), audit)}
+            for n in G.nodes()
+            if n in focus_nodes
+        )
 
         edges = []
         for u, v, data in G.edges(data=True):
+            if u not in focus_nodes or v not in focus_nodes:
+                continue
             relation_label = data.get("relation", "CONNECTED_TO")
             edges.append(
                 {"source": str(u), "target": str(v), "label": relation_label}
+            )
+
+        if "Nexus India" in focus_nodes:
+            edges.append(
+                {
+                    "source": audit.transaction_id,
+                    "target": "Nexus India",
+                    "label": "INITIATED_BY",
+                }
+            )
+        if audit.source_doc and audit.source_doc in focus_nodes:
+            edges.append(
+                {
+                    "source": audit.transaction_id,
+                    "target": audit.source_doc,
+                    "label": audit.status or "EVALUATED_AGAINST",
+                }
             )
 
         return {"nodes": nodes, "edges": edges}
