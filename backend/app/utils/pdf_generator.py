@@ -53,6 +53,9 @@ class PreparedAudit:
     source_document: str
     citations: list[str]
     citation_status: str
+    selected_evidence: list[dict]
+    audit_checks: list[dict]
+    audit_rationale: dict
 
 
 def validate_inputs(state_data: dict, output_path: str) -> Path:
@@ -321,6 +324,9 @@ def prepare_audit_data(state_data: dict) -> PreparedAudit:
         source_document=str(source_document or "N/A"),
         citations=normalize_citations(state_data["citations"], source_document),
         citation_status=citation_status,
+        selected_evidence=state_data.get("selected_evidence_items", []),
+        audit_checks=state_data.get("audit_checks", []),
+        audit_rationale=state_data.get("audit_rationale", {}),
     )
 
 
@@ -500,6 +506,100 @@ def build_evaluation_matrix(
     ]
 
 
+def build_audit_checks_section(
+    doc: SimpleDocTemplate,
+    audit: PreparedAudit,
+    styles: dict[str, ParagraphStyle],
+) -> list[Any]:
+    if not audit.audit_checks:
+        return []
+
+    header = styles["table_header"]
+    cell = styles["cell"]
+    data = [[
+        make_paragraph("Check", header),
+        make_paragraph("Expected", header),
+        make_paragraph("Actual", header),
+        make_paragraph("Result", header),
+    ]]
+    for check in audit.audit_checks[:6]:
+        data.append([
+            make_paragraph(check.get("name", "Audit Check"), cell),
+            make_paragraph(check.get("expected", "N/A"), cell),
+            make_paragraph(check.get("actual", "N/A"), cell),
+            make_paragraph(check.get("result", "REVIEW"), cell),
+        ])
+
+    table = Table(
+        data,
+        colWidths=[doc.width * part for part in (0.20, 0.34, 0.32, 0.14)],
+        repeatRows=1,
+        style=standard_table_style(),
+    )
+    return [
+        Paragraph("DETERMINISTIC AUDIT CHECKS", styles["section"]),
+        table,
+        Spacer(1, 4 * mm),
+    ]
+
+
+def build_selected_evidence_section(
+    doc: SimpleDocTemplate,
+    audit: PreparedAudit,
+    styles: dict[str, ParagraphStyle],
+) -> list[Any]:
+    if not audit.selected_evidence:
+        return []
+
+    header = styles["table_header"]
+    cell = styles["cell"]
+    data = [[
+        make_paragraph("Source", header),
+        make_paragraph("Page", header),
+        make_paragraph("Evidence Snippet", header),
+        make_paragraph("Selection Basis", header),
+    ]]
+    for item in audit.selected_evidence[:6]:
+        snippet = " ".join(str(item.get("snippet", "")).split())
+        criteria = ", ".join(item.get("selection_criteria", []))
+        data.append([
+            make_paragraph(item.get("source_document", "Unknown"), cell),
+            make_paragraph(item.get("page_number", "Unknown"), cell),
+            make_paragraph(snippet[:500], cell),
+            make_paragraph(criteria or "retrieved_context", cell),
+        ])
+
+    table = Table(
+        data,
+        colWidths=[doc.width * part for part in (0.20, 0.08, 0.52, 0.20)],
+        repeatRows=1,
+        style=standard_table_style(),
+    )
+    return [
+        Paragraph("SELECTED EVIDENCE USED", styles["section"]),
+        table,
+        Spacer(1, 4 * mm),
+    ]
+
+
+def build_rationale_section(audit: PreparedAudit, styles: dict[str, ParagraphStyle]) -> list[Any]:
+    if not audit.audit_rationale:
+        return []
+
+    rationale = audit.audit_rationale
+    findings = rationale.get("deficiency_findings") or []
+    finding_text = " ".join(str(item) for item in findings) if findings else "No deficiency findings returned."
+    return [
+        Paragraph("AUDIT RATIONALE AND ACTION", styles["section"]),
+        make_paragraph(rationale.get("rule_application_reasoning", "No rationale recorded."), styles["body"]),
+        Spacer(1, 2 * mm),
+        make_paragraph(f"Deficiency findings: {finding_text}", styles["body"]),
+        Spacer(1, 2 * mm),
+        make_paragraph(f"Recommended action: {rationale.get('recommended_action', 'HUMAN_REVIEW')}", styles["body"]),
+        Spacer(1, 4 * mm),
+    ]
+
+
 def build_citation_appendix(
     doc: SimpleDocTemplate,
     audit: PreparedAudit,
@@ -638,6 +738,9 @@ def generate_compliance_pdf(state_data: dict, output_path: str) -> str:
     story.extend(build_executive_summary(doc, audit, styles))
     story.extend(build_audit_scope(audit, styles))
     story.extend(build_evaluation_matrix(doc, audit, styles))
+    story.extend(build_audit_checks_section(doc, audit, styles))
+    story.extend(build_selected_evidence_section(doc, audit, styles))
+    story.extend(build_rationale_section(audit, styles))
     story.extend(build_citation_appendix(doc, audit, fingerprint, styles))
 
     footer = make_page_footer(record_id)

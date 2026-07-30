@@ -19,6 +19,9 @@ OUTPUT_FILE = settings.DB_DIR / "certificates"
 SEED_DATA = settings.DB_DIR / "seed_data.json"
 OUTPUT_FILE.mkdir(parents=True, exist_ok=True)
 
+for old_pdf in OUTPUT_FILE.glob("TX_100*.pdf"):
+    old_pdf.unlink()
+
 records = []
 for query in query_data:
     transaction_id = f"TX_100{idx}"
@@ -37,6 +40,10 @@ for query in query_data:
         "source_doc" : graph_output["extracted_metrics"].get("source_doc",""),
         "audit_verdict_markdown" : graph_output["audit_verdict"],
         "citations_json" : json.dumps(graph_output["citations"]),
+        "evidence_items": graph_output.get("evidence_items", []),
+        "selected_evidence_items": graph_output.get("selected_evidence_items", []),
+        "audit_checks": graph_output.get("audit_checks", []),
+        "audit_rationale": graph_output.get("audit_rationale", {}),
         "pdf_path" : f"certificates/{transaction_id}.pdf"
     }
 

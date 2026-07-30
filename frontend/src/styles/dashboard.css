@@ -662,10 +662,69 @@ button.audit-row:hover {
   padding-right: 6px;
 }
 
+.structured-evidence {
+  display: grid;
+  gap: 16px;
+  max-height: 38vh;
+  overflow-y: auto;
+  padding-right: 6px;
+  padding-bottom: 14px;
+}
+
+.structured-evidence section {
+  display: grid;
+  gap: 9px;
+}
+
+.structured-evidence h3,
 .citation-list h3 {
   margin: 0;
   padding: 0 0 10px;
   font-size: 1rem;
+}
+
+.check-row,
+.evidence-card {
+  display: grid;
+  gap: 5px;
+  border: 1px solid rgba(244, 241, 234, 0.08);
+  border-left: 3px solid var(--amber);
+  border-radius: 5px;
+  padding: 10px;
+  background: rgba(244, 241, 234, 0.035);
+}
+
+.check-row strong,
+.evidence-card strong {
+  color: var(--text);
+  font-size: 0.84rem;
+}
+
+.check-row span,
+.evidence-card span {
+  color: var(--amber);
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.check-row p,
+.evidence-card p,
+.structured-evidence p {
+  margin: 0;
+  color: #d8d1c5;
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.action-chip {
+  width: max-content;
+  border: 1px solid rgba(215, 168, 75, 0.35);
+  border-radius: 4px;
+  padding: 7px 9px;
+  color: var(--text);
+  font-size: 0.78rem;
+  font-weight: 850;
 }
 
 .citation-list div {

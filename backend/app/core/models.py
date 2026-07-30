@@ -30,11 +30,14 @@ class AuditRecord(Base):
     audit_verdict_markdown = Column(Text, nullable=False)
     
     citations_json = Column(Text, default="[]")
+    evidence_json = Column(Text, default="[]")
+    selected_evidence_json = Column(Text, default="[]")
+    audit_checks_json = Column(Text, default="[]")
+    audit_rationale_json = Column(Text, default="{}")
     pdf_path = Column(String(255))
 
     @property
     def citations(self):
-        """Helper to parse citations_json back to Python list."""
         try:
             return json.loads(self.citations_json)
         except Exception:
@@ -42,8 +45,35 @@ class AuditRecord(Base):
 
     @citations.setter
     def citations(self, value: list):
-        """Helper to serialize Python list to JSON string."""
         self.citations_json = json.dumps(value)
+
+    @property
+    def evidence(self):
+        try:
+            return json.loads(self.evidence_json)
+        except Exception:
+            return []
+
+    @property
+    def selected_evidence(self):
+        try:
+            return json.loads(self.selected_evidence_json)
+        except Exception:
+            return []
+
+    @property
+    def audit_checks(self):
+        try:
+            return json.loads(self.audit_checks_json)
+        except Exception:
+            return []
+
+    @property
+    def audit_rationale(self):
+        try:
+            return json.loads(self.audit_rationale_json)
+        except Exception:
+            return {}
 
 
 class AuditAssignment(Base):

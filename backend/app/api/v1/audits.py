@@ -33,7 +33,6 @@ GRAPH_NODE_TO_DOC = {node: doc for doc, node in DOC_TO_GRAPH_NODE.items()}
 
 
 def compute_status(extracted: dict, verdict: str) -> str:
-    """Calculates status based on ceiling and graph outputs."""
     val = float(extracted.get("transaction_value", 0.0))
     ceiling = float(extracted.get("allowed_ceiling", 0.0))
     source_doc = str(extracted.get("source_doc", ""))
@@ -53,6 +52,38 @@ def node_group(node: str, audit: AuditRecord | None = None) -> str:
     if "breach" in node.lower() or "warning" in node.lower():
         return "WARNING"
     return "CORPORATE_ENTITY"
+
+
+def parse_json_field(value: str | None, fallback):
+    try:
+        return json.loads(value or "")
+    except Exception:
+        return fallback
+
+
+def serialize_audit_record(rec: AuditRecord, include_user: bool = False) -> dict:
+    data = {
+        "id": rec.id,
+        "transaction_id": rec.transaction_id,
+        "query": rec.query,
+        "transaction_value": rec.transaction_value,
+        "allowed_ceiling": rec.allowed_ceiling,
+        "status": rec.status,
+        "source_doc": rec.source_doc,
+        "audit_verdict_markdown": rec.audit_verdict_markdown,
+        "citations": parse_json_field(rec.citations_json, []),
+        "evidence_items": parse_json_field(rec.evidence_json, []),
+        "selected_evidence_items": parse_json_field(rec.selected_evidence_json, []),
+        "audit_checks": parse_json_field(rec.audit_checks_json, []),
+        "audit_rationale": parse_json_field(rec.audit_rationale_json, {}),
+        "pdf_path": rec.pdf_path,
+        "created_at": rec.timestamp.isoformat()
+        if rec.timestamp
+        else "",
+    }
+    if include_user:
+        data["user_id"] = rec.user_id
+    return data
 
 
 def citation_nodes(citations_json: str | None) -> set[str]:
@@ -119,6 +150,10 @@ async def evaluate_transaction(
     generate_compliance_pdf(graph_output, str(pdf_file_path))
 
     citations_list = graph_output.get("citations", [])
+    evidence_items = graph_output.get("evidence_items", [])
+    selected_evidence_items = graph_output.get("selected_evidence_items", [])
+    audit_checks = graph_output.get("audit_checks", [])
+    audit_rationale = graph_output.get("audit_rationale", {})
 
     new_audit = AuditRecord(
         transaction_id=transaction_id,
@@ -130,6 +165,10 @@ async def evaluate_transaction(
         status=status_verdict,
         audit_verdict_markdown=graph_output.get("audit_verdict", ""),
         citations_json=json.dumps(citations_list),
+        evidence_json=json.dumps(evidence_items),
+        selected_evidence_json=json.dumps(selected_evidence_items),
+        audit_checks_json=json.dumps(audit_checks),
+        audit_rationale_json=json.dumps(audit_rationale),
         pdf_path=f"certificates/{pdf_filename}",
     )
 
@@ -143,21 +182,7 @@ async def evaluate_transaction(
             status_code=500, detail=f"Database record save failure: {str(e)}"
         )
 
-    return {
-        "id": new_audit.id,
-        "transaction_id": new_audit.transaction_id,
-        "query": new_audit.query,
-        "transaction_value": new_audit.transaction_value,
-        "allowed_ceiling": new_audit.allowed_ceiling,
-        "status": new_audit.status,
-        "source_doc": new_audit.source_doc,
-        "audit_verdict_markdown": new_audit.audit_verdict_markdown,
-        "citations": citations_list,
-        "pdf_path": new_audit.pdf_path,
-        "created_at": new_audit.timestamp.isoformat()
-        if new_audit.timestamp
-        else "",
-    }
+    return serialize_audit_record(new_audit)
 
 
 @audits_router.get("/history")
@@ -176,29 +201,7 @@ def get_history(
 
     response_data = []
     for rec in records:
-        try:
-            parsed_citations = json.loads(rec.citations_json or "[]")
-        except Exception:
-            parsed_citations = []
-
-        response_data.append(
-            {
-                "id": rec.id,
-                "transaction_id": rec.transaction_id,
-                "user_id": rec.user_id,
-                "query": rec.query,
-                "transaction_value": rec.transaction_value,
-                "allowed_ceiling": rec.allowed_ceiling,
-                "status": rec.status,
-                "source_doc": rec.source_doc,
-                "audit_verdict_markdown": rec.audit_verdict_markdown,
-                "citations": parsed_citations,
-                "pdf_path": rec.pdf_path,
-                "created_at": rec.timestamp.isoformat()
-                if rec.timestamp
-                else "",
-            }
-        )
+        response_data.append(serialize_audit_record(rec, include_user=True))
 
     return response_data
 
@@ -411,6 +414,10 @@ def serialize_assignment(assignment: AuditAssignment, audit: AuditRecord | None)
             "source_doc": audit.source_doc,
             "audit_verdict_markdown": audit.audit_verdict_markdown,
             "citations": audit.citations,
+            "evidence_items": audit.evidence,
+            "selected_evidence_items": audit.selected_evidence,
+            "audit_checks": audit.audit_checks,
+            "audit_rationale": audit.audit_rationale,
             "created_at": audit.timestamp.isoformat() if audit.timestamp else "",
         }
         if audit

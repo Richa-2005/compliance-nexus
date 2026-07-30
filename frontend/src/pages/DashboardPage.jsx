@@ -476,6 +476,7 @@ function AuditDetailOverlay({ audit, token, role, onAssignmentCreated, onNotice,
             <div className="markdown-verdict">{renderMarkdown(audit.verdict)}</div>
           </section>
           <aside className="citation-pane">
+            <StructuredEvidence audit={audit} />
             <CitationList citations={audit.citations} />
           </aside>
         </div>
@@ -579,6 +580,43 @@ function CitationList({ citations }) {
         ))
       ) : (
         <p>No citations returned.</p>
+      )}
+    </div>
+  );
+}
+
+function StructuredEvidence({ audit }) {
+  const evidence = audit.selectedEvidence || [];
+  const checks = audit.auditChecks || [];
+  const rationale = audit.auditRationale || {};
+
+  return (
+    <div className="structured-evidence">
+      <section>
+        <h3>Audit Checks</h3>
+        {checks.length ? checks.map((check, index) => (
+          <div className="check-row" key={`${check.name}-${index}`}>
+            <strong>{check.name || "Audit Check"}</strong>
+            <span>{check.result || "REVIEW"}</span>
+            <p>{check.actual || "No actual value recorded."}</p>
+          </div>
+        )) : <p>No audit checks returned.</p>}
+      </section>
+      <section>
+        <h3>Selected Evidence</h3>
+        {evidence.length ? evidence.slice(0, 4).map((item, index) => (
+          <div className="evidence-card" key={`${item.source_document}-${item.page_number}-${index}`}>
+            <strong>{item.source_document || "Evidence"}</strong>
+            <span>Page {item.page_number || "unresolved"}</span>
+            <p>{trimText(item.snippet || "", 280)}</p>
+          </div>
+        )) : <p>No selected evidence returned.</p>}
+      </section>
+      {rationale.recommended_action && (
+        <section>
+          <h3>Recommended Action</h3>
+          <div className="action-chip">{rationale.recommended_action}</div>
+        </section>
       )}
     </div>
   );
@@ -741,6 +779,9 @@ function normalizeAudit(record, persona) {
     source: record.source_doc || record.source || "N/A",
     status: normalizeStatus(record.status),
     citations: parseCitations(record.citations ?? record.citations_json),
+    selectedEvidence: parseCitations(record.selected_evidence_items ?? record.selected_evidence_json),
+    auditChecks: parseCitations(record.audit_checks ?? record.audit_checks_json),
+    auditRationale: parseObject(record.audit_rationale ?? record.audit_rationale_json),
     verdict: record.audit_verdict_markdown || "",
     delta: amount - ceiling,
   };
@@ -762,6 +803,22 @@ function parseCitations(value) {
   } catch {
     return [value];
   }
+}
+
+function parseObject(value) {
+  if (!value) return {};
+  if (typeof value === "object" && !Array.isArray(value)) return value;
+  try {
+    const parsed = JSON.parse(value);
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function trimText(value, maxLength) {
+  const text = String(value || "").replace(/\s+/g, " ").trim();
+  return text.length > maxLength ? `${text.slice(0, maxLength - 3)}...` : text;
 }
 
 function dedupeAudits(records) {
