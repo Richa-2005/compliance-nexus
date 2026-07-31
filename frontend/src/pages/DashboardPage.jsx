@@ -5,6 +5,7 @@ import {
   Gauge,
   GitBranch,
   Loader2,
+  Network,
   Radio,
   SearchCheck,
   ShieldCheck,
@@ -16,7 +17,9 @@ import {
   authenticateDemo,
   createAuditAssignment,
   evaluateAudit,
+  getAnalysts,
   getAssignmentInbox,
+  getAssignmentOutbox,
   getAuditHistory,
   getAuditTopology,
   getPdfUrl,
@@ -57,24 +60,24 @@ const GUIDE_COPY = {
 
 const SAMPLE_QUERIES = [
   {
-    label: "Foreign investment breach",
+    label: "Ceiling breach",
     outcome: "Expected non-compliant",
-    query: "Verify whether a software licensing transaction of $1,800,000 USD initiated by Nexus India to an overseas vendor violates the approved Foreign Investment remittance ceiling.",
+    query: "Verify if a technology software licensing transaction of $1,800,000 USD initiated by Nexus India to an overseas vendor violates internal cross-border limits.",
   },
   {
     label: "Routine vendor payment",
     outcome: "Expected compliant",
-    query: "Evaluate a cross-border technology services payment of $400,000 USD from Nexus India to an authorized overseas vendor under the Foreign Investment policy limit.",
+    query: "Audit an outbound technology software fee remittance of $400,000 USD from Nexus India to an authorized overseas vendor under the single-transaction licensing ceiling.",
   },
   {
-    label: "Large offshore remittance",
-    outcome: "Expected non-compliant",
-    query: "Audit a $4,500,000 USD remittance from Nexus India to an overseas fintech partner and determine whether RBI KYC and internal ceiling rules are breached.",
+    label: "Beneficiary KYC gap",
+    outcome: "Expected action required",
+    query: "Review a $750,000 USD cross-border wire transfer from Nexus India to a newly onboarded overseas supplier where beneficiary KYC and originator information must be verified.",
   },
   {
-    label: "Subsidiary policy check",
-    outcome: "Expected compliant",
-    query: "Check whether Nexus Global can approve a $900,000 USD subsidiary support transfer when the applicable corporate limit is $1,500,000 USD and source documents are available.",
+    label: "Anonymous crypto wallet",
+    outcome: "Expected action required",
+    query: "Evaluate a cross-border cryptocurrency treasury transfer of $900,000 USD initiated by Nexus Global to an anonymous offshore digital wallet with no verified beneficiary identity.",
   },
 ];
 
@@ -84,6 +87,10 @@ const FILTERS = [
   { id: "NON_COMPLIANT", label: "Non-Compliant" },
   { id: "ACTION_REQUIRED", label: "Action Required" },
 ];
+
+const AUDIT_CACHE_KEY = "compliance-nexus.audit-cache";
+const AUDIT_RUN_KEY = "compliance-nexus.active-audit-run";
+const AUDIT_RUN_TTL_MS = 12 * 60 * 1000;
 
 export function DashboardPage({ role = "analyst" }) {
   const [activeTab, setActiveTab] = React.useState("queue");
@@ -95,38 +102,53 @@ export function DashboardPage({ role = "analyst" }) {
   const [filter, setFilter] = React.useState("ALL");
   const [selectedAudit, setSelectedAudit] = React.useState(null);
   const [latestAudit, setLatestAudit] = React.useState(null);
+  const [activeAuditRun, setActiveAuditRun] = React.useState(readActiveAuditRun);
+  const [graphAuditId, setGraphAuditId] = React.useState("");
   const [assignments, setAssignments] = React.useState([]);
+  const [officerAssignments, setOfficerAssignments] = React.useState([]);
+  const [analysts, setAnalysts] = React.useState([]);
   const [notice, setNotice] = React.useState("");
 
   const activeToken = tokens[activeRole] || "";
+
+  const loadAuditHistories = React.useCallback(async () => {
+    const results = await Promise.all(
+      Object.keys(PERSONAS).map(async (persona) => {
+        const auth = await authenticateDemo(persona);
+        const history = await getAuditHistory(auth.access_token);
+        return { persona, token: auth.access_token, history };
+      })
+    );
+    const nextTokens = {};
+    const merged = [];
+    results.forEach((result) => {
+      nextTokens[result.persona] = result.token;
+      result.history.forEach((record) => merged.push(normalizeAudit(record, result.persona)));
+    });
+    const normalized = dedupeAudits(merged);
+    setTokens(nextTokens);
+    setAudits(normalized);
+    writeCachedAudits(normalized);
+    return normalized;
+  }, []);
 
   React.useEffect(() => {
     let ignore = false;
     setLoadingHistory(true);
     setNotice("");
 
-    Promise.all(
-      Object.keys(PERSONAS).map(async (persona) => {
-        const auth = await authenticateDemo(persona);
-        const history = await getAuditHistory(auth.access_token);
-        return { persona, token: auth.access_token, history };
-      })
-    )
-      .then((results) => {
+    const cached = readCachedAudits();
+    if (cached.length) setAudits(cached);
+
+    loadAuditHistories()
+      .then(() => {
         if (ignore) return;
-        const nextTokens = {};
-        const merged = [];
-        results.forEach((result) => {
-          nextTokens[result.persona] = result.token;
-          result.history.forEach((record) => merged.push(normalizeAudit(record, result.persona)));
-        });
-        setTokens(nextTokens);
-        setAudits(dedupeAudits(merged));
+        setActiveAuditRun(null);
       })
       .catch(() => {
         if (!ignore) {
-          setNotice("Unable to load audit history from localhost:8000.");
-          setAudits([]);
+          setNotice(cached.length ? "Unable to refresh audit history. Showing last loaded records." : "Unable to load audit history from localhost:8000.");
+          if (!cached.length) setAudits([]);
         }
       })
       .finally(() => {
@@ -136,12 +158,26 @@ export function DashboardPage({ role = "analyst" }) {
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [loadAuditHistories]);
+
+  React.useEffect(() => {
+    if (activeAuditRun) {
+      window.localStorage.setItem(AUDIT_RUN_KEY, JSON.stringify(activeAuditRun));
+    } else {
+      window.localStorage.removeItem(AUDIT_RUN_KEY);
+    }
+  }, [activeAuditRun]);
 
   React.useEffect(() => {
     if (!tokens.analyst) return;
     refreshAssignments(tokens.analyst);
   }, [tokens.analyst]);
+
+  React.useEffect(() => {
+    if (!tokens.officer) return;
+    refreshOfficerAssignments(tokens.officer);
+    getAnalysts(tokens.officer).then(setAnalysts).catch(() => setAnalysts([]));
+  }, [tokens.officer]);
 
   React.useEffect(() => {
     let socket;
@@ -150,6 +186,22 @@ export function DashboardPage({ role = "analyst" }) {
     function connect() {
       socket = new WebSocket("ws://localhost:8000/ws/live-feed");
       socket.onopen = () => setTelemetry("live");
+      socket.onmessage = (event) => {
+        try {
+          const message = JSON.parse(event.data);
+          if (message.event === "AUDIT_EVALUATION_COMPLETE") {
+            setNotice(`Audit ${message.transaction_id} completed: ${normalizeStatus(message.status).replace("_", " ")}.`);
+            setActiveAuditRun(null);
+            loadAuditHistories().catch(() => {});
+          }
+          if (message.event === "AUDIT_EVALUATION_FAILED") {
+            setNotice("Audit evaluation failed before a report could be saved.");
+            setActiveAuditRun(null);
+          }
+        } catch {
+          return;
+        }
+      };
       socket.onclose = () => {
         setTelemetry("reconnecting");
         reconnectTimer = window.setTimeout(connect, 2500);
@@ -178,9 +230,19 @@ export function DashboardPage({ role = "analyst" }) {
 
   function addAudit(record) {
     const audit = normalizeAudit(record, activeRole);
-    setAudits((current) => dedupeAudits([audit, ...current]));
+    setAudits((current) => {
+      const next = dedupeAudits([audit, ...current]);
+      writeCachedAudits(next);
+      return next;
+    });
     setLatestAudit(audit);
     setFilter("ALL");
+  }
+
+  function openGraphForAudit(audit) {
+    setGraphAuditId(audit.transactionId);
+    setSelectedAudit(null);
+    setActiveTab("graph");
   }
 
   async function refreshAssignments(token = tokens.analyst) {
@@ -193,15 +255,41 @@ export function DashboardPage({ role = "analyst" }) {
     }
   }
 
-  async function resolveAssignment(assignmentId) {
+  async function refreshOfficerAssignments(token = tokens.officer) {
+    if (!token) return;
+    try {
+      const outbox = await getAssignmentOutbox(token);
+      setOfficerAssignments(outbox);
+    } catch {
+      setOfficerAssignments([]);
+    }
+  }
+
+  async function resolveAssignment(assignmentId, resolutionNote) {
     if (!tokens.analyst) return;
     try {
-      const updated = await updateAssignment(tokens.analyst, assignmentId, { status: "RESOLVED" });
-      setAssignments((current) => current.map((item) => (item.id === assignmentId ? updated : item)));
-      setNotice("Assignment marked resolved.");
+      await updateAssignment(tokens.analyst, assignmentId, { status: "RESOLVED", resolution_note: resolutionNote });
+      setAssignments((current) => current.filter((item) => item.id !== assignmentId));
+      setNotice("Follow-up submitted to Marcus.");
     } catch {
       setNotice("Unable to resolve assignment.");
     }
+  }
+
+  async function closeReturnedAssignment(assignmentId) {
+    if (!tokens.officer) return;
+    try {
+      await updateAssignment(tokens.officer, assignmentId, { status: "CLOSED" });
+      setOfficerAssignments((current) => current.filter((item) => item.id !== assignmentId));
+      setNotice("Returned follow-up closed.");
+    } catch {
+      setNotice("Unable to close returned follow-up.");
+    }
+  }
+
+  function openAuditDetail(audit) {
+    setSelectedAudit(audit);
+    if (tokens.officer) refreshOfficerAssignments(tokens.officer);
   }
 
   const counts = countByStatus(audits);
@@ -225,7 +313,14 @@ export function DashboardPage({ role = "analyst" }) {
         </div>
       </header>
 
-      {notice && <div className="dash-notice">{notice}</div>}
+      {notice && (
+        <div className="dash-notice">
+          <span>{notice}</span>
+          <button type="button" onClick={() => setNotice("")} aria-label="Dismiss notification">
+            <X size={15} />
+          </button>
+        </div>
+      )}
 
       <div className="dashboard-layout">
         <aside className="dashboard-sidebar">
@@ -253,12 +348,14 @@ export function DashboardPage({ role = "analyst" }) {
             <AuditQueue
               audits={filteredAudits}
               assignments={activeRole === "analyst" ? assignments : []}
+              returnedAssignments={activeRole === "officer" ? officerAssignments.filter((assignment) => assignment.status === "RESOLVED") : []}
               counts={counts}
               filter={filter}
               loading={loadingHistory}
               onFilter={setFilter}
               onResolveAssignment={resolveAssignment}
-              onSelect={setSelectedAudit}
+              onCloseReturnedAssignment={closeReturnedAssignment}
+              onSelect={openAuditDetail}
             />
           )}
 
@@ -266,13 +363,15 @@ export function DashboardPage({ role = "analyst" }) {
             <NewAuditWorkspace
               token={activeToken}
               latestAudit={latestAudit}
+              activeAuditRun={activeAuditRun}
+              onAuditStart={setActiveAuditRun}
               onAuditComplete={addAudit}
               onNotice={setNotice}
             />
           )}
 
           {activeTab === "graph" && (
-            <KnowledgeGraphWorkspace audits={audits} token={activeToken} />
+            <KnowledgeGraphWorkspace audits={audits} token={activeToken} selectedAuditId={graphAuditId} onSelectedAuditId={setGraphAuditId} activeAuditRun={activeAuditRun} />
           )}
         </div>
       </div>
@@ -283,7 +382,12 @@ export function DashboardPage({ role = "analyst" }) {
           token={activeToken}
           role={activeRole}
           onAssignmentCreated={() => refreshAssignments()}
+          onOfficerAssignmentsChanged={() => refreshOfficerAssignments()}
+          followUps={officerAssignments.filter((assignment) => assignment.transaction_id === selectedAudit.transactionId)}
+          analysts={analysts}
           onNotice={setNotice}
+          onOpenGraph={openGraphForAudit}
+          onCloseReturnedAssignment={closeReturnedAssignment}
           onClose={() => setSelectedAudit(null)}
         />
       )}
@@ -311,7 +415,7 @@ function TelemetryPill({ telemetry }) {
   );
 }
 
-function AuditQueue({ audits, assignments, counts, filter, loading, onFilter, onResolveAssignment, onSelect }) {
+function AuditQueue({ audits, assignments, returnedAssignments, counts, filter, loading, onFilter, onResolveAssignment, onCloseReturnedAssignment, onSelect }) {
   return (
     <section className="tab-page audit-queue-page">
       <div className="section-head">
@@ -330,6 +434,10 @@ function AuditQueue({ audits, assignments, counts, filter, loading, onFilter, on
 
       {assignments.length > 0 && (
         <AssignmentInbox assignments={assignments} onResolve={onResolveAssignment} />
+      )}
+
+      {returnedAssignments.length > 0 && (
+        <ReturnedFollowUps assignments={returnedAssignments} onClose={onCloseReturnedAssignment} />
       )}
 
       <div className="audit-table" role="table" aria-label="Audit records">
@@ -365,6 +473,8 @@ function AuditQueue({ audits, assignments, counts, filter, loading, onFilter, on
 }
 
 function AssignmentInbox({ assignments, onResolve }) {
+  const [resolutionNotes, setResolutionNotes] = React.useState({});
+
   return (
     <section className="assignment-inbox" aria-label="Analyst assignments">
       <div>
@@ -377,9 +487,20 @@ function AssignmentInbox({ assignments, onResolve }) {
             <span className="mono">{assignment.transaction_id}</span>
             <strong>{formatAssignmentAction(assignment.action_type)}</strong>
             <p>{assignment.note}</p>
-            <button type="button" onClick={() => onResolve(assignment.id)} disabled={assignment.status !== "OPEN"}>
-              {assignment.status === "OPEN" ? "Mark Resolved" : "Resolved"}
-            </button>
+            <div className="assignment-resolution">
+              <input
+                value={resolutionNotes[assignment.id] || ""}
+                onChange={(event) => setResolutionNotes((current) => ({ ...current, [assignment.id]: event.target.value }))}
+                placeholder="Resolution note"
+              />
+              <button
+                type="button"
+                onClick={() => onResolve(assignment.id, resolutionNotes[assignment.id] || "")}
+                disabled={!String(resolutionNotes[assignment.id] || "").trim()}
+              >
+                Submit
+              </button>
+            </div>
           </div>
         ))}
       </div>
@@ -387,16 +508,42 @@ function AssignmentInbox({ assignments, onResolve }) {
   );
 }
 
-function NewAuditWorkspace({ token, latestAudit, onAuditComplete, onNotice }) {
+function ReturnedFollowUps({ assignments, onClose }) {
+  return (
+    <section className="assignment-inbox returned-work" aria-label="Returned analyst work">
+      <div>
+        <span className="eyebrow">Returned From L1</span>
+        <h2>Analyst follow-ups ready for Marcus</h2>
+      </div>
+      <div className="followup-list">
+        {assignments.slice(0, 5).map((assignment) => (
+          <article key={assignment.id} className="resolved">
+            <div>
+              <strong>{assignment.transaction_id} · {formatAssignmentAction(assignment.action_type)}</strong>
+              <Status value={assignment.status} />
+            </div>
+            <p>{assignment.resolution_note || "No analyst response recorded."}</p>
+            <div className="followup-footer">
+              <small>{formatDate(assignment.resolved_at || assignment.created_at)}</small>
+              <button type="button" onClick={() => onClose(assignment.id)}>Close</button>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function NewAuditWorkspace({ token, latestAudit, activeAuditRun, onAuditStart, onAuditComplete, onNotice }) {
   const [query, setQuery] = React.useState("");
-  const [loading, setLoading] = React.useState(false);
+  const loading = Boolean(activeAuditRun);
 
   async function submitAudit(event) {
     event.preventDefault();
     const trimmed = query.trim();
-    if (!trimmed || !token) return;
+    if (!trimmed || !token || loading) return;
 
-    setLoading(true);
+    onAuditStart({ query: trimmed, startedAt: Date.now() });
     onNotice("");
     try {
       const result = await evaluateAudit(token, trimmed);
@@ -405,7 +552,7 @@ function NewAuditWorkspace({ token, latestAudit, onAuditComplete, onNotice }) {
     } catch {
       onNotice("Audit evaluation failed.");
     } finally {
-      setLoading(false);
+      onAuditStart(null);
     }
   }
 
@@ -429,8 +576,9 @@ function NewAuditWorkspace({ token, latestAudit, onAuditComplete, onNotice }) {
           required
         />
         <div className="sample-queries" aria-label="Sample audit prompts">
+          <h2>Try audit scenarios</h2>
           {SAMPLE_QUERIES.map((sample) => (
-            <button type="button" onClick={() => setQuery(sample.query)} key={sample.label}>
+            <button type="button" onClick={() => setQuery(sample.query)} disabled={loading} key={sample.label}>
               <span>{sample.label}</span>
               <em>{sample.outcome}</em>
             </button>
@@ -451,13 +599,13 @@ function AuditResult({ audit, token, downloadLabel }) {
   return (
     <div className="audit-result">
       <MetricStrip audit={audit} />
-      <div className="markdown-verdict">{renderMarkdown(audit.verdict)}</div>
+      <StructuredAuditReport audit={audit} />
       <PdfDownloadButton audit={audit} token={token} label={downloadLabel} />
     </div>
   );
 }
 
-function AuditDetailOverlay({ audit, token, role, onAssignmentCreated, onNotice, onClose }) {
+function AuditDetailOverlay({ audit, token, role, onAssignmentCreated, onOfficerAssignmentsChanged, followUps, analysts, onNotice, onOpenGraph, onCloseReturnedAssignment, onClose }) {
   return (
     <div className="detail-overlay" role="dialog" aria-modal="true" aria-label="Audit detail">
       <div className="detail-panel">
@@ -466,38 +614,204 @@ function AuditDetailOverlay({ audit, token, role, onAssignmentCreated, onNotice,
             <span className="eyebrow">Audit Detail</span>
             <h2>{audit.transactionId}</h2>
           </div>
-          <button type="button" onClick={onClose} aria-label="Close detail">
-            <X size={18} />
-          </button>
+          <div className="detail-top-actions">
+            <button className="graph-jump" type="button" onClick={() => onOpenGraph(audit)}>
+              <Network size={16} />
+              Knowledge Graph
+            </button>
+            <PdfDownloadButton audit={audit} token={token} label="Download PDF" compact />
+            <button className="detail-close" type="button" onClick={onClose} aria-label="Close detail">
+              <X size={18} />
+            </button>
+          </div>
         </div>
         <MetricStrip audit={audit} />
-        <div className="detail-content">
-          <section className="report-pane">
-            <div className="markdown-verdict">{renderMarkdown(audit.verdict)}</div>
-          </section>
-          <aside className="citation-pane">
-            <StructuredEvidence audit={audit} />
-            <CitationList citations={audit.citations} />
-          </aside>
-        </div>
-        <div className="detail-actions">
-          {role === "officer" && (
+        <StructuredAuditReport audit={audit} />
+        {role === "officer" && (
+          <section className="followup-compose">
+            <div>
+              <span className="eyebrow">Create L2 Follow-Up</span>
+              <h3>Assign analyst work for this audit</h3>
+            </div>
             <AuthorityActions
               audit={audit}
               token={token}
+              analysts={analysts}
               onAssignmentCreated={onAssignmentCreated}
+              onOfficerAssignmentsChanged={onOfficerAssignmentsChanged}
               onNotice={onNotice}
             />
-          )}
-          <PdfDownloadButton audit={audit} token={token} label="Download PDF Certificate" />
-        </div>
+          </section>
+        )}
+        {role === "officer" && <FollowUpHistory assignments={followUps} onClose={onCloseReturnedAssignment} />}
       </div>
     </div>
   );
 }
 
-function AuthorityActions({ audit, token, onAssignmentCreated, onNotice }) {
+function StructuredAuditReport({ audit }) {
+  const checks = audit.auditChecks || [];
+  const evidence = audit.selectedEvidence || [];
+  const rationale = audit.auditRationale || {};
+  const findings = Array.isArray(rationale.deficiency_findings) ? rationale.deficiency_findings : [];
+
+  return (
+    <section className="structured-report" aria-label="Audit report">
+      <div className="report-section">
+        <span className="report-index">1</span>
+        <div>
+          <h3>Official Compliance Verdict</h3>
+          <Status value={audit.status} />
+          <p>{rationale.executive_summary || firstParagraph(audit.verdict) || "No executive summary returned."}</p>
+        </div>
+      </div>
+
+      <div className="report-section">
+        <span className="report-index">2</span>
+        <div>
+          <h3>Transaction Facts</h3>
+          <div className="facts-grid">
+            <Fact label="Transaction ID" value={audit.transactionId} />
+            <Fact label="Transaction Value" value={audit.amountLabel} />
+            <Fact label="Allowed Ceiling" value={audit.ceilingLabel} />
+            <Fact label="Delta" value={audit.ceiling > 0 ? formatMoney(audit.delta) : "UNRESOLVED"} />
+            <Fact label="Primary Rule Source" value={audit.source} />
+          </div>
+        </div>
+      </div>
+
+      <div className="report-section">
+        <span className="report-index">3</span>
+        <div>
+          <h3>Applicable Rule And Rationale</h3>
+          <p>{rationale.rule_application_reasoning || "No rule application rationale recorded."}</p>
+        </div>
+      </div>
+
+      <div className="report-section">
+        <span className="report-index">4</span>
+        <div>
+          <h3>Deterministic Audit Checks</h3>
+          <AuditCheckTable checks={checks} />
+        </div>
+      </div>
+
+      <div className="report-section">
+        <span className="report-index">5</span>
+        <div>
+          <h3>Primary Evidence Trail</h3>
+          <EvidenceGrid evidence={evidence} />
+        </div>
+      </div>
+
+      <div className="report-section">
+        <span className="report-index">6</span>
+        <div>
+          <h3>Audit Rationale And Action</h3>
+          <div className="finding-list">
+            {findings.length ? findings.map((finding, index) => (
+              <p key={`${finding}-${index}`}>{finding}</p>
+            )) : <p>No deterministic compliance deficiency was identified.</p>}
+          </div>
+          <div className="action-chip">{rationale.recommended_action || "HUMAN_REVIEW"}</div>
+        </div>
+      </div>
+
+      <div className="report-section">
+        <span className="report-index">7</span>
+        <div>
+          <CitationList citations={audit.citations} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Fact({ label, value }) {
+  return (
+    <div>
+      <span>{label}</span>
+      <strong>{value || "N/A"}</strong>
+    </div>
+  );
+}
+
+function AuditCheckTable({ checks }) {
+  if (!checks.length) return <p>No audit checks returned.</p>;
+
+  return (
+    <div className="audit-check-table" role="table" aria-label="Deterministic audit checks">
+      <div className="check-table-row check-table-head" role="row">
+        <span>Check</span>
+        <span>Expected</span>
+        <span>Actual</span>
+        <span>Result</span>
+        <span>Evidence</span>
+      </div>
+      {checks.map((check, index) => (
+        <div className="check-table-row" role="row" key={`${check.name}-${index}`}>
+          <span>{check.name || "Audit Check"}</span>
+          <span>{check.expected || "N/A"}</span>
+          <span>{check.actual || "N/A"}</span>
+          <span><Status value={check.result || "REVIEW"} /></span>
+          <span>{formatEvidenceRefs(check.evidence_items)}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function EvidenceGrid({ evidence }) {
+  if (!evidence.length) return <p>No selected evidence returned.</p>;
+
+  return (
+    <div className="evidence-grid">
+      {evidence.slice(0, 6).map((item, index) => (
+        <article key={`${item.source_document}-${item.page_number}-${index}`}>
+          <strong>{item.source_document || "Evidence"}</strong>
+          <span>Page {item.page_number || "unresolved"}</span>
+          <p>{trimText(item.snippet || "", 260)}</p>
+        </article>
+      ))}
+    </div>
+  );
+}
+
+function FollowUpHistory({ assignments, onClose }) {
+  return (
+    <section className="followup-history">
+      <div>
+        <span className="eyebrow">L2 Follow-Up History</span>
+        <h3>Review notes for this audit</h3>
+      </div>
+      {assignments.length ? (
+        <div className="followup-list">
+          {assignments.map((assignment) => (
+            <article key={assignment.id} className={assignment.status === "OPEN" ? "" : "resolved"}>
+              <div>
+                <strong>{formatAssignmentAction(assignment.action_type)}</strong>
+                <Status value={assignment.status} />
+              </div>
+              <p>{assignment.note}</p>
+              {assignment.resolution_note && <p className="resolution-text">Analyst response: {assignment.resolution_note}</p>}
+              <div className="followup-footer">
+                <small>{formatDate(assignment.resolved_at || assignment.created_at)}</small>
+                {assignment.status === "RESOLVED" && <button type="button" onClick={() => onClose(assignment.id)}>Close</button>}
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <p>No follow-ups created for this audit.</p>
+      )}
+    </section>
+  );
+}
+
+function AuthorityActions({ audit, token, analysts, onAssignmentCreated, onOfficerAssignmentsChanged, onNotice }) {
   const [loadingAction, setLoadingAction] = React.useState("");
+  const [assigneeEmail, setAssigneeEmail] = React.useState("analyst@compliancenexus.com");
+  const [customNote, setCustomNote] = React.useState("");
 
   async function assign(actionType, note) {
     if (!token) return;
@@ -505,11 +819,13 @@ function AuthorityActions({ audit, token, onAssignmentCreated, onNotice }) {
     try {
       await createAuditAssignment(token, audit.transactionId, {
         action_type: actionType,
-        assignee_email: "analyst@compliancenexus.com",
-        note,
+        assignee_email: assigneeEmail,
+        note: customNote.trim() || note,
       });
-      onNotice("Assignment sent to Sarah Jenkins.");
+      onNotice("Follow-up assigned.");
+      setCustomNote("");
       onAssignmentCreated();
+      onOfficerAssignmentsChanged();
     } catch {
       onNotice("Unable to create analyst assignment.");
     } finally {
@@ -519,27 +835,44 @@ function AuthorityActions({ audit, token, onAssignmentCreated, onNotice }) {
 
   return (
     <div className="authority-actions" aria-label="L2 risk officer actions">
-      <button
-        type="button"
-        onClick={() => assign("APPROVE_EXCEPTION", "L2 approved an exception review. Confirm citation coverage and prepare the final evidence certificate.")}
-        disabled={Boolean(loadingAction)}
-      >
-        {loadingAction === "APPROVE_EXCEPTION" ? "Sending..." : "Assign Exception Review"}
-      </button>
-      <button
-        type="button"
-        onClick={() => assign("BLOCK_REMITTANCE", "L2 blocked this remittance. Document the breach rationale and attach supporting source citations.")}
-        disabled={Boolean(loadingAction)}
-      >
-        {loadingAction === "BLOCK_REMITTANCE" ? "Sending..." : "Assign Block Follow-Up"}
-      </button>
-      <button
-        type="button"
-        onClick={() => assign("REQUEST_EVIDENCE", "L2 requested more evidence. Re-check source pages and confirm the governing policy trail.")}
-        disabled={Boolean(loadingAction)}
-      >
-        {loadingAction === "REQUEST_EVIDENCE" ? "Sending..." : "Request Evidence"}
-      </button>
+      <div className="authority-fields">
+        <label>
+          <span>Assign To</span>
+          <select value={assigneeEmail} onChange={(event) => setAssigneeEmail(event.target.value)}>
+            {(analysts.length ? analysts : [{ email: "analyst@compliancenexus.com", full_name: "Sarah Jenkins" }]).map((analyst) => (
+              <option value={analyst.email} key={analyst.email}>{analyst.full_name || analyst.email}</option>
+            ))}
+          </select>
+        </label>
+        <textarea
+          value={customNote}
+          onChange={(event) => setCustomNote(event.target.value)}
+          placeholder="Optional officer note for the analyst..."
+        />
+      </div>
+      <div className="authority-buttons">
+        <button
+          type="button"
+          onClick={() => assign("APPROVE_EXCEPTION", "L2 approved an exception review. Confirm citation coverage and prepare the final evidence certificate.")}
+          disabled={Boolean(loadingAction)}
+        >
+          {loadingAction === "APPROVE_EXCEPTION" ? "Sending..." : "Assign Exception Review"}
+        </button>
+        <button
+          type="button"
+          onClick={() => assign("BLOCK_REMITTANCE", "L2 blocked this remittance. Document the breach rationale and attach supporting source citations.")}
+          disabled={Boolean(loadingAction)}
+        >
+          {loadingAction === "BLOCK_REMITTANCE" ? "Sending..." : "Assign Block Follow-Up"}
+        </button>
+        <button
+          type="button"
+          onClick={() => assign("REQUEST_EVIDENCE", "L2 requested more evidence. Re-check source pages and confirm the governing policy trail.")}
+          disabled={Boolean(loadingAction)}
+        >
+          {loadingAction === "REQUEST_EVIDENCE" ? "Sending..." : "Request Evidence"}
+        </button>
+      </div>
     </div>
   );
 }
@@ -631,7 +964,7 @@ function StructuredEvidence({ audit }) {
   );
 }
 
-function PdfDownloadButton({ audit, token, label }) {
+function PdfDownloadButton({ audit, token, label, compact = false }) {
   const [loading, setLoading] = React.useState(false);
 
   async function downloadPdf() {
@@ -655,20 +988,27 @@ function PdfDownloadButton({ audit, token, label }) {
   }
 
   return (
-    <button className="pdf-download" type="button" onClick={downloadPdf} disabled={loading || !token}>
+    <button className={`pdf-download ${compact ? "compact" : ""}`} type="button" onClick={downloadPdf} disabled={loading || !token}>
       {loading ? <Loader2 className="spin" size={16} /> : <Download size={16} />}
       {label}
     </button>
   );
 }
 
-function KnowledgeGraphWorkspace({ audits, token }) {
-  const [selectedId, setSelectedId] = React.useState("");
+function KnowledgeGraphWorkspace({ audits, token, selectedAuditId, onSelectedAuditId, activeAuditRun }) {
+  const [selectedId, setSelectedId] = React.useState(selectedAuditId || "");
   const [topology, setTopology] = React.useState({ nodes: [], links: [] });
   const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
-    if (!selectedId && audits.length) setSelectedId(audits[0].transactionId);
+    if (selectedAuditId) setSelectedId(selectedAuditId);
+  }, [selectedAuditId]);
+
+  React.useEffect(() => {
+    if (!selectedId && audits.length) {
+      setSelectedId(audits[0].transactionId);
+      onSelectedAuditId(audits[0].transactionId);
+    }
   }, [audits, selectedId]);
 
   React.useEffect(() => {
@@ -677,14 +1017,15 @@ function KnowledgeGraphWorkspace({ audits, token }) {
       return undefined;
     }
 
+    const controller = new AbortController();
     let ignore = false;
     setLoading(true);
-    getAuditTopology(token, selectedId)
+    getAuditTopology(token, selectedId, controller.signal)
       .then((data) => {
         if (!ignore) setTopology(normalizeTopology(data));
       })
       .catch(() => {
-        if (!ignore) setTopology({ nodes: [], links: [] });
+        if (!ignore) setTopology((current) => current);
       })
       .finally(() => {
         if (!ignore) setLoading(false);
@@ -692,8 +1033,14 @@ function KnowledgeGraphWorkspace({ audits, token }) {
 
     return () => {
       ignore = true;
+      controller.abort();
     };
   }, [selectedId, token]);
+
+  function selectTransaction(value) {
+    setSelectedId(value);
+    onSelectedAuditId(value);
+  }
 
   return (
     <section className="graph-page">
@@ -704,7 +1051,7 @@ function KnowledgeGraphWorkspace({ audits, token }) {
         </div>
         <label>
           <span>Select Audit Transaction</span>
-          <select value={selectedId} onChange={(event) => setSelectedId(event.target.value)}>
+          <select value={selectedId} onChange={(event) => selectTransaction(event.target.value)}>
             {audits.map((audit) => (
               <option value={audit.transactionId} key={`${audit.persona}-${audit.transactionId}`}>
                 {audit.transactionId}
@@ -715,7 +1062,8 @@ function KnowledgeGraphWorkspace({ audits, token }) {
       </div>
 
       <div className="graph-canvas">
-        {loading && <div className="graph-loading"><Loader2 className="spin" size={18} /> Loading graph...</div>}
+        {activeAuditRun && <div className="graph-busy-note">Audit generation is still running. Existing graph data remains available.</div>}
+        {loading && <div className="graph-loading compact"><Loader2 className="spin" size={18} /> Loading graph...</div>}
         {!loading && topology.nodes.length === 0 && <div className="graph-loading">No topology available.</div>}
         <TopologyMap topology={topology} />
         <div className="graph-legend">
@@ -732,38 +1080,31 @@ function TopologyMap({ topology }) {
   const positioned = positionTopology(topology);
 
   return (
-    <svg className="topology-svg" viewBox="0 0 1200 620" role="img" aria-label="Transaction topology map">
+    <svg className="topology-svg" viewBox="0 0 1500 760" role="img" aria-label="Transaction topology map">
       <defs>
         <radialGradient id="nodeGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="rgba(215,168,75,0.22)" />
+          <stop offset="0%" stopColor="rgba(215,168,75,0.12)" />
           <stop offset="100%" stopColor="rgba(215,168,75,0)" />
         </radialGradient>
       </defs>
-      <circle cx="600" cy="310" r="230" className="topology-orbit" />
-      <circle cx="600" cy="310" r="150" className="topology-orbit muted" />
+      <circle cx="750" cy="380" r="300" className="topology-orbit" />
+      <circle cx="750" cy="380" r="205" className="topology-orbit muted" />
       {positioned.links.map((link, index) => (
         <g key={`${link.source}-${link.target}-${index}`}>
           <path
             className={`topology-link ${linkColorClass(link)}`}
-            d={`M ${link.sourceNode.x} ${link.sourceNode.y} C 600 310, 600 310, ${link.targetNode.x} ${link.targetNode.y}`}
+            d={`M ${link.sourceNode.x} ${link.sourceNode.y} C 750 380, 750 380, ${link.targetNode.x} ${link.targetNode.y}`}
           />
-          <text className="topology-link-label">
-            <textPath href={`#link-path-${index}`} startOffset="52%">{link.label}</textPath>
-          </text>
-          <path
-            id={`link-path-${index}`}
-            d={`M ${link.sourceNode.x} ${link.sourceNode.y} C 600 310, 600 310, ${link.targetNode.x} ${link.targetNode.y}`}
-            fill="none"
-            stroke="none"
-          />
+          <text className="topology-link-label" x={link.labelX} y={link.labelY}>{shortEdgeLabel(link.label)}</text>
         </g>
       ))}
       {positioned.nodes.map((node) => (
         <g className="topology-node" transform={`translate(${node.x} ${node.y})`} key={node.id}>
-          <circle r="42" className="node-halo" />
-          <circle r="20" style={{ "--node-color": nodeColor(node) }} />
-          <text y="48">{shortLabel(node.id)}</text>
-          <text y="66" className="node-type">{node.group}</text>
+          <circle r="34" className="node-halo" />
+          <circle r="18" style={{ "--node-color": nodeColor(node) }} />
+          <rect className="node-label-bg" x={-(node.labelWidth || 240) / 2} y={(node.labelY || 52) - 28} width={node.labelWidth || 240} height="62" rx="6" />
+          <text y={node.labelY || 52}>{shortLabel(node.id)}</text>
+          <text y={(node.labelY || 52) + 19} className="node-type">{node.group}</text>
         </g>
       ))}
     </svg>
@@ -870,18 +1211,27 @@ function normalizeTopology(data) {
 }
 
 function positionTopology(topology) {
-  const nodes = topology.nodes || [];
-  const links = topology.links || [];
-  const center = { x: 600, y: 310 };
-  const radius = nodes.length > 8 ? 245 : 210;
-  const indexed = nodes.map((node, index) => {
-    const isCore = index === 0 || String(node.id).toLowerCase().includes("nexus india");
-    if (isCore) return { ...node, x: center.x, y: center.y };
-    const angle = -Math.PI / 2 + ((index - 1) / Math.max(nodes.length - 1, 1)) * Math.PI * 2;
+  const nodes = (topology.nodes || []).filter((node) => !isTransactionNode(node));
+  const visibleNodeIds = new Set(nodes.map((node) => String(node.id)));
+  const links = (topology.links || []).filter((link) => (
+    visibleNodeIds.has(String(link.source)) && visibleNodeIds.has(String(link.target))
+  ));
+  const center = { x: 750, y: 380 };
+  const radius = nodes.length > 8 ? 330 : 285;
+  const outerNodes = nodes.filter((node) => !String(node.id).toLowerCase().includes("nexus india"));
+  const indexed = nodes.map((node) => {
+    const isCore = String(node.id).toLowerCase().includes("nexus india");
+    if (isCore) return { ...node, x: center.x, y: center.y, labelY: 86, labelWidth: 270 };
+    const outerIndex = outerNodes.findIndex((outerNode) => outerNode.id === node.id);
+    const angle = -Math.PI / 2 + (outerIndex / Math.max(outerNodes.length, 1)) * Math.PI * 2;
+    const x = center.x + Math.cos(angle) * radius;
+    const y = center.y + Math.sin(angle) * radius * 0.76;
     return {
       ...node,
-      x: center.x + Math.cos(angle) * radius,
-      y: center.y + Math.sin(angle) * radius * 0.72,
+      x,
+      y,
+      labelY: y < center.y ? -72 : 78,
+      labelWidth: labelWidthFor(node.id),
     };
   });
   const byId = new Map(indexed.map((node) => [node.id, node]));
@@ -894,13 +1244,41 @@ function positionTopology(topology) {
         sourceNode: byId.get(String(link.source)),
         targetNode: byId.get(String(link.target)),
       }))
-      .filter((link) => link.sourceNode && link.targetNode),
+      .filter((link) => link.sourceNode && link.targetNode)
+      .map((link, index) => {
+        const sourceIsCore = Math.abs(link.sourceNode.x - center.x) < 8 && Math.abs(link.sourceNode.y - center.y) < 8;
+        const targetIsCore = Math.abs(link.targetNode.x - center.x) < 8 && Math.abs(link.targetNode.y - center.y) < 8;
+        const anchor = sourceIsCore ? 0.58 : targetIsCore ? 0.42 : 0.5;
+        const baseX = link.sourceNode.x + (link.targetNode.x - link.sourceNode.x) * anchor;
+        const baseY = link.sourceNode.y + (link.targetNode.y - link.sourceNode.y) * anchor;
+        const labelX = baseX + (baseX < center.x ? -56 : 56);
+        const labelY = baseY + ((index % 3) - 1) * 32;
+        return { ...link, labelX, labelY };
+      }),
   };
 }
 
 function shortLabel(value) {
   const label = String(value || "");
-  return label.length > 22 ? `${label.slice(0, 19)}...` : label;
+  return label.length > 28 ? `${label.slice(0, 25)}...` : label;
+}
+
+function isTransactionNode(node) {
+  const group = String(node.group || "").toUpperCase();
+  const id = String(node.id || "").toUpperCase();
+  return group === "TRANSACTION" || /^TX_/.test(id);
+}
+
+function labelWidthFor(value) {
+  const length = String(value || "").length;
+  if (length > 24) return 350;
+  if (length > 18) return 300;
+  return 250;
+}
+
+function shortEdgeLabel(value) {
+  const label = String(value || "CONNECTED_TO").replaceAll("_", " ");
+  return label.length > 20 ? `${label.slice(0, 18)}...` : label;
 }
 
 function linkColorClass(link) {
@@ -983,6 +1361,21 @@ function stripMarkdown(value) {
   return String(value).replace(/\*\*/g, "").replace(/`/g, "");
 }
 
+function formatEvidenceRefs(items) {
+  if (!Array.isArray(items) || !items.length) return "No evidence attached";
+  return items
+    .slice(0, 2)
+    .map((item) => `${item.source_document || "Evidence"} p.${item.page_number || "N/A"}`)
+    .join(", ");
+}
+
+function firstParagraph(markdown) {
+  return String(markdown || "")
+    .split("\n")
+    .map((line) => stripMarkdown(line.trim()))
+    .find((line) => line && !line.startsWith("#") && !line.startsWith("|") && !line.startsWith(":---")) || "";
+}
+
 function formatCitation(citation) {
   if (typeof citation === "string") return citation;
   const source = citation.source || citation.document || citation.file || "Evidence";
@@ -1008,4 +1401,30 @@ function formatAssignmentAction(value) {
     .split("_")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
+}
+
+function readCachedAudits() {
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(AUDIT_CACHE_KEY) || "[]");
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeCachedAudits(audits) {
+  window.localStorage.setItem(AUDIT_CACHE_KEY, JSON.stringify(audits));
+}
+
+function readActiveAuditRun() {
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(AUDIT_RUN_KEY) || "null");
+    if (!parsed?.startedAt || Date.now() - parsed.startedAt > AUDIT_RUN_TTL_MS) {
+      window.localStorage.removeItem(AUDIT_RUN_KEY);
+      return null;
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
 }

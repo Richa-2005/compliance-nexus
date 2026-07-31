@@ -38,9 +38,10 @@ export async function evaluateAudit(token, query) {
   return response.json();
 }
 
-export async function getAuditTopology(token, transactionId) {
+export async function getAuditTopology(token, transactionId, signal) {
   const response = await fetch(`${API_BASE}/api/v1/audits/topology/${transactionId}`, {
     headers: { Authorization: `Bearer ${token}` },
+    signal,
   });
   if (!response.ok) throw new Error("Topology unavailable");
   return response.json();
@@ -59,11 +60,27 @@ export async function createAuditAssignment(token, transactionId, payload) {
   return response.json();
 }
 
-export async function getAssignmentInbox(token) {
-  const response = await fetch(`${API_BASE}/api/v1/audits/assignments/inbox`, {
+export async function getAnalysts(token) {
+  const response = await fetch(`${API_BASE}/api/v1/audits/analysts`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) throw new Error("Analyst list unavailable");
+  return response.json();
+}
+
+export async function getAssignmentInbox(token, includeResolved = false) {
+  const response = await fetch(`${API_BASE}/api/v1/audits/assignments/inbox?include_resolved=${includeResolved}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!response.ok) throw new Error("Assignment inbox unavailable");
+  return response.json();
+}
+
+export async function getAssignmentOutbox(token) {
+  const response = await fetch(`${API_BASE}/api/v1/audits/assignments/outbox`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) throw new Error("Assignment outbox unavailable");
   return response.json();
 }
 

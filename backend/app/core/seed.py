@@ -67,6 +67,16 @@ def ensure_audit_record_columns(db: Session) -> None:
     db.commit()
 
 
+def ensure_assignment_columns(db: Session) -> None:
+    existing = {
+        row[1]
+        for row in db.execute(text("PRAGMA table_info(audit_assignments)")).fetchall()
+    }
+    if "resolution_note" not in existing:
+        db.execute(text("ALTER TABLE audit_assignments ADD COLUMN resolution_note TEXT DEFAULT ''"))
+    db.commit()
+
+
 def seed_database_if_empty() -> None:
     """Executes atomic database initialization and seeding on container cold-boot."""
   
@@ -75,6 +85,7 @@ def seed_database_if_empty() -> None:
     db: Session = SessionLocal()
     try:
         ensure_audit_record_columns(db)
+        ensure_assignment_columns(db)
     
         analyst_user = db.query(Users).filter(Users.email == "analyst@compliancenexus.com").first()
         

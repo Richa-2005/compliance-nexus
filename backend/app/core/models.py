@@ -86,6 +86,7 @@ class AuditAssignment(Base):
     assigned_to_user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     action_type = Column(String(40), nullable=False)
     note = Column(Text, nullable=False)
+    resolution_note = Column(Text, default="")
     status = Column(String(30), default="OPEN", index=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     resolved_at = Column(DateTime, nullable=True)

@@ -13,6 +13,7 @@ from app.api.dependencies import get_current_user
 from app.core.config import settings
 from app.core.database import get_db
 from app.core.models import AuditAssignment, AuditRecord, Roles, Users
+from app.api.v1.websockets import manager
 from app.utils.pdf_generator import generate_compliance_pdf
 
 audits_router = APIRouter(prefix="/audits")
@@ -30,6 +31,15 @@ DOC_TO_GRAPH_NODE = {
 }
 
 GRAPH_NODE_TO_DOC = {node: doc for doc, node in DOC_TO_GRAPH_NODE.items()}
+
+
+def serialize_user(user: Users) -> dict:
+    return {
+        "id": user.id,
+        "email": user.email,
+        "full_name": user.full_name,
+        "role": user.role.value if hasattr(user.role, "value") else str(user.role),
+    }
 
 
 def compute_status(extracted: dict, verdict: str, audit_checks: list[dict] | None = None) -> str:
@@ -142,7 +152,16 @@ async def evaluate_transaction(
     tx_timestamp = int(datetime.datetime.utcnow().timestamp())
     transaction_id = f"TX_{tx_timestamp}"
 
-    graph_output = audit_graph.invoke({"query": query_text})
+    try:
+        graph_output = audit_graph.invoke({"query": query_text})
+    except Exception:
+        await manager.broadcast(
+            {
+                "event": "AUDIT_EVALUATION_FAILED",
+                "query": query_text,
+            }
+        )
+        raise
 
     extracted = graph_output.get("extracted_metrics", {})
     status_verdict = compute_status(
@@ -190,6 +209,15 @@ async def evaluate_transaction(
             status_code=500, detail=f"Database record save failure: {str(e)}"
         )
 
+    await manager.broadcast(
+        {
+            "event": "AUDIT_EVALUATION_COMPLETE",
+            "transaction_id": new_audit.transaction_id,
+            "status": new_audit.status,
+            "source_doc": new_audit.source_doc,
+        }
+    )
+
     return serialize_audit_record(new_audit)
 
 
@@ -212,6 +240,23 @@ def get_history(
         response_data.append(serialize_audit_record(rec, include_user=True))
 
     return response_data
+
+
+@audits_router.get("/analysts")
+def get_analysts(
+    db: Session = Depends(get_db),
+    current_user: Users = Depends(get_current_user),
+):
+    if current_user.role != Roles.L2_RISK_OFFICER:
+        raise HTTPException(status_code=403, detail="Only L2 risk officers can list analysts.")
+
+    analysts = db.scalars(
+        select(Users)
+        .where(Users.role == Roles.L1_ANALYST)
+        .where(Users.is_active == True)
+        .order_by(Users.full_name.asc())
+    ).all()
+    return [serialize_user(user) for user in analysts]
 
 
 @audits_router.post("/{transaction_id}/assignments")
@@ -255,6 +300,7 @@ def create_assignment(
 
 @audits_router.get("/assignments/inbox")
 def get_assignment_inbox(
+    include_resolved: bool = Query(False),
     db: Session = Depends(get_db),
     current_user: Users = Depends(get_current_user),
 ):
@@ -262,6 +308,26 @@ def get_assignment_inbox(
         select(AuditAssignment, AuditRecord)
         .join(AuditRecord, AuditRecord.id == AuditAssignment.audit_record_id)
         .where(AuditAssignment.assigned_to_user_id == current_user.id)
+    )
+    if not include_resolved:
+        stmt = stmt.where(AuditAssignment.status == "OPEN")
+    stmt = stmt.order_by(AuditAssignment.created_at.desc())
+    rows = db.execute(stmt).all()
+    return [serialize_assignment(assignment, audit) for assignment, audit in rows]
+
+
+@audits_router.get("/assignments/outbox")
+def get_assignment_outbox(
+    db: Session = Depends(get_db),
+    current_user: Users = Depends(get_current_user),
+):
+    if current_user.role != Roles.L2_RISK_OFFICER:
+        raise HTTPException(status_code=403, detail="Only L2 risk officers can view follow-up history.")
+
+    stmt = (
+        select(AuditAssignment, AuditRecord)
+        .join(AuditRecord, AuditRecord.id == AuditAssignment.audit_record_id)
+        .where(AuditAssignment.assigned_by_user_id == current_user.id)
         .order_by(AuditAssignment.created_at.desc())
     )
     rows = db.execute(stmt).all()
@@ -278,11 +344,23 @@ def update_assignment(
     assignment = db.scalar(select(AuditAssignment).where(AuditAssignment.id == assignment_id))
     if not assignment:
         raise HTTPException(status_code=404, detail="Assignment not found.")
-    if assignment.assigned_to_user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Assignment is not assigned to this user.")
 
     next_status = str(payload.get("status") or "RESOLVED").upper()
+    is_assignee = assignment.assigned_to_user_id == current_user.id
+    is_assigning_officer = (
+        assignment.assigned_by_user_id == current_user.id
+        and current_user.role == Roles.L2_RISK_OFFICER
+    )
+    if is_assignee and next_status != "RESOLVED":
+        raise HTTPException(status_code=403, detail="Analysts can only resolve assigned follow-ups.")
+    if is_assigning_officer and next_status != "CLOSED":
+        raise HTTPException(status_code=403, detail="L2 officers can only close returned follow-ups.")
+    if not is_assignee and not is_assigning_officer:
+        raise HTTPException(status_code=403, detail="Assignment is not assigned to or created by this user.")
+
     assignment.status = next_status
+    if "resolution_note" in payload:
+        assignment.resolution_note = str(payload.get("resolution_note") or "")
     if next_status in {"RESOLVED", "CLOSED"}:
         assignment.resolved_at = datetime.datetime.utcnow()
 
@@ -408,8 +486,12 @@ def serialize_assignment(assignment: AuditAssignment, audit: AuditRecord | None)
     return {
         "id": assignment.id,
         "transaction_id": assignment.transaction_id,
+        "audit_record_id": assignment.audit_record_id,
+        "assigned_by_user_id": assignment.assigned_by_user_id,
+        "assigned_to_user_id": assignment.assigned_to_user_id,
         "action_type": assignment.action_type,
         "note": assignment.note,
+        "resolution_note": assignment.resolution_note or "",
         "status": assignment.status,
         "created_at": assignment.created_at.isoformat() if assignment.created_at else "",
         "resolved_at": assignment.resolved_at.isoformat() if assignment.resolved_at else "",
