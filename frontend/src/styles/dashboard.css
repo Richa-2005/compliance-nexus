@@ -717,6 +717,21 @@ button.audit-row:hover {
   line-height: 1.45;
 }
 
+.check-evidence {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 2px;
+}
+
+.check-evidence small {
+  border: 1px solid rgba(215, 168, 75, 0.22);
+  border-radius: 4px;
+  padding: 4px 6px;
+  color: #cfc7ba;
+  font-size: 0.72rem;
+}
+
 .action-chip {
   width: max-content;
   border: 1px solid rgba(215, 168, 75, 0.35);

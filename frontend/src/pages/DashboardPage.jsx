@@ -599,11 +599,20 @@ function StructuredEvidence({ audit }) {
             <strong>{check.name || "Audit Check"}</strong>
             <span>{check.result || "REVIEW"}</span>
             <p>{check.actual || "No actual value recorded."}</p>
+            {Array.isArray(check.evidence_items) && check.evidence_items.length > 0 && (
+              <div className="check-evidence">
+                {check.evidence_items.slice(0, 2).map((item, evidenceIndex) => (
+                  <small key={`${item.source_document}-${item.page_number}-${evidenceIndex}`}>
+                    {item.source_document || "Evidence"} p.{item.page_number || "N/A"}
+                  </small>
+                ))}
+              </div>
+            )}
           </div>
         )) : <p>No audit checks returned.</p>}
       </section>
       <section>
-        <h3>Selected Evidence</h3>
+        <h3>Primary Evidence Trail</h3>
         {evidence.length ? evidence.slice(0, 4).map((item, index) => (
           <div className="evidence-card" key={`${item.source_document}-${item.page_number}-${index}`}>
             <strong>{item.source_document || "Evidence"}</strong>

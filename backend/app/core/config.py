@@ -1,6 +1,7 @@
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pathlib import Path
+from typing import ClassVar
 
 class Settings(BaseSettings):
     
@@ -26,7 +27,7 @@ class Settings(BaseSettings):
 
     API_V1_PREFIX: str = "/api/v1"
 
-    NODE_TO_DOC = {
+    NODE_TO_DOC: ClassVar[dict[str, str]] = {
         "Apple SEC Filings": "apple-SEC.pdf",
         "RBI Credit Risk": "credit_Risk_RBI.pdf",
         "Foreign Investment": "foreign_Investement_rbi.pdf",
@@ -35,9 +36,9 @@ class Settings(BaseSettings):
         "Internal Policy": "nexus_holdings_global_inc.pdf",
     }
 
-    DOC_TO_NODE = {doc: node for node, doc in NODE_TO_DOC.items()}
+    DOC_TO_NODE: ClassVar[dict[str, str]] = {doc: node for node, doc in NODE_TO_DOC.items()}
 
-    EVIDENCE_SELECTION_CRITERIA = {
+    EVIDENCE_SELECTION_CRITERIA: ClassVar[dict[str, int]] = {
         "direct_threshold_rule_match": 80,
         "primary_source_match": 20,
         "ceiling_value_match": 30,
@@ -45,7 +46,7 @@ class Settings(BaseSettings):
         "rule_language_match": 10,
     }
 
-    RULE_LANGUAGE_TERMS = {
+    RULE_LANGUAGE_TERMS: ClassVar[set[str]] = {
         "cap",
         "capped",
         "ceiling",
@@ -59,4 +60,3 @@ class Settings(BaseSettings):
     }
 
 settings = Settings()
-

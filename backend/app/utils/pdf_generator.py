@@ -521,18 +521,25 @@ def build_audit_checks_section(
         make_paragraph("Expected", header),
         make_paragraph("Actual", header),
         make_paragraph("Result", header),
+        make_paragraph("Attached Evidence", header),
     ]]
     for check in audit.audit_checks[:6]:
+        evidence = check.get("evidence_items") or []
+        evidence_display = ", ".join(
+            f"{item.get('source_document', 'Unknown')} p.{item.get('page_number', 'N/A')}"
+            for item in evidence[:2]
+        ) or "No evidence attached"
         data.append([
             make_paragraph(check.get("name", "Audit Check"), cell),
             make_paragraph(check.get("expected", "N/A"), cell),
             make_paragraph(check.get("actual", "N/A"), cell),
             make_paragraph(check.get("result", "REVIEW"), cell),
+            make_paragraph(evidence_display, cell),
         ])
 
     table = Table(
         data,
-        colWidths=[doc.width * part for part in (0.20, 0.34, 0.32, 0.14)],
+        colWidths=[doc.width * part for part in (0.18, 0.28, 0.26, 0.10, 0.18)],
         repeatRows=1,
         style=standard_table_style(),
     )
@@ -576,7 +583,7 @@ def build_selected_evidence_section(
         style=standard_table_style(),
     )
     return [
-        Paragraph("SELECTED EVIDENCE USED", styles["section"]),
+        Paragraph("PRIMARY EVIDENCE TRAIL", styles["section"]),
         table,
         Spacer(1, 4 * mm),
     ]
@@ -588,16 +595,24 @@ def build_rationale_section(audit: PreparedAudit, styles: dict[str, ParagraphSty
 
     rationale = audit.audit_rationale
     findings = rationale.get("deficiency_findings") or []
-    finding_text = " ".join(str(item) for item in findings) if findings else "No deficiency findings returned."
-    return [
+    flowables = [
         Paragraph("AUDIT RATIONALE AND ACTION", styles["section"]),
         make_paragraph(rationale.get("rule_application_reasoning", "No rationale recorded."), styles["body"]),
         Spacer(1, 2 * mm),
-        make_paragraph(f"Deficiency findings: {finding_text}", styles["body"]),
+        Paragraph("Deficiency findings", styles["metadata_label"]),
+    ]
+    if findings:
+        for finding in findings:
+            flowables.append(make_paragraph(f"- {finding}", styles["body"]))
+            flowables.append(Spacer(1, 1 * mm))
+    else:
+        flowables.append(make_paragraph("- No deficiency findings returned.", styles["body"]))
+    flowables.extend([
         Spacer(1, 2 * mm),
         make_paragraph(f"Recommended action: {rationale.get('recommended_action', 'HUMAN_REVIEW')}", styles["body"]),
         Spacer(1, 4 * mm),
-    ]
+    ])
+    return flowables
 
 
 def build_citation_appendix(

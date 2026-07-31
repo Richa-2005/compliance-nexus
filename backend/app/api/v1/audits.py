@@ -32,7 +32,13 @@ DOC_TO_GRAPH_NODE = {
 GRAPH_NODE_TO_DOC = {node: doc for doc, node in DOC_TO_GRAPH_NODE.items()}
 
 
-def compute_status(extracted: dict, verdict: str) -> str:
+def compute_status(extracted: dict, verdict: str, audit_checks: list[dict] | None = None) -> str:
+    check_results = {check.get("result") for check in (audit_checks or [])}
+    if "FAIL" in check_results:
+        return "NON_COMPLIANT"
+    if "REVIEW" in check_results:
+        return "ACTION_REQUIRED"
+
     val = float(extracted.get("transaction_value", 0.0))
     ceiling = float(extracted.get("allowed_ceiling", 0.0))
     source_doc = str(extracted.get("source_doc", ""))
@@ -140,7 +146,9 @@ async def evaluate_transaction(
 
     extracted = graph_output.get("extracted_metrics", {})
     status_verdict = compute_status(
-        extracted, graph_output.get("audit_verdict", "")
+        extracted,
+        graph_output.get("audit_verdict", ""),
+        graph_output.get("audit_checks", []),
     )
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)

@@ -197,6 +197,94 @@ def synchronize_checks_with_metrics(checks: list[dict], metrics: dict) -> list[d
     return synchronized
 
 
+def _evidence_matches(item: dict, docs: set[str], terms: set[str]) -> bool:
+    source_document = item.get("source_document")
+    snippet = _normalize(item.get("snippet"))
+    return source_document in docs or any(term in snippet for term in terms)
+
+
+def _rank_check_evidence(items: list[dict], docs: set[str], terms: set[str], limit: int = 3) -> list[dict]:
+    ranked = []
+    for index, item in enumerate(items):
+        snippet = _normalize(item.get("snippet"))
+        score = 0
+        source_matches = item.get("source_document") in docs
+        if docs and not source_matches:
+            continue
+        if source_matches:
+            score += 30
+        score += sum(8 for term in terms if term in snippet)
+        if score and "direct_threshold_rule_match" in item.get("selection_criteria", []):
+            score += 20
+        if score:
+            ranked.append((score, index, item))
+    ranked.sort(key=lambda row: (-row[0], row[1]))
+    return [item for _, _, item in ranked[:limit]]
+
+
+def attach_evidence_to_checks(state: AgentState) -> list[dict]:
+    evidence_items = state.get("evidence_items", [])
+    selected_evidence = state.get("selected_evidence_items", [])
+    all_evidence = selected_evidence + [
+        item for item in evidence_items if item not in selected_evidence
+    ]
+    routed_checks = []
+
+    route_config = {
+        "Transactional Exposure": (
+            {"nexus_holdings_global_inc.pdf"},
+            {"ceiling", "capped", "cap", "limit", "threshold", "remittance"},
+        ),
+        "Primary Rule Source": (
+            {"nexus_holdings_global_inc.pdf"},
+            {"policy", "governing", "threshold", "ceiling", "inherited", "binding"},
+        ),
+        "Rule Applicability": (
+            {"nexus_holdings_global_inc.pdf"},
+            {"licensing", "software", "vendor", "nexus india", "overseas"},
+        ),
+        "Cross-Border Classification": (
+            {"kyc_rbi.pdf", "nexus_holdings_global_inc.pdf"},
+            {"cross-border", "wire transfer", "overseas", "foreign", "outbound"},
+        ),
+        "KYC / Wire Transfer Evidence": (
+            {"kyc_rbi.pdf"},
+            {"kyc", "wire transfer", "originator", "beneficiary", "customer identification"},
+        ),
+        "Regulatory Overlay": (
+            {"nexus_holdings_global_inc.pdf", "foreign_Investement_rbi.pdf", "kyc_rbi.pdf", "credit_Risk_RBI.pdf"},
+            {"statutory", "regulatory", "rbi", "foreign investment", "compliance", "overlay"},
+        ),
+        "Foreign Investment Route": (
+            {"foreign_Investement_rbi.pdf"},
+            {"foreign investment", "fdi", "equity", "acquisition", "automatic route", "approval"},
+        ),
+        "Director Exposure Risk": (
+            {"credit_Risk_RBI.pdf", "nexus_holdings_global_inc.pdf"},
+            {"director", "credit", "exposure", "lending", "vendor", "promoter"},
+        ),
+        "Cumulative Quarterly Exposure": (
+            {"nexus_holdings_global_inc.pdf"},
+            {"quarterly", "cumulative", "technology", "remittance", "threshold", "limit"},
+        ),
+        "Digital Asset Beneficiary Verification": (
+            {"kyc_rbi.pdf", "nexus_holdings_global_inc.pdf"},
+            {"digital", "wallet", "beneficiary", "kyc", "anonymous", "originator"},
+        ),
+    }
+
+    for check in state.get("audit_checks", []):
+        updated = dict(check)
+        docs, terms = route_config.get(check.get("name"), (set(), set()))
+        routed = _rank_check_evidence(all_evidence, docs, terms)
+        if not routed and selected_evidence:
+            routed = selected_evidence[:1]
+        updated["evidence_items"] = routed
+        routed_checks.append(updated)
+
+    return routed_checks
+
+
 def _format_money(value, currency: str = "USD") -> str:
     try:
         return f"${float(value):,.2f} {currency}"
@@ -227,18 +315,21 @@ def _render_evidence_table(evidence_items: list[dict]) -> str:
 
 def _render_checks_table(checks: list[dict]) -> str:
     rows = [
-        "| Check | Expected | Actual | Result | Variance |",
+        "| Check | Expected | Actual | Result | Evidence |",
         "| :--- | :--- | :--- | :--- | :--- |",
     ]
     for check in checks:
-        variance = check.get("variance")
-        variance_display = "N/A" if variance is None else f"{float(variance):,.2f}"
+        evidence = check.get("evidence_items") or []
+        evidence_display = ", ".join(
+            f"{item.get('source_document', 'Unknown')} p.{item.get('page_number', 'N/A')}"
+            for item in evidence[:2]
+        ) or "No evidence attached"
         rows.append(
             f"| {check.get('name', 'Unknown')} | "
             f"{check.get('expected', 'N/A')} | "
             f"{check.get('actual', 'N/A')} | "
             f"{check.get('result', 'REVIEW')} | "
-            f"{variance_display} |"
+            f"{evidence_display} |"
         )
     return "\n".join(rows)
 
@@ -249,7 +340,13 @@ def build_audit_verdict(state: AgentState) -> str:
     rationale = state.get("audit_rationale", {})
     evidence = state.get("selected_evidence_items", [])
     currency = metrics.get("currency", "USD")
-    status = "NON_COMPLIANT" if any(c.get("result") == "FAIL" for c in checks) else "COMPLIANT"
+    check_results = {c.get("result") for c in checks}
+    if "FAIL" in check_results:
+        status = "NON_COMPLIANT"
+    elif "REVIEW" in check_results:
+        status = "ACTION_REQUIRED"
+    else:
+        status = "COMPLIANT"
 
     findings = rationale.get("deficiency_findings", [])
     findings_markdown = "\n".join(f"* {finding}" for finding in findings) or "* No deficiency findings returned."
@@ -277,7 +374,7 @@ def build_audit_verdict(state: AgentState) -> str:
 ## 4. DETERMINISTIC AUDIT CHECKS
 {_render_checks_table(checks)}
 
-## 5. SELECTED EVIDENCE
+## 5. PRIMARY EVIDENCE TRAIL
 {_render_evidence_table(evidence)}
 
 ## 6. DEFICIENCY FINDINGS
@@ -305,6 +402,39 @@ def filter_deficiency_findings(findings: list[str], selected_evidence: list[dict
             continue
         filtered.append(finding)
     return filtered
+
+
+def build_rule_application_reasoning(metrics: dict) -> str:
+    return (
+        f"The selected rule applies because {metrics.get('source_doc', 'the selected source')} "
+        f"governs the {metrics.get('transaction_type', 'transaction')} involving "
+        f"{metrics.get('origin_entity', 'the origin entity')} and "
+        f"{metrics.get('destination_entity_or_type', 'the counterparty')} for "
+        f"{metrics.get('payment_purpose', 'the stated payment purpose')} in "
+        f"{metrics.get('jurisdiction', 'the recorded jurisdiction')}."
+    )
+
+
+def normalize_rationale_findings(
+    findings: list[str],
+    checks: list[dict],
+    selected_evidence: list[dict],
+) -> list[str]:
+    normalized = []
+    for check in checks:
+        name = check.get("name", "Audit check")
+        result = check.get("result")
+        if result == "FAIL":
+            normalized.append(
+                f"{name} failed: actual value is {check.get('actual', 'N/A')}; expected {check.get('expected', 'N/A')}."
+            )
+        elif result == "REVIEW":
+            normalized.append(
+                f"{name} remains marked for reviewer confirmation based on attached evidence."
+            )
+    if not normalized:
+        normalized.append("No deterministic compliance deficiency was identified.")
+    return normalized
 
 def extract_audit_json(state: AgentState) -> AgentState:
     """Invokes the environment factory model strictly for structured metrics extraction."""
@@ -414,9 +544,14 @@ def generate_audit_rationale(state: AgentState) -> AgentState:
         state.get("audit_checks", []),
         state.get("extracted_metrics", {}),
     )
+    state["audit_checks"] = attach_evidence_to_checks(state)
 
     has_failed_check = any(
         check.get("result") == "FAIL"
+        for check in state.get("audit_checks", [])
+    )
+    has_review_check = any(
+        check.get("result") == "REVIEW"
         for check in state.get("audit_checks", [])
     )
 
@@ -425,7 +560,7 @@ def generate_audit_rationale(state: AgentState) -> AgentState:
 
     You must NOT calculate the verdict yourself.
     You must explain the deterministic audit result using only the supplied extracted facts,
-    audit checks, and evidence items.
+    audit checks, and the evidence_items attached to each audit check.
 
     USER QUERY:
     {state["query"]}
@@ -436,16 +571,18 @@ def generate_audit_rationale(state: AgentState) -> AgentState:
     DETERMINISTIC AUDIT CHECKS:
     {state["audit_checks"]}
 
-    SELECTED EVIDENCE ITEMS:
+    PRIMARY EVIDENCE TRAIL:
     {selected_evidence}
 
     Instructions:
     - Treat deterministic audit checks as controlling. If a check result is FAIL, your explanation must not recommend approval.
     - The selected rule source is EXTRACTED METRICS.source_doc. Do not call any other rule the selected rule.
-    - Explain why the selected rule applies.
-    - Explain the failed or passed checks.
-    - Cite document names and page numbers from selected evidence items.
-    - Prefer evidence items with primary_source_match and ceiling_value_match.
+    - Explain each check using only that check's attached evidence_items.
+    - Cite document names and page numbers from the evidence_items attached to the relevant check.
+    - Use PRIMARY EVIDENCE TRAIL only as the overall threshold evidence trail, not as a substitute for missing check evidence.
+    - Do not mention the literal strings "EXTRACTED METRICS", "PRIMARY EVIDENCE TRAIL", or "evidence_items" in the final rationale.
+    - Do not claim the ceiling is missing when any attached evidence states the ceiling.
+    - Deficiency findings must be short separate findings, not a long paragraph.
     - Do not invent document names, thresholds, parties, or regulations.
     - If evidence is weak or missing, say that human review is needed.
     """
@@ -458,15 +595,20 @@ def generate_audit_rationale(state: AgentState) -> AgentState:
     recommended_action = result.recommended_action
     if has_failed_check:
         recommended_action = "BLOCK_REMITTANCE"
+    elif has_review_check:
+        recommended_action = "REQUEST_MORE_EVIDENCE"
     elif not selected_evidence:
         recommended_action = "REQUEST_MORE_EVIDENCE"
 
     state["audit_rationale"] = {
         "executive_summary": result.executive_summary,
-        "rule_application_reasoning": result.rule_application_reasoning,
+        "rule_application_reasoning": build_rule_application_reasoning(
+            state.get("extracted_metrics", {})
+        ),
         "evidence_summary": result.evidence_summary,
-        "deficiency_findings": filter_deficiency_findings(
+        "deficiency_findings": normalize_rationale_findings(
             result.deficiency_findings,
+            state.get("audit_checks", []),
             selected_evidence,
         ),
         "recommended_action": recommended_action,
