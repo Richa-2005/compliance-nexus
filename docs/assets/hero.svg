@@ -1,0 +1,75 @@
+<svg width="1280" height="520" viewBox="0 0 1280 520" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">ComplianceNexus audit intelligence architecture</title>
+  <desc id="desc">Animated flow from transaction query through RAG retrieval, LangGraph agents, deterministic checks, and audit-ready output.</desc>
+  <style>
+    .bg { fill: #0d0d0c; }
+    .grid { stroke: rgba(244,241,234,.055); stroke-width: 1; }
+    .card { fill: rgba(22,21,18,.94); stroke: rgba(215,168,75,.28); stroke-width: 1.3; }
+    .card-blue { stroke: rgba(78,156,255,.34); }
+    .card-green { stroke: rgba(55,178,108,.34); }
+    .label { fill: #f4f1ea; font: 800 22px Inter, ui-sans-serif, system-ui, sans-serif; }
+    .small { fill: #b7aea2; font: 700 13px Inter, ui-sans-serif, system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; }
+    .body { fill: #d8d1c5; font: 500 15px Inter, ui-sans-serif, system-ui, sans-serif; }
+    .accent { fill: #d7a84b; }
+    .blue { fill: #4e9cff; }
+    .green { fill: #37b26c; }
+    .red { fill: #dc3f4d; }
+    .flow { stroke: #d7a84b; stroke-width: 3; stroke-linecap: round; stroke-dasharray: 10 12; animation: dash 7s linear infinite; }
+    .flow-blue { stroke: #4e9cff; }
+    .pulse { transform-origin: center; animation: pulse 3.8s ease-in-out infinite; }
+    @keyframes dash { to { stroke-dashoffset: -132; } }
+    @keyframes pulse { 0%, 100% { opacity: .72; } 50% { opacity: 1; } }
+  </style>
+  <rect class="bg" width="1280" height="520" rx="22"/>
+  <g opacity=".9">
+    <path class="grid" d="M80 0v520M160 0v520M240 0v520M320 0v520M400 0v520M480 0v520M560 0v520M640 0v520M720 0v520M800 0v520M880 0v520M960 0v520M1040 0v520M1120 0v520M1200 0v520"/>
+    <path class="grid" d="M0 80h1280M0 160h1280M0 240h1280M0 320h1280M0 400h1280M0 480h1280"/>
+  </g>
+
+  <text x="64" y="120" class="label" font-size="34">RAG-powered compliance audits with deterministic verdicts.</text>
+  <text x="64" y="154" class="body">Turns a transaction question into source-backed checks, citations, PDF evidence, and L1/L2 follow-up.</text>
+
+  <path class="flow" d="M174 294 C284 238 330 238 434 294"/>
+  <path class="flow flow-blue" d="M526 294 C626 238 674 238 774 294"/>
+  <path class="flow" d="M866 294 C960 238 1010 238 1110 294"/>
+
+  <g class="pulse">
+    <rect class="card" x="64" y="218" width="245" height="150" rx="14"/>
+    <circle cx="98" cy="258" r="12" class="accent"/>
+    <text x="124" y="264" class="small">Step 01</text>
+    <text x="92" y="305" class="label">Transaction</text>
+    <text x="92" y="333" class="body">Natural-language audit query</text>
+  </g>
+
+  <g class="pulse" style="animation-delay:.4s">
+    <rect class="card card-blue" x="374" y="218" width="250" height="150" rx="14"/>
+    <circle cx="408" cy="258" r="12" class="blue"/>
+    <text x="434" y="264" class="small">Step 02</text>
+    <text x="402" y="305" class="label">Evidence RAG</text>
+    <text x="402" y="333" class="body">Policy PDFs and graph context</text>
+  </g>
+
+  <g class="pulse" style="animation-delay:.8s">
+    <rect class="card" x="694" y="218" width="275" height="150" rx="14"/>
+    <circle cx="728" cy="258" r="12" class="accent"/>
+    <text x="754" y="264" class="small">Step 03</text>
+    <text x="722" y="305" class="label">Audit Graph</text>
+    <text x="722" y="333" class="body">LangGraph extraction and checks</text>
+  </g>
+
+  <g class="pulse" style="animation-delay:1.2s">
+    <rect class="card card-green" x="1014" y="218" width="230" height="150" rx="14"/>
+    <circle cx="1048" cy="258" r="12" class="green"/>
+    <text x="1074" y="264" class="small">Step 04</text>
+    <text x="1042" y="305" class="label">Audit Record</text>
+    <text x="1042" y="333" class="body">Verdict, citations, and PDF</text>
+  </g>
+
+  <g transform="translate(64 424)">
+    <rect x="0" y="0" width="640" height="60" rx="10" fill="rgba(244,241,234,.035)" stroke="rgba(244,241,234,.09)"/>
+    <circle cx="28" cy="24" r="7" class="green"/>
+    <text x="48" y="29" class="body">LLM explains from evidence; deterministic checks decide PASS / FAIL / REVIEW.</text>
+    <circle cx="28" cy="45" r="7" class="accent"/>
+    <text x="48" y="49" class="body">Every generated report preserves selected evidence and source-page citations.</text>
+  </g>
+</svg>

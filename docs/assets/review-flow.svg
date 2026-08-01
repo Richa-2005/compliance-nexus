@@ -1,0 +1,43 @@
+<svg width="1180" height="320" viewBox="0 0 1180 320" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">L1 and L2 follow-up flow</title>
+  <desc id="desc">A restrained workflow diagram showing Marcus assigning follow-up work to Sarah and closing returned work.</desc>
+  <style>
+    .bg { fill: #0d0d0c; }
+    .lane { fill: rgba(244,241,234,.032); stroke: rgba(244,241,234,.09); }
+    .card { fill: rgba(22,21,18,.96); stroke: rgba(215,168,75,.3); stroke-width: 1.2; }
+    .card-g { stroke: rgba(55,178,108,.35); }
+    .label { fill: #f4f1ea; font: 850 18px Inter, ui-sans-serif, system-ui, sans-serif; }
+    .small { fill: #d7a84b; font: 850 12px Inter, ui-sans-serif, system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; }
+    .text { fill: #cfc7ba; font: 500 13px Inter, ui-sans-serif, system-ui, sans-serif; }
+    .line { stroke: #d7a84b; stroke-width: 2.5; stroke-dasharray: 8 10; animation: dash 6.5s linear infinite; }
+    @keyframes dash { to { stroke-dashoffset: -120; } }
+  </style>
+  <rect class="bg" width="1180" height="320" rx="18"/>
+  <text x="42" y="44" class="small">Human review</text>
+  <text x="42" y="74" class="label" font-size="24">A small L1/L2 workflow supports the audit engine without becoming the product.</text>
+
+  <rect class="lane" x="42" y="106" width="1096" height="82" rx="12"/>
+  <rect class="lane" x="42" y="210" width="1096" height="72" rx="12"/>
+  <text x="66" y="139" class="small">Marcus - L2 Risk Officer</text>
+  <text x="66" y="243" class="small">Sarah - L1 Analyst</text>
+
+  <g transform="translate(270 122)">
+    <rect class="card" width="190" height="52" rx="10"/>
+    <text x="18" y="32" class="label">Create follow-up</text>
+  </g>
+  <g transform="translate(520 226)">
+    <rect class="card card-g" width="190" height="42" rx="10"/>
+    <text x="18" y="27" class="label">Submit note</text>
+  </g>
+  <g transform="translate(780 122)">
+    <rect class="card" width="210" height="52" rx="10"/>
+    <text x="18" y="32" class="label">Close returned work</text>
+  </g>
+
+  <path class="line" d="M460 148 C510 148 506 246 520 246"/>
+  <path class="line" d="M710 246 C756 246 744 148 780 148"/>
+  <text x="270" y="196" class="text">Assignments are lightweight review </text>
+  <text x="260" y="210" class="text">notes attached to a transaction audit.</text>
+  <text x="790" y="196" class="text">Resolved items leave Sarah's </text>
+  <text x="780" y="210" class="text">active queue and return to Marcus.</text>
+</svg>
