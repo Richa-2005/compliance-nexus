@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     OLLAMA_BASE_URL: str
     JWT_SECRET_KEY : SecretStr
     JWT_ALGORITHM:str
-    BACKEND_CORS_ORIGINS: str = "http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174"
+    BACKEND_CORS_ORIGINS: str = "http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174,https://compliance-nexus.vercel.app"
     model_config = SettingsConfigDict(
         env_file=Path(__file__).resolve().parents[2] / ".env",
         env_file_encoding="utf-8",
