@@ -1,4 +1,6 @@
-export const API_BASE = (import.meta.env.VITE_API_BASE_URL || "http://localhost:8000").replace(/\/$/, "");
+const fallbackApiBase = import.meta.env.PROD ? "https://compliancenexus-api.onrender.com" : "http://localhost:8000";
+
+export const API_BASE = (import.meta.env.VITE_API_BASE_URL || fallbackApiBase).replace(/\/$/, "");
 
 export function getLiveFeedUrl() {
   const configured = import.meta.env.VITE_WS_BASE_URL;
