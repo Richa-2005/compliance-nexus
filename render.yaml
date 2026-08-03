@@ -4,7 +4,7 @@ services:
     env: python
     plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: PYTHONPATH=backend uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    startCommand: CHROMA_ENABLED=false PYTHONPATH=backend uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: LLM_PROVIDER
         value: GROQ
