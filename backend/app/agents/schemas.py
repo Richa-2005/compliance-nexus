@@ -20,7 +20,7 @@ class ComplianceExtractionSchema(BaseModel):
         "Apple SEC Filings",
         "Microsoft SEC Filings"
     ] = Field(
-        description="Select EXACTLY ONE strict matching token string corresponding to the primary governing framework node establishing this limit."
+        description="Select EXACTLY ONE allowed framework node label. Do not return PDF filenames."
     )
 
     transaction_type: str = Field(

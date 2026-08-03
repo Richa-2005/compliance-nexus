@@ -10,8 +10,9 @@ class Settings(BaseSettings):
     OLLAMA_BASE_URL: str
     JWT_SECRET_KEY : SecretStr
     JWT_ALGORITHM:str
+    BACKEND_CORS_ORIGINS: str = "http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174"
     model_config = SettingsConfigDict(
-        env_file="/Users/richagupta/Documents/compliance-nexus/backend/.env",
+        env_file=Path(__file__).resolve().parents[2] / ".env",
         env_file_encoding="utf-8",
         extra="ignore"  
     )
@@ -26,6 +27,14 @@ class Settings(BaseSettings):
     REPORT_OUTPUT_FILE : Path = PROJECT_ROOT / "data" / "processed" / "eval_results.md"
 
     API_V1_PREFIX: str = "/api/v1"
+
+    @property
+    def cors_origins(self) -> list[str]:
+        return [
+            origin.strip()
+            for origin in self.BACKEND_CORS_ORIGINS.split(",")
+            if origin.strip()
+        ]
 
     NODE_TO_DOC: ClassVar[dict[str, str]] = {
         "Apple SEC Filings": "apple-SEC.pdf",

@@ -1,0 +1,112 @@
+[
+    {
+        "content_type": "text",
+        "page_number": 1,
+        "raw_content": "NEXUS HOLDINGS GLOBAL INC.\nENTERPRISE OPERATIONS POLICY MANUAL\nDocument Ref: NHG-OP-2026-v2\nEffective Date: January 15, 2026\nClassification: Confidential - Internal Auditing Use Only",
+        "section_inferred": null,
+        "source_document": "nexus_holdings_global_inc.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 1,
+        "raw_content": "SECTION 1: CORPORATE ENTITY STRUCTURE &\nGOVERNANCE HIERARCHY",
+        "section_inferred": "SECTION 1: CORPORATE ENTITY STRUCTURE &",
+        "source_document": "nexus_holdings_global_inc.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 1,
+        "raw_content": "1.1 Organizational Lineage\nNexus Holdings Global Inc. (\"The Parent Company\") operates globally through several wholly-\nowned subsidiaries, including but not limited to:\n\u2022 Nexus India FinTech Solutions Pvt. Ltd. (Operating primarily within the Indian subcontinent)\n\u2022 Nexus Euro Distribution GmbH (Operating within the European Union)\n\u2022 Nexus Tech Logistics Ltd. (A global logistics arm incorporated in Delaware, USA)",
+        "section_inferred": "1.1 Organizational Lineage",
+        "source_document": "nexus_holdings_global_inc.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 1,
+        "raw_content": "1.2 Policy Inheritance Framework\nPursuant to corporate governance guidelines, all rules, thresholds, and reporting metrics outlined\nin this document are immediately inherited by and legally binding upon all corporate subsidiaries,\njoint ventures, and related promoter entities where Nexus Holdings Global Inc. maintains a equity\nstake exceeding 26%.\n\u2022 Statutory Compliance Mandate: Subsidiary operations must comply first with localized central\nbanking guidelines (e.g., the Reserve Bank of India for Nexus India FinTech Solutions). Where an\ninternal corporate threshold contradicts a localized statutory ceiling, the more restrictive rule\nshall govern the transactional clearance pipeline.",
+        "section_inferred": "1.2 Policy Inheritance Framework",
+        "source_document": "nexus_holdings_global_inc.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 1,
+        "raw_content": "SECTION 2: VENDOR ALLOCATION & CREDENTIAL\nVERIFICATION (KYC)",
+        "section_inferred": "SECTION 2: VENDOR ALLOCATION & CREDENTIAL",
+        "source_document": "nexus_holdings_global_inc.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 1,
+        "raw_content": "2.1 Vendor Classification and Due Diligence\nBefore any corporate capital can be transferred or escrowed, all prospective commercial vendors\nmust undergo institutional verification overseen by the Operations Risks Committee (ORC).\nVendors are grouped based on systemic transactional exposure:",
+        "section_inferred": "2.1 Vendor Classification and Due Diligence",
+        "source_document": "nexus_holdings_global_inc.pdf"
+    },
+    {
+        "content_type": "table",
+        "page_number": 1,
+        "raw_content": [
+            [
+                "Vendor Classification",
+                "Cumulative Annual\nSpend Threshold",
+                "Required Identity\nMandate",
+                "KYC Remediation\nCycle"
+            ],
+            [
+                "Tier-1 (High Risk)",
+                "Exceeds $5,000,000\nUSD",
+                "Full Ultimate\nBeneficial Owner\n(UBO) Verification +\nMulti-Country\nSanctions Check",
+                "Every 3 Years"
+            ],
+            [
+                "Tier-2 (Medium Risk)",
+                "$500,000 to\n$5,000,000 USD",
+                "Corporate Registration\nCertificate + Tax\nIdentification Pin\nVerification",
+                "Every 5 Years"
+            ],
+            [
+                "Tier-3 (Low Risk)",
+                "Under $500,000 USD",
+                "Standard Commercial\nInvoice Matching +\nSingle Sign-On Bank\nRouting Approval",
+                "Every 10 Years"
+            ]
+        ],
+        "section_inferred": "2.1 Vendor Classification and Due Diligence",
+        "source_document": "nexus_holdings_global_inc.pdf",
+        "table_index": 1
+    },
+    {
+        "content_type": "text",
+        "page_number": 2,
+        "raw_content": "2.2 Prohibited Lending & Credit Exposures\nNo subsidiary of Nexus Holdings Global Inc. shall extend commercial credit loans, operational\nadvances, or trade-financing facilities to any active vendor if an executive director or immediate\nfamily member of an executive director of the Parent Company holds an equity stake or promoter\nshare in that vendor entity exceeding 2.5%.",
+        "section_inferred": "2.2 Prohibited Lending & Credit Exposures",
+        "source_document": "nexus_holdings_global_inc.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 2,
+        "raw_content": "SECTION 3: CROSS-BORDER CAPITAL EXPANSION &\nREMITTANCE LIMITS",
+        "section_inferred": "SECTION 3: CROSS-BORDER CAPITAL EXPANSION &",
+        "source_document": "nexus_holdings_global_inc.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 2,
+        "raw_content": "3.1 Foreign Direct Investment & Strategic Stakes\nTo optimize global operational footprint, corporate subsidiaries are authorized to acquire capital\nequity positions in international technology infrastructure providers under the following\nauthorization matrices:\n\u2022 The Automatic Route: Acquisitions where the total capital deployment is less than $10,000,000\nUSD and the acquired asset represents less than 40% equity in the target entity can be cleared\nvia the Chief Financial Officer (CFO) signature node without requiring external statutory\nregulatory intervention or prior board review.\n\u2022 The Approval Route: Any asset acquisition exceeding $10,000,000 USD, or operating within\nsensitive sectors (including core retail banking, payment processing systems, or satellite\ncommunications), requires explicit Board of Directors ratification and a 60-day cool-off auditing\nwindow.",
+        "section_inferred": "3.1 Foreign Direct Investment & Strategic Stakes",
+        "source_document": "nexus_holdings_global_inc.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 2,
+        "raw_content": "3.2 Non-Resident Outbound Transfers\nAll outbound cross-border capital remittances initiated by Nexus India FinTech Solutions Pvt.\nLtd. to overseas supplier entities for technology licensing software fees are capped at a maximum\nceiling of $1,500,000 USD per single transaction assignment, up to a maximum cumulative\npool of $5,000,000 USD per fiscal quarter.\n\u2022 Deviations Node: Any transaction structure attempting to bypass this limit via multi-invoice\nsplitting under identical contract identifiers shall be intercepted by the LangGraph agent layer\nand flagged as an immediate governance breach.",
+        "section_inferred": "3.2 Non-Resident Outbound Transfers",
+        "source_document": "nexus_holdings_global_inc.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 2,
+        "raw_content": "SECTION 4: SYSTEMIC POLICY EXCEPTION MATRIX\nIn the event of an operational bottleneck or emergency supply chain disruptions, the Chief\nExecutive Officer (CEO) of any localized subsidiary retains the localized power to execute an\nemergency waiver bypassing Section 2.1 and Section 3.1 rules for a window not to exceed 14\nbusiness days, provided that an entry logging the precise exception token is recorded inside the\ncentral compliance registry within 48 hours of asset allocation.",
+        "section_inferred": "SECTION 4: SYSTEMIC POLICY EXCEPTION MATRIX",
+        "source_document": "nexus_holdings_global_inc.pdf"
+    }
+]

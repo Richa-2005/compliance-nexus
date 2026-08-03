@@ -23,6 +23,8 @@ class Retriever:
 
         self.json_data = self._load_child_chunks()
         self.bm25 = self._build_bm25(self.json_data)
+        if self.chroma_collec.count() == 0:
+            self.chroma_collection()
         self.child_to_parent = {
             child["child_id"]: child["parent_id"]
             for child in self.json_data

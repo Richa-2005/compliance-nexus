@@ -1,4 +1,16 @@
-const API_BASE = "http://localhost:8000";
+export const API_BASE = (import.meta.env.VITE_API_BASE_URL || "http://localhost:8000").replace(/\/$/, "");
+
+export function getLiveFeedUrl() {
+  const configured = import.meta.env.VITE_WS_BASE_URL;
+  if (configured) return `${configured.replace(/\/$/, "")}/ws/live-feed`;
+
+  const url = new URL(API_BASE);
+  url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
+  url.pathname = "/ws/live-feed";
+  url.search = "";
+  url.hash = "";
+  return url.toString();
+}
 
 const demoCredentials = {
   analyst: { username: "analyst@compliancenexus.com", password: "analyst123" },

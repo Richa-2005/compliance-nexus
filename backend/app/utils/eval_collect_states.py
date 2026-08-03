@@ -1,4 +1,5 @@
 import json
+from json import JSONDecodeError
 import time
 from pathlib import Path
 from app.agents.audit_graph import audit_graph
@@ -10,12 +11,14 @@ STATES_OUTPUT_FILE = PROJECT_ROOT / "data" / "processed" / "eval_states.json"
 def collect_graph_states():
     with open(EVAL_DATA_FILE, "r", encoding="utf-8") as file:
         eval_data = json.load(file)
-    eval_data = eval_data[30:]
     # Load existing progress if any to ensure resume capability
     collected_states = []
-    if STATES_OUTPUT_FILE.exists():
+    if STATES_OUTPUT_FILE.exists() and STATES_OUTPUT_FILE.stat().st_size > 0:
         with open(STATES_OUTPUT_FILE, "r", encoding="utf-8") as file:
-            collected_states = json.load(file)
+            try:
+                collected_states = json.load(file)
+            except JSONDecodeError:
+                collected_states = []
     
     completed_queries = {state["query"] for state in collected_states}
     
@@ -26,7 +29,7 @@ def collect_graph_states():
         if query in completed_queries:
             continue
 
-        print(f"🎬 Run graph pass {idx}/{len(eval_data)}: {query[:50]}...")
+        print(f"Run graph pass {idx}/{len(eval_data)}: {query[:50]}...")
         
         # Invoke the multi-agent graph with validation guardrails active
         output_state = audit_graph.invoke({"query": query})
@@ -40,6 +43,7 @@ def collect_graph_states():
                 block.get("text_content", "")
                 for block in output_state.get("context_blocks", [])
             ],
+            "audit_verdict": output_state.get("audit_verdict", ""),
             "extracted_metrics": {
                 "transaction_value": extracted.get("transaction_value", 0.0),
                 "allowed_ceiling": extracted.get("allowed_ceiling", 0.0),

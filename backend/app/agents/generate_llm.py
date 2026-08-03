@@ -3,12 +3,20 @@ from app.agents.schemas import (
     ComplianceExtractionSchema, AuditRationaleSchema, AgentState
 )
 from app.core.llm_factory import get_chat_model
+import os
 import re
 from app.core.config import settings
+
+EXTRACTION_CONTEXT_CHAR_LIMIT = int(os.getenv("EXTRACTION_CONTEXT_CHAR_LIMIT", "18000"))
+EXTRACTION_CONTEXT_BLOCK_LIMIT = int(os.getenv("EXTRACTION_CONTEXT_BLOCK_LIMIT", "14"))
 
 
 def _normalize(value) -> str:
     return str(value or "").strip().lower()
+
+
+def _contains_any(text: str, terms: tuple[str, ...]) -> bool:
+    return any(term in text for term in terms)
 
 
 def _money_terms(value) -> set[str]:
@@ -71,6 +79,125 @@ def normalize_extracted_metrics(metrics: dict, query: str) -> dict:
         normalized["currency"] = str(currency).upper()
 
     return normalized
+
+
+def _query_terms(query: str) -> set[str]:
+    return {
+        term
+        for term in re.findall(r"[a-zA-Z][a-zA-Z0-9_-]{3,}", _normalize(query))
+        if term not in {"with", "where", "from", "into", "that", "this", "than", "under"}
+    }
+
+
+def _query_money_terms(query: str) -> set[str]:
+    terms = set()
+    for match in re.findall(r"\$?\s*([0-9][0-9,]*(?:\.\d+)?)", query):
+        raw = match.replace(",", "")
+        try:
+            terms.update(_money_terms(float(raw)))
+        except ValueError:
+            continue
+    return {term.lower() for term in terms}
+
+
+def _source_priority(source_document: str, query: str) -> int:
+    query_text = _normalize(query)
+    priority = 0
+    if source_document == "nexus_holdings_global_inc.pdf":
+        priority += 35
+    if source_document == "kyc_rbi.pdf" and _contains_any(
+        query_text, ("kyc", "wire", "beneficiary", "originator", "wallet", "crypto")
+    ):
+        priority += 30
+    if source_document == "credit_Risk_RBI.pdf" and _contains_any(
+        query_text, ("director", "promoter", "credit", "loan", "advance", "lending")
+    ):
+        priority += 30
+    if source_document == "foreign_Investement_rbi.pdf" and _contains_any(
+        query_text, ("foreign investment", "fdi", "equity", "acquisition", "ownership", "capital")
+    ):
+        priority += 30
+    if source_document in {"apple-SEC.pdf", "microsoft-SEC.pdf"} and _contains_any(
+        query_text, ("apple", "microsoft", "sec", "benchmark")
+    ):
+        priority += 18
+    return priority
+
+
+def rank_context_blocks_for_extraction(
+    context_blocks: list[dict],
+    query: str,
+    max_blocks: int = EXTRACTION_CONTEXT_BLOCK_LIMIT,
+    max_chars: int = EXTRACTION_CONTEXT_CHAR_LIMIT,
+) -> str:
+    query_text = _normalize(query)
+    query_terms = _query_terms(query)
+    money_terms = _query_money_terms(query)
+    ranked = []
+
+    for index, block in enumerate(context_blocks):
+        source_document = block.get("metadata", {}).get("source_document", "")
+        page_number = block.get("metadata", {}).get("page_number", "Unknown")
+        text_content = str(block.get("text_content", ""))
+        normalized_text = _normalize(text_content)
+        score = _source_priority(source_document, query)
+        score += sum(3 for term in query_terms if term in normalized_text)
+        score += sum(12 for term in money_terms if term in normalized_text)
+        score += sum(10 for term in settings.RULE_LANGUAGE_TERMS if term in normalized_text)
+
+        if _contains_any(query_text, ("cumulative", "quarterly")) and _contains_any(
+            normalized_text, ("cumulative", "quarterly", "5,000,000", "5000000")
+        ):
+            score += 35
+        if _contains_any(query_text, ("split", "invoice", "identical contract")) and _contains_any(
+            normalized_text, ("multi-invoice", "splitting", "identical contract", "deviations")
+        ):
+            score += 35
+        if _contains_any(query_text, ("director", "promoter", "advance", "loan")) and _contains_any(
+            normalized_text, ("2.5", "director", "promoter", "credit", "advance")
+        ):
+            score += 35
+        if _contains_any(query_text, ("kyc", "wire", "beneficiary", "originator")) and _contains_any(
+            normalized_text, ("beneficial owner", "wire transfer", "originator", "beneficiary", "kyc")
+        ):
+            score += 35
+        if _contains_any(query_text, ("foreign investment", "equity", "acquisition")) and _contains_any(
+            normalized_text, ("automatic route", "foreign investment", "equity", "approval route")
+        ):
+            score += 35
+
+        if score:
+            ranked.append((score, index, source_document, page_number, text_content))
+
+    ranked.sort(key=lambda row: (-row[0], row[1]))
+    selected = []
+    seen_sources = set()
+    for row in ranked:
+        if len(selected) >= max_blocks:
+            break
+        source_document = row[2]
+        if source_document not in seen_sources:
+            selected.append(row)
+            seen_sources.add(source_document)
+    for row in ranked:
+        if len(selected) >= max_blocks:
+            break
+        if row not in selected:
+            selected.append(row)
+
+    parts = []
+    remaining_chars = max_chars
+    for rank, (_, original_index, source_document, page_number, text_content) in enumerate(selected, 1):
+        if remaining_chars <= 0:
+            break
+        header = f"\n--- Ranked Evidence {rank}: {source_document or 'Unknown Document'} (Page {page_number}; Retrieved #{original_index + 1}) ---\n"
+        available = remaining_chars - len(header)
+        if available <= 0:
+            break
+        body = text_content[:available]
+        parts.append(f"{header}{body}\n")
+        remaining_chars -= len(parts[-1])
+    return "".join(parts)
 
 
 def select_relevant_evidence(
@@ -441,11 +568,10 @@ def extract_audit_json(state: AgentState) -> AgentState:
     raw_llm = get_chat_model(temperature=0.0)
     structured_extractor = raw_llm.with_structured_output(ComplianceExtractionSchema)
 
-    formatted_context = ""
-    for idx, block in enumerate(state["context_blocks"], 1):
-        src = block["metadata"].get("source_document", "Unknown Document")
-        pg = block["metadata"].get("page_number", "Unknown")
-        formatted_context += f"\n--- Doc {idx}: {src} (Page {pg}) ---\n{block['text_content']}\n"
+    formatted_context = rank_context_blocks_for_extraction(
+        state["context_blocks"],
+        state["query"],
+    )
     
     feedback_note = state.get("error_feedback", "")
 
@@ -454,14 +580,31 @@ def extract_audit_json(state: AgentState) -> AgentState:
     Your objective is to read the provided Context and Topology, isolate the metrics requested, and map them to the structural JSON keys.
     
     CRITICAL CONSTRAINT FOR 'source_doc':
-    You MUST isolate and return EXACTLY ONE single, definitive primary source document name or topology node description anchor (e.g., 'Internal Policy' or 'nexus_holdings_global_inc.pdf') that directly establishes the threshold ceiling metric rule.
-    Choose the source that contains the actual governing text or exact numeric ceiling. If a graph edge only cross-references another framework but an internal policy chunk contains the exact threshold language, choose Internal Policy.
-    DO NOT output comma-separated lists, multiple document names, or arrays of multiple nodes. Choose the single most relevant governing anchor.
+    You MUST return EXACTLY ONE of these allowed framework node labels:
+    - Internal Policy
+    - Foreign Investment
+    - RBI KYC
+    - RBI Credit Risk
+    - Apple SEC Filings
+    - Microsoft SEC Filings
+
+    PDF filename to node-label mapping:
+    - nexus_holdings_global_inc.pdf => Internal Policy
+    - foreign_Investement_rbi.pdf => Foreign Investment
+    - kyc_rbi.pdf => RBI KYC
+    - credit_Risk_RBI.pdf => RBI Credit Risk
+    - apple-SEC.pdf => Apple SEC Filings
+    - microsoft-SEC.pdf => Microsoft SEC Filings
+
+    Do NOT return PDF filenames in source_doc. If a PDF contains the governing text, return its mapped node label.
+    Choose the node label that contains the actual governing text or exact numeric ceiling. If a graph edge only cross-references another framework but an internal policy chunk contains the exact threshold language, choose Internal Policy.
 
     FIELD EXTRACTION RULES:
     - destination_entity_or_type must be the recipient or recipient category. It must never be a currency, amount, or jurisdiction.
     - currency must be only a currency code such as USD, INR, or EUR.
     - applicable_rules must include only rules supported by the supplied context or topology.
+    - applicable_rules must be a simple list. Each object must use short string values only; use "N/A" instead of null.
+    - risk_factors must appear exactly once. Each object must contain only "factor" and "source" string fields.
     - primary_evidence_summary must mention the document/page evidence that directly supports the ceiling or rule.
 
     TEXTUAL CONTEXT:
@@ -477,11 +620,18 @@ def extract_audit_json(state: AgentState) -> AgentState:
     """
     
     messages = [
-        SystemMessage(content="You parse raw numbers and strings with absolute literal text precision. You do not compute mathematical verdicts."),
+        SystemMessage(content="You parse raw numbers and strings with absolute literal text precision. You do not compute mathematical verdicts. You must return one valid structured tool call only."),
         HumanMessage(content=extraction_prompt)
     ]
-    
-    extracted_data = structured_extractor.invoke(messages)
+
+    try:
+        extracted_data = structured_extractor.invoke(messages)
+    except Exception as error:
+        retry_messages = [
+            SystemMessage(content="Your previous structured tool call was invalid. Return one valid ComplianceExtractionSchema tool call only. Do not duplicate fields. Close every string."),
+            HumanMessage(content=f"{extraction_prompt}\n\nPrevious tool-call error: {type(error).__name__}: {error}")
+        ]
+        extracted_data = structured_extractor.invoke(retry_messages)
     
     extracted_metrics = {
         "transaction_value": extracted_data.transaction_value,

@@ -1,284 +1,306 @@
 [
   {
-    "query": "Verify if a technology software licensing transaction of $1,800,000 USD initiated by Nexus India violates internal cross-border limits.",
+    "query": "Verify whether Nexus India can approve a $1,800,000 USD outbound technology software licensing remittance to an overseas vendor under the group cross-border payment policy.",
     "ground_truth_verdict": "NON_COMPLIANT",
-    "ground_truth_answer": "The transaction is NON_COMPLIANT. Outbound cross-border capital remittances initiated by Nexus India for technology licensing software fees are capped at a strict maximum ceiling of $1,500,000 USD per single transaction assignment under Section 3.2 of the Nexus Holdings Internal Policy. The current request of $1,800,000 USD explicitly breaches this threshold by an excess variance of $300,000 USD.",
+    "ground_truth_answer": "The transaction is NON_COMPLIANT. Nexus India's outbound technology software licensing remittances are capped at $1,500,000 USD per single transaction assignment under Section 3.2 of the Nexus Holdings internal policy. The requested $1,800,000 USD exceeds that ceiling by $300,000 USD.",
     "expected_citations": [
       "nexus_holdings_global_inc.pdf (Page 2)",
-      "foreign_Investment_rbi.pdf (Page 74)"
+      "foreign_Investement_rbi.pdf (Page 74)"
     ]
   },
   {
-    "query": "Audit an outbound technology software fee remittance of $1,200,000 USD from Nexus India to an overseas vendor when the cumulative fees sent this quarter already total $4,100,000 USD.",
-    "ground_truth_verdict": "NON_COMPLIANT",
-    "ground_truth_answer": "The transaction is NON_COMPLIANT. While the individual transaction amount of $1,200,000 USD resides below the single assignment ceiling of $1,500,000 USD, Section 3.2 of nexus_holdings_global_inc.pdf mandates a maximum cumulative pool of $5,000,000 USD per fiscal quarter for technology licensing fees. Adding the current transaction brings the quarter total to $5,300,000 USD, breaching the cumulative budget constraint by $300,000 USD.",
-    "expected_citations": [
-      "nexus_holdings_global_inc.pdf (Page 2)"
-    ]
-  },
-  {
-    "query": "Assess a cross-border license transaction of $1,400,000 USD requested by Nexus India where the invoicing structure is split into two rapid-succession bills of $700,000 USD under identical contract identifiers.",
-    "ground_truth_verdict": "NON_COMPLIANT",
-    "ground_truth_answer": "The transaction is NON_COMPLIANT. Section 3.2 of nexus_holdings_global_inc.pdf explicitly contains a Deviations Node stating that any transaction structure attempting to bypass transaction ceilings via multi-invoice splitting under identical contract identifiers shall be intercepted and flagged as an immediate governance breach.",
-    "expected_citations": [
-      "nexus_holdings_global_inc.pdf (Page 2)"
-    ]
-  },
-  {
-    "query": "Evaluate an urgent cross-border transaction of $2,100,000 USD by Nexus India for a software assignment that has an attached emergency waiver token signed by the subsidiary CEO dated 5 days ago.",
+    "query": "Audit a $1,450,000 USD outbound software licensing fee from Nexus India to an overseas supplier where the current quarterly technology remittance total is $2,000,000 USD.",
     "ground_truth_verdict": "COMPLIANT",
-    "ground_truth_answer": "The transaction is COMPLIANT. Under Section 4 (Systemic Policy Exception Matrix) of nexus_holdings_global_inc.pdf, the Chief Executive Officer of any localized subsidiary retains the authority to execute an emergency waiver bypassing standard remittance limits for a window not to exceed 14 business days, provided that the transaction is within this window and logged in the central compliance registry.",
+    "ground_truth_answer": "The transaction is COMPLIANT. The $1,450,000 USD request is below the $1,500,000 USD single transaction ceiling, and adding it to the existing $2,000,000 USD quarterly total keeps aggregate exposure at $3,450,000 USD, below the $5,000,000 USD quarterly pool.",
     "expected_citations": [
       "nexus_holdings_global_inc.pdf (Page 2)"
     ]
   },
   {
-    "query": "Verify an emergency cross-border capital transaction of $3,000,000 USD by Nexus India backed by a CEO exception waiver that was approved and allocated 22 business days ago.",
+    "query": "Assess a $1,200,000 USD outbound technology licensing payment by Nexus India when cumulative quarterly technology remittances already stand at $4,100,000 USD.",
     "ground_truth_verdict": "NON_COMPLIANT",
-    "ground_truth_answer": "The transaction is NON_COMPLIANT. Section 4 of nexus_holdings_global_inc.pdf specifies that any emergency waiver executed by a localized subsidiary CEO is strictly bound to an operational window not to exceed 14 business days. Because 22 business days have elapsed since asset allocation, the waiver has expired, making the $3,000,000 USD transaction an unauthorized threshold violation.",
+    "ground_truth_answer": "The transaction is NON_COMPLIANT. The individual payment is under the $1,500,000 USD single assignment ceiling, but adding $1,200,000 USD to the existing $4,100,000 USD quarterly total creates $5,300,000 USD of quarterly exposure, exceeding the $5,000,000 USD cumulative pool by $300,000 USD.",
     "expected_citations": [
       "nexus_holdings_global_inc.pdf (Page 2)"
     ]
   },
   {
-    "query": "Check if an outbound technology fee transaction of $1,450,000 USD initiated by Nexus India is authorized under corporate guidelines, assuming no previous quarterly pool allocations.",
+    "query": "Check a $1,495,000 USD cross-border technology infrastructure fee from Nexus India where no earlier quarterly allocations exist.",
     "ground_truth_verdict": "COMPLIANT",
-    "ground_truth_answer": "The transaction is COMPLIANT. The transaction amount of $1,450,000 USD is safely below the maximum single assignment ceiling of $1,500,000 USD outlined in Section 3.2 of the internal policy guidelines, and does not breach the cumulative quarterly cap of $5,000,000 USD.",
+    "ground_truth_answer": "The transaction is COMPLIANT. The $1,495,000 USD value remains just below the $1,500,000 USD single transaction cap and does not consume enough quarterly capacity to breach the $5,000,000 USD cumulative threshold.",
     "expected_citations": [
       "nexus_holdings_global_inc.pdf (Page 2)"
     ]
   },
   {
-    "query": "Audit an outbound transfer of $900,000 USD by Nexus India to a foreign software provider, where no source document reference or page citation matches can be located during the context extraction node.",
-    "ground_truth_verdict": "ACTION_REQUIRED",
-    "ground_truth_answer": "The transaction returns a status of ACTION_REQUIRED. While the transaction amount is under the $1,500,000 USD threshold, the absence of clean verifiable source context blocks causes a citation validation fault within the multi-agent graph, forcing a state override for manual professional auditing.",
-    "expected_citations": [
-      "nexus_holdings_global_inc.pdf (Page 2)"
-    ]
-  },
-  {
-    "query": "Verify if Nexus India's cross-border software licensing transactions inherit the parent group remittance caps or must follow independent localized subsidiary constraints.",
-    "ground_truth_verdict": "COMPLIANT",
-    "ground_truth_answer": "The transaction framework is COMPLIANT. Based on the structural corporate graph edges, localized subsidiaries inherit the global policy architecture framework from the parent node (Nexus Holdings) but are strictly bound by the distinct regional sub-memos, which enforce a $1,500,000 USD single limit for Nexus India.",
-    "expected_citations": [
-      "nexus_holdings_global_inc.pdf (Page 2)"
-    ]
-  },
-  {
-    "query": "Review an outbound payment request of $1,600,000 USD from Nexus India where the user query states an emergency waiver exists, but the 'extracted_metrics' payload returns empty waiver parameters from the database logs.",
-    "ground_truth_verdict": "ACTION_REQUIRED",
-    "ground_truth_answer": "The transaction status resolves to ACTION_REQUIRED. The requested sum exceeds the $1,500,000 USD single transaction limit. Although a waiver is claimed, the lack of an uncorrupted validation token in the state metrics prevents automated approval, triggering a circuit-breaker human review override.",
-    "expected_citations": [
-      "nexus_holdings_global_inc.pdf (Page 2)"
-    ]
-  },
-  {
-    "query": "Audit a sequence of three technology licensing software fee payments of $450,000 USD each, sent on the same day by Nexus India to the same overseas contractor under separate invoice dates.",
+    "query": "Verify a $1,520,000 USD software license remittance by Nexus India where quarterly exposure is currently zero.",
     "ground_truth_verdict": "NON_COMPLIANT",
-    "ground_truth_answer": "The transaction sequence is NON_COMPLIANT. The combined total of these identical-day payments is $1,350,000 USD (under the $1,500,000 USD threshold). However, fracturing a single project assignment into separate smaller invoices to obscure corporate oversight violates the multi-invoice anti-splitting rule in Section 3.2.",
+    "ground_truth_answer": "The transaction is NON_COMPLIANT. Even with no previous quarterly exposure, the individual $1,520,000 USD request exceeds the strict $1,500,000 USD single assignment cap by $20,000 USD.",
     "expected_citations": [
       "nexus_holdings_global_inc.pdf (Page 2)"
     ]
   },
   {
-    "query": "Verify if a software remittance request of $1,550,000 USD by Nexus India can clear automated evaluation passes if the total quarterly exposure stands at only $1,000,000 USD.",
+    "query": "Audit an outbound software transfer of $1,220,000 USD from Nexus India when cumulative quarterly software remittances are already $3,800,000 USD.",
     "ground_truth_verdict": "NON_COMPLIANT",
-    "ground_truth_answer": "The transaction is NON_COMPLIANT. Even though the cumulative quarterly exposure ($2,550,000 USD total) remains well within the $5,000,000 USD quarterly cap, the individual assignment breaches the strict single transaction limit of $1,500,000 USD by a variance delta of $50,000 USD.",
+    "ground_truth_answer": "The transaction is NON_COMPLIANT. The request itself is below the single cap, but the cumulative quarterly total becomes $5,020,000 USD after adding the new transfer, breaching the $5,000,000 USD quarterly limit by $20,000 USD.",
     "expected_citations": [
       "nexus_holdings_global_inc.pdf (Page 2)"
     ]
   },
   {
-    "query": "Assess an outbound transaction of $4,900,000 USD initiated by Nexus India for a single vendor software license purchase, assuming no previous allocations this quarter.",
-    "ground_truth_verdict": "NON_COMPLIANT",
-    "ground_truth_answer": "The transaction is NON_COMPLIANT. This transaction violates the individual transaction remittance cap of $1,500,000 USD outlined in Section 3.2, exceeding it by an absolute variance of $3,400,000 USD, despite staying under the $5,000,000 USD quarterly cap.",
-    "expected_citations": [
-      "nexus_holdings_global_inc.pdf (Page 2)"
-    ]
-  },
-  {
-    "query": "Review an outbound payment assignment of $500,000 USD from Nexus India where the vector index extracts conflicting metadata and triggers a second reflection retry pass inside the state graph.",
-    "ground_truth_verdict": "ACTION_REQUIRED",
-    "ground_truth_answer": "The transaction state results in ACTION_REQUIRED. When the citation validator identifies a document reference mismatch, it triggers an error feedback loop. If the threshold metric cannot be deterministically validated on the retry pass, the circuit breaker overrides the state to enforce manual review.",
-    "expected_citations": [
-      "nexus_holdings_global_inc.pdf (Page 2)"
-    ]
-  },
-  {
-    "query": "Verify if a technology license transfer of $100,000 USD initiated by Nexus India to an offshore contractor requires an attached central registry exception token under Section 4 guidelines.",
+    "query": "Evaluate a $900,000 USD outbound software services payment from Nexus India to an overseas provider with complete beneficiary details and no prior quarterly spend.",
     "ground_truth_verdict": "COMPLIANT",
-    "ground_truth_answer": "The transaction is COMPLIANT. An exception token under Section 4 is only required for emergency waivers that deliberately bypass standard limits. Since $100,000 USD is safely below the standard single transaction ceiling of $1,500,000 USD, it does not require an exception token.",
-    "expected_citations": [
-      "nexus_holdings_global_inc.pdf (Page 2)"
-    ]
-  },
-  {
-    "query": "Audit an outbound tech remittance of $1,100,000 USD by Nexus India when current fiscal quarter expenditures sit at exactly $3,950,000 USD.",
-    "ground_truth_verdict": "NON_COMPLIANT",
-    "ground_truth_answer": "The transaction is NON_COMPLIANT. The transaction amount ($1,100,000 USD) is under the single transaction ceiling. However, adding this amount to the existing expenditure ($3,950,000 USD) pushes the total quarterly remittance to $5,050,000 USD, breaching the $5,000,000 USD cumulative quarterly ceiling by $50,000 USD.",
-    "expected_citations": [
-      "nexus_holdings_global_inc.pdf (Page 2)"
-    ]
-  },
-  {
-    "query": "Verify if Microsoft's corporate infrastructure spend models or cloud licensing transaction parameters place any legal restrictions on Nexus India's cross-border limit thresholds.",
-    "ground_truth_verdict": "COMPLIANT",
-    "ground_truth_answer": "The query framework is COMPLIANT. Microsoft SEC disclosures represent external, non-governing market peer data chunks. They share no topological or regulatory inheritance lines with Nexus India and have an evaluation impact variance of zero on internal currency ceiling calculations.",
-    "expected_citations": [
-      "nexus_holdings_global_inc.pdf (Page 2)"
-    ]
-  },
-  {
-    "query": "Determine if a transaction of $1,300,000 USD for general tech consulting from Nexus India is bound by Apple's SEC 10-K risk disclosure frameworks.",
-    "ground_truth_verdict": "COMPLIANT",
-    "ground_truth_answer": "The transaction layout is COMPLIANT. Apple SEC filings represent external benchmarking data. Because they have no structural cross-references or edges linking them to the Nexus Holdings governance network, they exert no authority over internal subsidiary expenditure caps.",
-    "expected_citations": [
-      "nexus_holdings_global_inc.pdf (Page 2)"
-    ]
-  },
-  {
-    "query": "Audit an outbound transfer of $1,950,000 USD to a foreign software provider, where the search string context returns references to Microsoft licensing rules but completely misses internal policy nodes.",
-    "ground_truth_verdict": "ACTION_REQUIRED",
-    "ground_truth_answer": "The transaction returns a status of ACTION_REQUIRED. Because the hybrid RAG pipeline pulled irrelevant peer document data and missed the internal policy threshold metrics, the citation validation layer intercepted the data collision and initialized a safe fallback override to isolate the logical exception.",
-    "expected_citations": [
-      "nexus_holdings_global_inc.pdf (Page 2)"
-    ]
-  },
-  {
-    "query": "Assess a licensing payment request of $1,750,000 USD by Nexus India where the query text mimics formal SEC prose and references global industry standards rather than internal corporate thresholds.",
-    "ground_truth_verdict": "NON_COMPLIANT",
-    "ground_truth_answer": "The transaction is NON_COMPLIANT. Despite the complex prose, the transaction value of $1,750,000 USD must be cross-referenced with the internal corporate ceiling. Since it exceeds the strict $1,500,000 USD maximum cap outlined in Section 3.2, it triggers a regulatory variance violation.",
-    "expected_citations": [
-      "nexus_holdings_global_inc.pdf (Page 2)"
-    ]
-  },
-  {
-    "query": "Check if a software fee remittance of $400,000 USD by Nexus India violates statutory boundaries if the search query matches vocabulary across Apple SEC filings and RBI circulars simultaneously.",
-    "ground_truth_verdict": "COMPLIANT",
-    "ground_truth_answer": "The transaction is COMPLIANT. The high-precision compliance token gates filter out the noisy benchmarking contexts from Apple SEC filings, allowing only the core transaction metrics and relevant RBI statutory overlays to reach the evaluation engine. The $400,000 USD request clears all standard bounds.",
+    "ground_truth_answer": "The transaction is COMPLIANT. The payment is cross-border but remains below the $1,500,000 USD single assignment ceiling and there is no stated cumulative quarterly breach or beneficiary verification gap.",
     "expected_citations": [
       "nexus_holdings_global_inc.pdf (Page 2)",
-      "foreign_Investment_rbi.pdf (Page 74)"
+      "kyc_rbi.pdf (Page 7)"
     ]
   },
   {
-    "query": "Audit an outbound licensing fee remittance of $1,350,000 USD from Nexus India where the vector database index yields zero matches inside the internal policy collection but registers hits inside general banking text corpora.",
+    "query": "Review a $950,000 USD cross-border wire transfer from Nexus India to a newly onboarded offshore software vendor with no verified beneficiary or originator information provided.",
     "ground_truth_verdict": "ACTION_REQUIRED",
-    "ground_truth_answer": "The transaction status resolves to ACTION_REQUIRED. The failure to retrieve the definitive corporate policy document containing the exact ceiling limits prevents the system from performing an automated audit, triggering a circuit-breaker override to protect the data trail.",
-    "expected_citations": [
-      "nexus_holdings_global_inc.pdf (Page 2)"
-    ]
-  },
-  {
-    "query": "Verify if an outbound transaction of $5,500,000 USD can clear automated evaluation filters if the query claims it represents an accumulation of unspent software license caps over the past three fiscal years.",
-    "ground_truth_verdict": "NON_COMPLIANT",
-    "ground_truth_answer": "The transaction is NON_COMPLIANT. Section 3.2 of the internal operations playbook specifies a strict maximum cumulative limit of $5,000,000 USD per single fiscal quarter. The policy does not permit the rollover or accumulation of unused limits across years, making this transaction a threshold breach.",
-    "expected_citations": [
-      "nexus_holdings_global_inc.pdf (Page 2)"
-    ]
-  },
-  {
-    "query": "Review a transaction request of $1,480,000 USD initiated by Nexus India, where the vector space score is heavily diluted by competing terms from cross-border text chunks inside the Microsoft 10-K report.",
-    "ground_truth_verdict": "COMPLIANT",
-    "ground_truth_answer": "The transaction is COMPLIANT. The system's signature signature filters successfully suppress the irrelevant Microsoft document tokens, isolating the internal policy text chunks to resolve the $1,500,000 USD ceiling metric. The transaction amount passes within compliance limits.",
-    "expected_citations": [
-      "nexus_holdings_global_inc.pdf (Page 2)"
-    ]
-  },
-  {
-    "query": "Audit a technology licensing remittance of $2,500,000 USD by Nexus India to an offshore software supplier, assuming the current quarterly pool balance stands at zero.",
-    "ground_truth_verdict": "NON_COMPLIANT",
-    "ground_truth_answer": "The transaction is NON_COMPLIANT. The individual request value of $2,500,000 USD breaches the standard maximum single transaction ceiling of $1,500,000 USD by a variance delta of $1,000,000 USD, regardless of the quarterly pool balance.",
-    "expected_citations": [
-      "nexus_holdings_global_inc.pdf (Page 2)"
-    ]
-  },
-  {
-    "query": "Assess a software fee transaction of $1,250,000 USD from Nexus India where the extracted data attributes match keyword variables inside Apple, Microsoft, and internal compliance files simultaneously.",
-    "ground_truth_verdict": "COMPLIANT",
-    "ground_truth_answer": "The transaction is COMPLIANT. The structural graph traversal node isolates the corporate governance network, filtering out the benchmarking noise from Apple and Microsoft SEC filings. Cross-referencing the $1,250,000 USD request with the internal policy confirmed it falls safely within the $1,500,000 USD ceiling limit.",
-    "expected_citations": [
-      "nexus_holdings_global_inc.pdf (Page 2)"
-    ]
-  },
-  {
-    "query": "Verify if an outbound remittance of $1,700,000 USD initiated by Nexus India for software vendor fees complies with central bank notifications and group guidelines.",
-    "ground_truth_verdict": "NON_COMPLIANT",
-    "ground_truth_answer": "The transaction is NON_COMPLIANT. The request value of $1,700,000 USD explicitly breaches the maximum individual remittance ceiling of $1,500,000 USD defined in Section 3.2 of the corporate operations playbook, resulting in a variance violation of $200,000 USD.",
+    "ground_truth_answer": "The transaction is ACTION_REQUIRED. The amount is within the numeric remittance ceiling, but the query presents a KYC and wire-transfer evidence gap because the offshore beneficiary and originator information are not verified. The audit should request evidence before approval.",
     "expected_citations": [
       "nexus_holdings_global_inc.pdf (Page 2)",
-      "foreign_Investment_rbi.pdf (Page 74)"
+      "kyc_rbi.pdf (Page 7)"
     ]
   },
   {
-    "query": "Audit an outbound payment request of $850,000 USD by Nexus India, where the vector indexing engine completely fails to locate any matching metadata parameters or corporate lineage references.",
+    "query": "Audit a $700,000 USD digital wallet crypto settlement by Nexus India for offshore software services where the beneficiary wallet owner is anonymous.",
     "ground_truth_verdict": "ACTION_REQUIRED",
-    "ground_truth_answer": "The transaction returns a status of ACTION_REQUIRED. Due to a total retrieval failure during the context phase, the system cannot programmatically verify corporate limits or lineages, triggering a safe fallback override for professional auditing.",
+    "ground_truth_answer": "The transaction is ACTION_REQUIRED. Although the amount is below the internal remittance cap, the anonymous crypto wallet beneficiary creates unresolved digital asset and KYC traceability risk requiring human review and additional evidence.",
     "expected_citations": [
+      "kyc_rbi.pdf (Page 7)",
       "nexus_holdings_global_inc.pdf (Page 2)"
     ]
   },
   {
-    "query": "Check if a cross-border transaction of $1,495,000 USD for technology infrastructure fees violates group guidelines, assuming no previous allocations this quarter.",
+    "query": "Determine whether Nexus India can extend a $600,000 USD operational advance to a vendor where a Nexus Holdings executive director owns a 3% promoter stake.",
+    "ground_truth_verdict": "NON_COMPLIANT",
+    "ground_truth_answer": "The transaction is NON_COMPLIANT. Section 2.2 prohibits subsidiaries from extending operational advances or commercial credit to vendors where an executive director or immediate family member of the parent company holds more than a 2.5% equity or promoter share. The 3% promoter stake exceeds that threshold.",
+    "expected_citations": [
+      "nexus_holdings_global_inc.pdf (Page 2)",
+      "credit_Risk_RBI.pdf (Page 2)"
+    ]
+  },
+  {
+    "query": "Assess a $450,000 USD vendor advance from Nexus India where a parent-company director holds exactly 2.0% equity in the vendor.",
+    "ground_truth_verdict": "ACTION_REQUIRED",
+    "ground_truth_answer": "The transaction is ACTION_REQUIRED. The stated 2.0% director ownership is below the 2.5% prohibited exposure threshold, but the transaction is still a vendor advance involving director exposure language, so the system should flag it for reviewer confirmation rather than treating it as an ordinary software remittance.",
+    "expected_citations": [
+      "nexus_holdings_global_inc.pdf (Page 2)",
+      "credit_Risk_RBI.pdf (Page 2)"
+    ]
+  },
+  {
+    "query": "Verify a $2,200,000 USD commercial loan request from Nexus India to an active vendor whose promoter is the immediate family member of a Nexus Holdings executive director with a 4% stake.",
+    "ground_truth_verdict": "NON_COMPLIANT",
+    "ground_truth_answer": "The transaction is NON_COMPLIANT. The request is a commercial loan or credit exposure to an active vendor connected to an executive director's immediate family member, and the 4% promoter stake is above the 2.5% prohibition threshold in the internal policy.",
+    "expected_citations": [
+      "nexus_holdings_global_inc.pdf (Page 2)",
+      "credit_Risk_RBI.pdf (Page 2)"
+    ]
+  },
+  {
+    "query": "Check a $300,000 USD ordinary software support invoice from Nexus India to an overseas vendor with no director, promoter, lending, or advance relationship.",
     "ground_truth_verdict": "COMPLIANT",
-    "ground_truth_answer": "The transaction is COMPLIANT. The requested amount of $1,495,000 USD is within the standard single assignment cap of $1,500,000 USD and stays safely inside the $5,000,000 USD quarterly collective allocation pool.",
+    "ground_truth_answer": "The transaction is COMPLIANT. It is below the $1,500,000 USD single transaction ceiling, has no stated cumulative quarterly breach, and does not present director exposure, lending, advance, or KYC risk indicators.",
     "expected_citations": [
       "nexus_holdings_global_inc.pdf (Page 2)"
     ]
   },
   {
-    "query": "Audit an outbound transfer of $1,650,000 USD from Nexus India where the query text claims the excess variance has been approved via a verbal agreement with the regional group director.",
+    "query": "Under the corporate expansion policy, assess a $12,000,000 USD foreign investment by Nexus India into an international cloud infrastructure company for a 35% equity stake.",
     "ground_truth_verdict": "NON_COMPLIANT",
-    "ground_truth_answer": "The transaction is NON_COMPLIANT. The amount of $1,650,000 USD breaches the strict $1,500,000 USD single transaction cap. Section 4 specifies that exceptions can only be granted via an official emergency waiver signed by the subsidiary CEO and logged inside the central compliance registry. Verbal agreements are legally invalid.",
+    "ground_truth_answer": "The transaction is NON_COMPLIANT. Strategic foreign investment above $10,000,000 USD falls outside the automatic route and requires board-level approval treatment under the internal foreign direct investment and strategic stakes policy.",
     "expected_citations": [
-      "nexus_holdings_global_inc.pdf (Page 2)"
+      "nexus_holdings_global_inc.pdf (Page 2)",
+      "foreign_Investement_rbi.pdf (Page 7)"
     ]
   },
   {
-    "query": "Assess if an outbound software licensing remittance of $1,150,000 USD violates corporate policy if previous quarterly transactions already total $3,900,000 USD.",
+    "query": "Evaluate a $4,000,000 USD foreign equity acquisition by Nexus India for a 45% ownership stake in an overseas technology infrastructure provider.",
     "ground_truth_verdict": "NON_COMPLIANT",
-    "ground_truth_answer": "The transaction is NON_COMPLIANT. While the individual assignment value falls below the $1,500,000 USD single cap, adding this amount to the current quarterly expenditures ($3,900,000 USD) brings the total to $5,050,000 USD, breaching the strict $5,000,000 USD cumulative quarterly ceiling.",
+    "ground_truth_answer": "The transaction is NON_COMPLIANT. Even though the capital deployment is below $10,000,000 USD, the 45% ownership stake exceeds the less-than-40% automatic-route condition and therefore requires stricter approval treatment.",
     "expected_citations": [
-      "nexus_holdings_global_inc.pdf (Page 2)"
+      "nexus_holdings_global_inc.pdf (Page 2)",
+      "foreign_Investement_rbi.pdf (Page 7)"
     ]
   },
   {
-    "query": "Audit an outbound transaction of $1,380,000 USD by Nexus India for software licenses, where the current quarterly expenditure stands at exactly $3,500,000 USD.",
+    "query": "Assess a $4,000,000 USD foreign investment by Nexus India for a 30% equity stake in a non-sensitive overseas software infrastructure provider.",
+    "ground_truth_verdict": "ACTION_REQUIRED",
+    "ground_truth_answer": "The transaction is ACTION_REQUIRED. The amount and ownership percentage appear within the internal automatic-route bounds, but because it is a foreign investment and strategic equity transaction, the system should surface foreign-investment route evidence for reviewer confirmation rather than treating it as a routine remittance.",
+    "expected_citations": [
+      "nexus_holdings_global_inc.pdf (Page 2)",
+      "foreign_Investement_rbi.pdf (Page 7)"
+    ]
+  },
+  {
+    "query": "Review a $9,500,000 USD acquisition by Nexus India of a 39% foreign equity position in an overseas data analytics platform.",
+    "ground_truth_verdict": "ACTION_REQUIRED",
+    "ground_truth_answer": "The transaction is ACTION_REQUIRED. The amount is below $10,000,000 USD and the equity percentage is below 40%, but the foreign investment route still requires reviewer confirmation against internal strategic-stake evidence and external RBI foreign investment context.",
+    "expected_citations": [
+      "nexus_holdings_global_inc.pdf (Page 2)",
+      "foreign_Investement_rbi.pdf (Page 7)"
+    ]
+  },
+  {
+    "query": "Verify whether Microsoft's SEC filing language about cloud infrastructure spend changes Nexus India's $1,500,000 USD internal cross-border software remittance cap for a $1,300,000 USD payment.",
     "ground_truth_verdict": "COMPLIANT",
-    "ground_truth_answer": "The transaction is COMPLIANT. The request amount ($1,380,000 USD) is under the individual transaction cap of $1,500,000 USD. Furthermore, adding it to the quarterly expenditures brings the total to $4,880,000 USD, which remains within the strict $5,000,000 USD collective quarterly ceiling.",
+    "ground_truth_answer": "The transaction is COMPLIANT. Microsoft SEC filings are market benchmark material, not governing policy for Nexus India. The relevant internal policy cap remains $1,500,000 USD, and the $1,300,000 USD payment is within that limit.",
     "expected_citations": [
-      "nexus_holdings_global_inc.pdf (Page 2)"
+      "nexus_holdings_global_inc.pdf (Page 2)",
+      "microsoft-SEC.pdf (Page 60)"
     ]
   },
   {
-    "query": "Verify if a technology software licensing request of $2,000,000 USD initiated by Nexus India complies with corporate limits, assuming an emergency waiver was executed by the CEO exactly 10 days ago.",
+    "query": "Determine whether Apple SEC risk disclosures impose any additional compliance ceiling on a $1,250,000 USD Nexus India software licensing remittance.",
     "ground_truth_verdict": "COMPLIANT",
-    "ground_truth_answer": "The transaction is COMPLIANT. Under Section 4 of the internal policy guidelines, an active emergency waiver executed by the subsidiary CEO authorizes the transaction to bypass standard limits for up to 14 business days. Since the request falls within this 10-day window, it clears automated evaluation passes.",
+    "ground_truth_answer": "The transaction is COMPLIANT. Apple SEC disclosures are external benchmark context and do not govern Nexus India's internal payment authority. The $1,250,000 USD remittance remains below the Nexus internal $1,500,000 USD ceiling.",
+    "expected_citations": [
+      "nexus_holdings_global_inc.pdf (Page 2)",
+      "apple-SEC.pdf (Page 46)"
+    ]
+  },
+  {
+    "query": "Assess a $1,700,000 USD outbound software vendor remittance by Nexus India where the query also mentions RBI foreign investment circulars and Microsoft benchmark filings.",
+    "ground_truth_verdict": "NON_COMPLIANT",
+    "ground_truth_answer": "The transaction is NON_COMPLIANT. Multi-source context does not override the controlling internal cap. The $1,700,000 USD outbound software remittance exceeds the $1,500,000 USD single transaction ceiling by $200,000 USD.",
+    "expected_citations": [
+      "nexus_holdings_global_inc.pdf (Page 2)",
+      "foreign_Investement_rbi.pdf (Page 74)",
+      "microsoft-SEC.pdf (Page 60)"
+    ]
+  },
+  {
+    "query": "Check a $400,000 USD software fee remittance from Nexus India where the search vocabulary overlaps Apple filings, Microsoft filings, RBI KYC text, and the internal policy.",
+    "ground_truth_verdict": "COMPLIANT",
+    "ground_truth_answer": "The transaction is COMPLIANT. The retrieval pipeline should distinguish benchmark and regulatory background from the controlling internal remittance rule. The $400,000 USD request is below the internal single transaction cap and does not contain stated KYC or cumulative exposure gaps.",
+    "expected_citations": [
+      "nexus_holdings_global_inc.pdf (Page 2)",
+      "kyc_rbi.pdf (Page 7)",
+      "apple-SEC.pdf (Page 46)",
+      "microsoft-SEC.pdf (Page 60)"
+    ]
+  },
+  {
+    "query": "Audit a $1,100,000 USD outbound technology remittance by Nexus India when cumulative quarterly expenditures sit at exactly $3,950,000 USD.",
+    "ground_truth_verdict": "NON_COMPLIANT",
+    "ground_truth_answer": "The transaction is NON_COMPLIANT. The current payment is individually below the $1,500,000 USD cap, but the quarterly total becomes $5,050,000 USD after adding it, exceeding the $5,000,000 USD cumulative quarterly ceiling.",
     "expected_citations": [
       "nexus_holdings_global_inc.pdf (Page 2)"
     ]
   },
   {
-    "query": "Audit a sequence of four cross-border software payments of $400,000 USD each, sent within 48 hours by Nexus India to a single overseas vendor under identical contract identifiers.",
-    "ground_truth_verdict": "NON_COMPLIANT",
-    "ground_truth_answer": "The transaction sequence is NON_COMPLIANT. Although individual payments are under the threshold, their combined value is $1,600,000 USD, which exceeds the single transaction limit of $1,500,000 USD. Splitting a single project assignment into smaller invoices under identical contract identifiers violates the anti-splitting rule in Section 3.2.",
+    "query": "Verify a $1,380,000 USD outbound software license payment where Nexus India's cumulative quarterly technology spend currently stands at $3,500,000 USD.",
+    "ground_truth_verdict": "COMPLIANT",
+    "ground_truth_answer": "The transaction is COMPLIANT. The payment is below the $1,500,000 USD single transaction cap and brings the quarter to $4,880,000 USD, which remains below the $5,000,000 USD cumulative pool.",
     "expected_citations": [
       "nexus_holdings_global_inc.pdf (Page 2)"
     ]
   },
   {
-    "query": "Verify if a software license remittance of $1,520,000 USD by Nexus India can clear automated evaluation passes if the total quarterly exposure stands at zero.",
+    "query": "Review a $1,350,000 USD outbound licensing fee to an offshore vendor where the vendor is newly onboarded and KYC documentation is incomplete.",
+    "ground_truth_verdict": "ACTION_REQUIRED",
+    "ground_truth_answer": "The transaction is ACTION_REQUIRED. The amount is under the numeric remittance cap, but incomplete KYC documentation for a newly onboarded offshore vendor creates an evidence gap requiring reviewer follow-up.",
+    "expected_citations": [
+      "nexus_holdings_global_inc.pdf (Page 2)",
+      "kyc_rbi.pdf (Page 7)"
+    ]
+  },
+  {
+    "query": "Assess a $1,600,000 USD outbound software remittance from Nexus India described as approved verbally by a regional director.",
     "ground_truth_verdict": "NON_COMPLIANT",
-    "ground_truth_answer": "The transaction is NON_COMPLIANT. The individual assignment value explicitly breaches the strict single transaction limit ceiling of $1,500,000 USD outlined in Section 3.2 by an excess variance delta of $20,000 USD, regardless of the quarterly balance.",
+    "ground_truth_answer": "The transaction is NON_COMPLIANT. The $1,600,000 USD amount exceeds the $1,500,000 USD single transaction ceiling. A verbal regional-director approval is not a sufficient documented policy basis to override the cap.",
     "expected_citations": [
       "nexus_holdings_global_inc.pdf (Page 2)"
     ]
   },
   {
-    "query": "Audit an outbound transfer of $1,220,000 USD from Nexus India to an offshore software supplier, assuming the total quarterly expenditures currently stand at exactly $3,800,000 USD.",
-    "ground_truth_verdict": "NON_COMPLIANT",
-    "ground_truth_answer": "The transaction is NON_COMPLIANT. The individual assignment amount is within the standard limit. However, adding it to the quarterly expenditures pushes the total cumulative remittance to $5,020,000 USD, breaching the $5,000,000 USD quarterly ceiling by an excess variance of $20,000 USD.",
+    "query": "Audit a $750,000 USD domestic India-only software services payment between two Nexus India accounts with no overseas, foreign, offshore, or outbound counterparty.",
+    "ground_truth_verdict": "ACTION_REQUIRED",
+    "ground_truth_answer": "The transaction is ACTION_REQUIRED. The value is below the cross-border remittance threshold, but the query lacks cross-border indicators while invoking a cross-border policy context. The system should require reviewer confirmation on classification before applying the outbound transfer rule.",
     "expected_citations": [
+      "nexus_holdings_global_inc.pdf (Page 2)"
+    ]
+  },
+  {
+    "query": "Verify whether a $5,500,000 USD outbound software license payment can clear because Nexus India claims unused quarterly limits rolled over from prior fiscal years.",
+    "ground_truth_verdict": "NON_COMPLIANT",
+    "ground_truth_answer": "The transaction is NON_COMPLIANT. The internal policy sets a $1,500,000 USD single transaction cap and a $5,000,000 USD fiscal-quarter pool. It does not permit unused limits from prior years to roll over, and the requested amount breaches both relevant constraints.",
+    "expected_citations": [
+      "nexus_holdings_global_inc.pdf (Page 2)"
+    ]
+  },
+  {
+    "query": "Evaluate a $100,000 USD offshore software support payment from Nexus India with standard beneficiary information and no prior quarterly spend.",
+    "ground_truth_verdict": "COMPLIANT",
+    "ground_truth_answer": "The transaction is COMPLIANT. The amount is far below the $1,500,000 USD single transaction ceiling, has no stated cumulative breach, and includes no KYC, director exposure, foreign investment, or digital asset risk trigger.",
+    "expected_citations": [
+      "nexus_holdings_global_inc.pdf (Page 2)"
+    ]
+  },
+  {
+    "query": "Audit a $2,500,000 USD single vendor software license purchase by Nexus India with no previous quarterly allocations.",
+    "ground_truth_verdict": "NON_COMPLIANT",
+    "ground_truth_answer": "The transaction is NON_COMPLIANT. The $2,500,000 USD individual request exceeds the $1,500,000 USD single transaction ceiling by $1,000,000 USD, regardless of the available quarterly pool.",
+    "expected_citations": [
+      "nexus_holdings_global_inc.pdf (Page 2)"
+    ]
+  },
+  {
+    "query": "Check a $1,480,000 USD Nexus India software remittance where SEC benchmark documents appear in retrieval but the internal policy remains available.",
+    "ground_truth_verdict": "COMPLIANT",
+    "ground_truth_answer": "The transaction is COMPLIANT. The relevant governing evidence is the internal Nexus policy, not the SEC benchmark documents. The $1,480,000 USD amount is within the $1,500,000 USD single transaction ceiling.",
+    "expected_citations": [
+      "nexus_holdings_global_inc.pdf (Page 2)",
+      "microsoft-SEC.pdf (Page 60)",
+      "apple-SEC.pdf (Page 46)"
+    ]
+  },
+  {
+    "query": "Review a $1,000,000 USD cross-border wire transfer by Nexus India for software services where the intermediary bank chain and originator information are not documented.",
+    "ground_truth_verdict": "ACTION_REQUIRED",
+    "ground_truth_answer": "The transaction is ACTION_REQUIRED. The amount is within the internal ceiling, but missing intermediary bank chain documentation creates a wire-transfer traceability issue requiring evidence before final approval.",
+    "expected_citations": [
+      "kyc_rbi.pdf (Page 7)",
+      "nexus_holdings_global_inc.pdf (Page 2)"
+    ]
+  },
+  {
+    "query": "Verify a $1,300,000 USD general tech consulting payment from Nexus India to a foreign vendor with clean beneficiary information and quarterly spend of $1,000,000 USD.",
+    "ground_truth_verdict": "COMPLIANT",
+    "ground_truth_answer": "The transaction is COMPLIANT. The payment remains under the $1,500,000 USD single cap, the quarterly total after adding it is $2,300,000 USD, and no KYC, director, digital asset, or foreign investment risk factor is stated.",
+    "expected_citations": [
+      "nexus_holdings_global_inc.pdf (Page 2)"
+    ]
+  },
+  {
+    "query": "Audit a $1,560,000 USD offshore software supplier payment from Nexus India where quarterly spend is only $500,000 USD and all KYC documents are complete.",
+    "ground_truth_verdict": "NON_COMPLIANT",
+    "ground_truth_answer": "The transaction is NON_COMPLIANT. Complete KYC and low quarterly usage do not cure the individual cap breach: $1,560,000 USD exceeds the $1,500,000 USD single transaction ceiling by $60,000 USD.",
+    "expected_citations": [
+      "nexus_holdings_global_inc.pdf (Page 2)",
+      "kyc_rbi.pdf (Page 7)"
+    ]
+  },
+  {
+    "query": "Assess a $500,000 USD outbound payment from Nexus India for software licenses where the stated purpose and counterparty are clear but the user asks whether RBI KYC rules still need to be cited.",
+    "ground_truth_verdict": "COMPLIANT",
+    "ground_truth_answer": "The transaction is COMPLIANT. The amount is within the internal policy ceiling and no KYC defect is stated; RBI KYC material may provide supporting background, but the controlling payment threshold remains the Nexus internal policy.",
+    "expected_citations": [
+      "nexus_holdings_global_inc.pdf (Page 2)",
+      "kyc_rbi.pdf (Page 7)"
+    ]
+  },
+  {
+    "query": "Review a $850,000 USD outbound technology payment from Nexus India to a foreign vendor where KYC beneficial owner information is unavailable.",
+    "ground_truth_verdict": "ACTION_REQUIRED",
+    "ground_truth_answer": "The transaction is ACTION_REQUIRED. The amount is within the internal remittance limit, but missing beneficial owner information creates a KYC evidence gap that should be resolved before approval.",
+    "expected_citations": [
+      "kyc_rbi.pdf (Page 7)",
       "nexus_holdings_global_inc.pdf (Page 2)"
     ]
   }

@@ -7,6 +7,12 @@ import warnings
 from pathlib import Path
 from typing import Any
 
+warnings.filterwarnings(
+    "ignore",
+    message=r"Importing .* from 'ragas\.metrics' is deprecated.*",
+    category=DeprecationWarning,
+)
+
 from langchain_groq import ChatGroq
 from chromadb.utils.embedding_functions import DefaultEmbeddingFunction
 from langchain_core.embeddings import Embeddings
@@ -20,12 +26,6 @@ from ragas.metrics import (
 )
 from ragas.run_config import RunConfig
 from app.core.config import settings
-
-warnings.filterwarnings(
-    "ignore",
-    message=r"Importing .* from 'ragas\.metrics' is deprecated.*",
-    category=DeprecationWarning,
-)
 
 
 METRICS = {
@@ -53,7 +53,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Evaluate saved graph states with a cloud-hosted Groq judge."
     )
-    parser.add_argument("--metric", choices=[*METRICS, "all"], default="faithfulness")
+    parser.add_argument("--metric", choices=[*METRICS, "all"], default="all")
     parser.add_argument("--record", type=int, help="Evaluate only this zero-based row.")
     parser.add_argument("--start", type=int, default=0, help="Inclusive zero-based row.")
     parser.add_argument("--end", type=int, help="Exclusive zero-based row.")
@@ -62,8 +62,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--model", default="llama-3.3-70b-versatile")
     parser.add_argument("--timeout", type=int, default=120, help="Seconds per Ragas job.")
     
-    # UNCAP CONTEXT BOUNDARIES: Allow full pages of text through for perfect alignment scores
-    parser.add_argument("--max-context-chars", type=int, default=128000)
+    parser.add_argument("--max-context-chars", type=int, default=48000)
     parser.add_argument("--max-contexts", type=int, default=12)
     parser.add_argument("--force", action="store_true")
     
@@ -129,6 +128,10 @@ def limited_contexts(
 
 
 def semantic_response(state: dict[str, Any]) -> str:
+    audit_verdict = str(state.get("audit_verdict", "")).strip()
+    if audit_verdict:
+        return audit_verdict
+
     extracted = state.get("extracted_metrics", {})
     value = float(extracted.get("transaction_value", 0.0))
     ceiling = float(extracted.get("allowed_ceiling", 0.0))
@@ -208,12 +211,7 @@ def compute_metrics_incrementally(args: argparse.Namespace) -> None:
     progress = load_progress()
     indices = selected_indices(args, len(saved_states))
 
-    # STRATEGIC FIX 1: Run your valid metrics in a single unified run context window
-    active_metrics = {
-        "faithfulness": faithfulness,
-        "context_precision": context_precision,
-        "context_recall": context_recall
-    }
+    active_metrics = METRICS if args.metric == "all" else {args.metric: METRICS[args.metric]}
 
     print(
         f"Loaded {len(saved_states)} states; rows {indices.start}:{indices.stop}; "
@@ -242,10 +240,9 @@ def compute_metrics_incrementally(args: argparse.Namespace) -> None:
         full_chars = sum(len(str(context)) for context in all_contexts)
         selected_chars = sum(len(context) for context in contexts)
 
-        # Skip this entire row structural entry if all three core metrics are already processed
         record_metrics = progress.get("records", {}).get(str(index), {}).get("metrics", {})
         if all(record_metrics.get(m, {}).get("status") == "success" for m in active_metrics) and not args.force:
-            print(f"SKIP row={index} (All target metrics already completed successfully)", flush=True)
+            print(f"SKIP row={index} (All requested metrics already completed successfully)", flush=True)
             continue
 
         sample = SingleTurnSample(
@@ -257,7 +254,7 @@ def compute_metrics_incrementally(args: argparse.Namespace) -> None:
         dataset = EvaluationDataset(samples=[sample])
 
         print(
-            f"RUN  row={index} batch processing [faithfulness, context_precision, context_recall] "
+            f"RUN  row={index} batch processing [{', '.join(active_metrics)}] "
             f"contexts={len(contexts)}/{len(all_contexts)} "
             f"chars={selected_chars}/{full_chars}",
             flush=True,
@@ -268,8 +265,6 @@ def compute_metrics_incrementally(args: argparse.Namespace) -> None:
         try:
             evaluator_llm = build_llm(args)
             
-            # STRATEGIC FIX 2: Evaluate the array as a single atomic batch pass 
-            # This completely avoids closed asyncio event loop tracking errors!
             evaluation = evaluate(
                 dataset=dataset,
                 metrics=[copy.deepcopy(active_metrics[m]) for m in active_metrics],
@@ -281,7 +276,6 @@ def compute_metrics_incrementally(args: argparse.Namespace) -> None:
                 show_progress=False,
             )
 
-            # Store the combined successful scoring variables
             elapsed = round(time.monotonic() - started, 2)
             for m_name in active_metrics:
                 score = float(evaluation[m_name][0])

@@ -77,6 +77,31 @@ Thumbs.db
 
 
 data/
+!data/
+data/*
+!data/processed/
+data/processed/*
+!data/processed/apple-SEC.json
+!data/processed/child_chunks.json
+!data/processed/credit_Risk_RBI.json
+!data/processed/foreign_Investement_rbi.json
+!data/processed/knowledge_graph.pkl
+!data/processed/kyc_rbi.json
+!data/processed/microsoft-SEC.json
+!data/processed/nexus_holdings_global_inc.json
+!data/processed/parent_chunks.json
+!data/processed/seed_data.json
+!data/processed/certificates/
+data/processed/certificates/*
+!data/processed/certificates/TX_1001.pdf
+!data/processed/certificates/TX_1002.pdf
+!data/processed/certificates/TX_1003.pdf
+!data/processed/certificates/TX_1004.pdf
+!data/processed/certificates/TX_1005.pdf
+!data/processed/certificates/TX_1006.pdf
+!data/processed/certificates/TX_1007.pdf
+!data/processed/certificates/TX_1008.pdf
+!data/processed/eval_ground_truth.json
 
 
 output/

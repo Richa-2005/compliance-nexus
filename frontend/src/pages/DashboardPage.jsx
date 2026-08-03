@@ -22,6 +22,7 @@ import {
   getAssignmentOutbox,
   getAuditHistory,
   getAuditTopology,
+  getLiveFeedUrl,
   getPdfUrl,
   updateAssignment,
 } from "../utils/api";
@@ -147,7 +148,7 @@ export function DashboardPage({ role = "analyst" }) {
       })
       .catch(() => {
         if (!ignore) {
-          setNotice(cached.length ? "Unable to refresh audit history. Showing last loaded records." : "Unable to load audit history from localhost:8000.");
+          setNotice(cached.length ? "Unable to refresh audit history. Showing last loaded records." : "Unable to load audit history from the configured API.");
           if (!cached.length) setAudits([]);
         }
       })
@@ -184,7 +185,7 @@ export function DashboardPage({ role = "analyst" }) {
     let reconnectTimer;
 
     function connect() {
-      socket = new WebSocket("ws://localhost:8000/ws/live-feed");
+      socket = new WebSocket(getLiveFeedUrl());
       socket.onopen = () => setTelemetry("live");
       socket.onmessage = (event) => {
         try {

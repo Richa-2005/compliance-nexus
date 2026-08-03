@@ -1,0 +1,600 @@
+[
+    {
+        "content_type": "text",
+        "page_number": 1,
+        "raw_content": "\u092d\u093e\u0930\u0924\u0940\u092f \ufffd\u0930\u095b\u0935\u0930\u094d \u092c\u0948\u0902\u0915\nRESERVE BANK OF INDIA\nRBI/DOR/2025-26/157\nDOR.CRE.REC.76/07-02-001/2025-26 November 28, 2025\nReserve Bank of India (Commercial Banks \u2013 Credit Risk Management) Directions,\n2025 (Updated as on July 01, 2026)\nTable of Contents\nChapter I - Preliminary ............................................................................................... 2\nChapter II - Board Approved Policies ..................................................................... 10\nChapter III - Credit Risk Evaluation ........................................................................ 11\nChapter IV - Statutory Restrictions ......................................................................... 13\nChapter V - Regulatory Restrictions ....................................................................... 17\nChapter VI - Country Risk Management ................................................................. 23\nChapter VII - Unhedged Foreign Currency Exposure (UFCE) .............................. 27\nChapter VIII - Legal Entity Identifier (LEI) for Borrowers ...................................... 33\nChapter IX - Valuation of Properties - Empanelment of Valuers .......................... 35",
+        "section_inferred": null,
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 1,
+        "raw_content": "Chapter X - Filing of Security Interest relating to Immovable (other than\nequitable mortgage), Movable, and Intangible Assets in CERSAI ....................... 37\nChapter XI - [Deleted] ............................................................................................... 39\nChapter XIA - Maintenance of Cash Credit Accounts, Current Accounts and\nOverdraft Accounts by Banks ................................................................................. 40\nChapter XII - Loan System for Delivery of Bank Credit ......................................... 46\nChapter XIII - Repeal and other provisions ............................................................ 48\nAnnex I ...................................................................................................................... 50\nAnnex II ..................................................................................................................... 52\nAnnex III .................................................................................................................... 53",
+        "section_inferred": "Chapter X - Filing of Security Interest relating to Immovable (other than",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 2,
+        "raw_content": "Introduction\nCommercial Banks (CBs), in the course of financial intermediation, are exposed to various\nfinancial and non-financial risks, of which credit risk is the one of the most significant risks.\nIf not managed effectively, credit risk may have ramifications for a range of other risk\ncategories too. As credit exposures of CBs encompass varied sectors, borrower types\nand products with their own idiosyncratic complexities as well as systemic implications\ndue to interconnectedness among themselves, credit risk management of CBs involve a\nrange of prudential tools, including statutory and regulatory restrictions / prohibitions on\ncertain activities. Recognising this, the Reserve Bank has, from time to time, issued\nguidelines to strengthen credit risk management practices.\nAccordingly, in exercise of the powers conferred by Sections 20, 21 and 35A of the\nBanking Regulation Act, 1949 and all other provisions / laws enabling the Reserve Bank\nof India (hereinafter called the Reserve Bank) in this regard, Reserve Bank being satisfied\nthat it is necessary and expedient in the public interest so to do, hereby issues these\nDirections hereinafter specified.",
+        "section_inferred": "Chapter X - Filing of Security Interest relating to Immovable (other than",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 2,
+        "raw_content": "Chapter I - Preliminary\nA. Short title and Commencement\n1. These Directions shall be called the Reserve Bank of India (Commercial Banks \u2013\nCredit Risk Management) Directions, 2025.\n2. These Directions shall come into effect immediately upon issuance.\nB. Applicability\n3. These Directions shall be applicable to commercial banks (hereinafter collectively\nreferred to as 'banks' and individually as a 'bank').\nFor the purpose of these Directions, \u2018Commercial Banks\u2019 shall mean banking\ncompanies (other than Small Finance Banks, Payment Banks, and Local Area\nBanks), corresponding new banks, and the State Bank of India, as defined\nrespectively under clauses (c), (da), and (nc) of Section 5 of the Banking",
+        "section_inferred": "Chapter I - Preliminary",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 3,
+        "raw_content": "Regulation Act, 1949.\nC. Definitions\n4. (1) In these Directions, unless the context otherwise requires,\n(i) \u2018Bank Guarantee\u2019 shall mean financial and performance guarantees issued by\nbanks on behalf of their clients. A financial guarantee assures payment of money in\nthe event of non-fulfilment of contractual obligations by the client. A performance\nguarantee provides assurance of compensation if there is delayed or inadequate\nperformance on a contract. A deferred payment guarantee assures payment of\ninstalments due to a supplier of goods.\n(ii) \u2018Bills Purchased and Discounted\u2019 shall mean negotiable instruments that give the\nholder the right to receive stated fixed sums on demand or at a fixed or determinable\nfuture time. When a bank negotiates a bill payable on demand (sight bill) and\nprovides funds to the holder, at a fee / interest, the facility is referred to as bill\npurchase. When a bank negotiates bill payable after a usance i.e., at a fixed or\ndeterminable future time (usance bill) and provides funds to the holder, at a discount,\nthe facility is referred to as bill discounting. Bills purchased and discounted can be\nInland Bills and Foreign Bills. Inland Bills are Bills of Exchange drawn in India and\npaid in India to a person in India.\n(iii) 'Cash credit (CC)\u2019 shall mean a facility, under which a customer is allowed an\nadvance up to the credit limit against the security by way of hypothecation / pledge\nof goods, book debts, standing crops, etc. The facility is a running account and\n\u2019Drawing Power \u2013 DP\u2019 is periodically determined with reference to the value of the\neligible current assets. The outstanding amount is repayable on demand.",
+        "section_inferred": "Chapter I - Preliminary",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 4,
+        "raw_content": "1[(iiia) \u2018Committee on lending to related parties\u2019 shall mean a committee of the Board of\nthe bank entrusted with sanctioning of loans to related parties. Banks may also\nidentify any existing Committee, other than the Audit Committee, for this purpose.\n(iiib) \u2018Contract or arrangement\u2019 shall have the same meaning as specified in Section\n188(1)(a) to (g) of the Companies Act, 2013.\n(iiic) \u2018Control\u2019 shall have the same meaning as assigned to it under Section 2(27) of the\nCompanies Act, 2013.]\n(iv) \u2019Current Account\u2019 shall mean a form of demand deposit account wherefrom\nwithdrawals are allowed any number of times depending upon the balance in the\naccount or up to a particular agreed amount and shall also be deemed to include\nother deposit accounts which are neither Savings nor Term deposit account.\n(v) \u2018Demand loans\u2019 shall mean all loans repayable on demand (such as cash credit,\noverdraft, bills purchased and discounted, etc.) and short-term loans with maturity\nup to one year, whether secured or unsecured, are considered demand loans.\n2[(va) \u2018Director of a bank\u2019 shall have the same meaning as defined in Explanation (b) to\nSection 20 of the Banking Regulation Act 1949 and would include a nominee\ndirector and an independent director.]\n(vi) \u2018Earnings before Interest and Depreciation (EBID)\u2019 shall have the same meaning as\ndefined for computation of Debt Service Coverage Ratio (DSCR), i.e., EBID = Profit\nAfter Tax + Depreciation + Interest on debt + Lease Rentals, if any.\n(vii) \u2018Entity\u2019 in the context of \u2018Unhedged Foreign Currency Exposure\u2019 prescribed in\nChapter-VII of these Directions shall mean a counterparty to which a bank has\nexposure in any currency.\n1Inserted with effect from April 01, 2026 vide Reserve Bank of India (Commercial Banks \u2013 Credit Risk Management) \u2013\nAmendment Directions, 2026 dated January 05, 2026.\n2Inserted with effect from April 01, 2026 vide Reserve Bank of India (Commercial Banks \u2013 Credit Risk Management) \u2013\nAmendment Directions, 2026 dated January 05, 2026.",
+        "section_inferred": "Chapter I - Preliminary",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 5,
+        "raw_content": "Explanation: Exposure shall mean all fund-based and non-fund-based exposures.\n3[(viia) \u2018Entity\u2019 in the context of a \u2018related party\u2019 prescribed in Chapter V shall mean a\n\u2018person\u2019 other than an individual and a Hindu Undivided Family (HUF).]\n(viii) \u2018Financial hedge\u2019 shall mean hedging through a derivative contract with a financial\ninstitution. Financial hedge shall be considered only where the entity has\ndocumented the purpose and the strategy for hedging at inception of the derivative\ncontract and assessed its effectiveness as a hedging instrument at periodic\nintervals.\nNote: For the purpose of assessing the effectiveness of hedge, guidance may be\ntaken from the applicable accounting standards and the relevant guidance notes of\nthe Institute of Chartered Accountants of India on the matter.\n(ix) \u2018Foreign Currency Exposure (FCE)\u2019 of an entity shall mean the gross sum of all\nitems on the entity\u2019s balance sheet that have impact on its profit and loss account\ndue to movement in foreign exchange rates.\n4[(ixa) \u2018Key Managerial Personnel (KMP)\u2019 of a bank shall have the same meaning as\ndefined in Section 2(51) of the Companies Act, 2013.\n(ixb) \u2018Lending\u2019 in the context of a \u2018related party\u2019 shall mean extending funded or/ and non-\nfund-based credit facilities to related parties. While investments in debt instruments\nof related parties shall be covered for this purpose, equity investments shall be\nexcluded.]\n(x) \u2018Letter of Credit (LC)\u2019 shall mean any arrangement how so ever named or\ndescribed, that is irrevocable and thereby constitutes a definite undertaking of the\nissuing bank to honour a complying presentation. An LC confirmed by a bank\n3Inserted with effect from April 01, 2026 vide Reserve Bank of India (Commercial Banks \u2013 Credit Risk Management) \u2013\nAmendment Directions, 2026 dated January 05, 2026.\n4Inserted with effect from April 01, 2026 vide Reserve Bank of India (Commercial Banks \u2013 Credit Risk Management) \u2013\nAmendment Directions, 2026 dated January 05, 2026.",
+        "section_inferred": "Chapter I - Preliminary",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 6,
+        "raw_content": "based and operating in another country is payable by the confirming bank.\n(xi) \u2018Major shareholder\u2019 shall mean a person holding 10 per cent or more of the paid-\nup share capital or \u20b95 crore in paid-up shares, whichever is less.\n(xii) \u2018Natural hedge\u2019 shall mean a hedge arising out of the operations of the company\nwhen cash flows offset the risk arising out of the Foreign Currency Exposure (FCE).\nExplanation: An exposure shall be considered as naturally hedged only if the\noffsetting exposure has the maturity / cash flow within the same accounting year.\nFor instance, export revenues (booked as receivable) may offset the exchange risk\narising out of repayment obligations of an external commercial borrowing if both\nthe exposures have cash flows / maturity within the same accounting year.\n(xiii) \u2018Overdraft (OD)\u2019 shall mean a facility, under which a customer is allowed to draw\nan agreed sum (credit limit) in excess of credit balance in their account. The\noverdraft facility may be secured (against fixed / term deposits and other securities,\nlike small saving instruments, surrender value of insurance policies, etc.) or clean\n(i.e. without any security). The overdraft facility might be granted on their current\naccount, savings deposits account or temporary overdraft on credit accounts.\n5[(xiiia) \u2018Person\u2019 shall have the same meaning as assigned to it under Section 3(23) of\nPart I of Insolvency and Bankruptcy Code (IBC), 2016.]\n(xiv) 6[\u2018Personal Loan\u2019 shall have the same meaning as defined under Banking Statistics\n(Harmonised Definitions).]\n7[(xiva) \u2018Promoter\u2019 shall have the same meaning as assigned to it under Section 2(69) of\nthe Companies Act, 2013.\n5Inserted with effect from April 01, 2026 vide Reserve Bank of India (Commercial Banks \u2013 Credit Risk Management) \u2013\nAmendment Directions, 2026 dated January 05, 2026.\n6Substituted with effect from April 01, 2026 vide Reserve Bank of India (Commercial Banks \u2013 Credit Risk Management)\n\u2013 Amendment Directions, 2026 dated January 05, 2026.\n7Inserted with effect from April 01, 2026 vide Reserve Bank of India (Commercial Banks \u2013 Credit Risk Management) \u2013\nAmendment Directions, 2026 dated January 05, 2026.",
+        "section_inferred": "Chapter I - Preliminary",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 7,
+        "raw_content": "(xivb) \u2018Reciprocally Related Person\u2019 means an individual who is either (i) a director\n(excluding independent director / Nominee director appointed by the Government\nor RBI or a statutory body) of another commercial bank, or an AIFI, or a scheduled\ncooperative bank, or a subsidiary of a commercial bank; or (ii) a trustee of a mutual\nfund or an alternate investment fund established by any of the aforesaid regulated\nentities; or (iii) a relative of such a director or a trustee.\n(xivc) \u2018Related Party\u2019 with respect to a bank shall mean a related person, a reciprocally\nrelated person, or any of the following entities:\n(a) where a related person or a reciprocally related person is a partner, manager,\nKMP, director or a promoter; or\n(b) where a related person or a reciprocally related person is a shareholder with more\nthan ten per cent of paid-up equity share capital; or\n(c) where a related person or a reciprocally related person is having control, whether\nsingly or jointly with another person; or\n(d) where a related person or a reciprocally related person controls more than twenty\nper cent of voting rights on account of ownership or through a voting agreement or\nthrough any other arrangement; or\n(e) where a related person or a reciprocally related person has the power to nominate\na director to its Board; or\n(f) which is accustomed to act on the advice, direction, or instruction of a related\nperson or reciprocally related person; or\n(g) where a related person or a reciprocally related person is a guarantor or a surety;\nor\n(h) where a related person or a reciprocally related person is a trustee or an author or\na beneficiary and where the entity is in the form of a private trust.\n(i) which is related to the related person or a reciprocally related person as a\nsubsidiary or a parent company or a holding company or an associate or a joint\nventure.",
+        "section_inferred": "Chapter I - Preliminary",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 8,
+        "raw_content": "Provided that, nothing in sub-clause (e) above shall apply in cases where the authority to\nnominate a director arises exclusively from a lending or financing arrangement.\nProvided further that, nothing in sub-clause (f) above shall apply to the advice, directions\nor instructions given in a professional capacity.\nProvided further that, Government of India / State Government-owned or controlled\nentities shall not be treated as related parties to a government-owned bank just by virtue\nof the fact that the Government has the common ownership or control of such entities.\n(xivd) \u2018Related Person\u2019 with respect to a bank shall mean a person, and the relatives of\nsuch a person, where the person:\n(a) is either a promoter, or a director, or a KMP of the bank; or\n(b) owns more than five per cent of paid-up equity share capital of the bank or can,\neither singly or jointly, exercise more than five per cent of the voting rights of the\nbank on account of either ownership or voting agreement or through shareholders\u2019\nagreement or through any other arrangement; or\n(c) can, through an agreement with the bank, nominate a director to its Board; or\n(d) is either singly or jointly, in control of the bank.]\n(xv) 8[\u2018Relative\u2019 with regard to a natural person shall have the same meaning as defined\nin Section 2(77) of the Companies Act, 2013 and rules framed therein.]\n(xvi) 'Revaluation Reserve' shall mean a reserve created on the revaluation of assets\nor net assets represented by the surplus of the estimated replacement cost or\nestimated market values over the book values thereof.\n8Substituted with effect from April 01, 2026 vide Reserve Bank of India (Commercial Banks \u2013 Credit Risk Management)\n\u2013 Amendment Directions, 2026 dated January 05, 2026.",
+        "section_inferred": "Chapter I - Preliminary",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 9,
+        "raw_content": "(xvii) \u2018Smaller entities\u2019 in the context of \u2018Unhedged Foreign Currency Exposure\u2019\nprescribed in Chapter-VII of these Directions shall mean those entities on which total\nexposure of the banking system is at \u20b950 crore or less.\n9[(xviia) \u2018Specified employees\u2019 mean all employees of a bank who are positioned up to\ntwo levels below the Board and any employee designated as such as per the\nbank\u2019s policy.]\n(xviii) 'Substantial interest' shall have the same meaning as assigned to it in Section\n5(ne) of the Banking Regulation Act, 1949.\n(xix) \u2018Term loans\u2019 shall mean loans which have a specified maturity and is payable in\ninstalments or in bullet form.\n(xx) 'Unhedged Foreign Currency Exposure (UFCE)' shall mean Foreign Currency\nExposure (FCE) excluding items which are effective hedge of each other. While\nestimating UFCE of an entity, banks shall consider only two types of hedges -\nfinancial hedge and natural hedge.\n(2) All other expressions unless defined herein shall have the same meaning as have\nbeen assigned to them under the Banking Regulation Act, 1949 or the Reserve Bank\nof India Act, 1934, and rules / regulations made thereunder, or any statutory\nmodification or re-enactment thereto or in other relevant regulations issued by the\nReserve Bank, or Glossary of Terms published by Reserve Bank or as used in\ncommercial parlance, as the case may be.\n9Inserted with effect from April 01, 2026 vide Reserve Bank of India (Commercial Banks \u2013 Credit Risk Management)\n\u2013 Amendment Directions, 2026 dated January 05, 2026",
+        "section_inferred": "Chapter I - Preliminary",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 10,
+        "raw_content": "Chapter II - Board Approved Policies\n5. 10[A bank shall put in place a comprehensive Board approved policy on Credit Risk\nManagement. The policy shall, inter alia, cover aspects related to lending to related\nparties, country risk management, unhedged foreign currency exposures, valuation\nof properties including empanelment of valuers, and opening of current accounts and\nCC / OD accounts. The afore-mentioned specific aspects and other areas of concern\nwhich need to be addressed in such policies are also detailed in the relevant\nparagraphs of these Directions.]\n10Substituted with effect from April 01, 2026 vide Reserve Bank of India (Commercial Banks \u2013 Credit Risk Management)\n\u2013 Amendment Directions, 2026 dated January 05, 2026.",
+        "section_inferred": "Chapter II - Board Approved Policies",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 11,
+        "raw_content": "Chapter III - Credit Risk Evaluation\n6. A bank shall strictly follow the credit risk management guidelines contained in the\n\u2018Guidance Note on Credit Risk Management\u2019.\n7. A bank shall carry out their independent and objective credit appraisal in all cases and\nmust not depend on credit appraisal reports prepared by outside consultants,\nespecially the in-house consultants of the borrowing entity.\n8. A bank / lender shall carry out sensitivity tests / scenario analysis, especially for\ninfrastructure projects, which shall inter alia include project delays and cost overruns.\nThis shall aid in taking a view on viability of the project at the time of deciding on\ndeferment of Date of Commencement of Commercial Operations (DCCO) /\nrestructuring.\n9. A bank shall ascertain the source and quality of equity capital brought in by the\npromoters / shareholders. Multiple leveraging, especially, in infrastructure projects, is\na matter of concern as it effectively camouflages the financial ratios such as Debt\nEquity ratio, leading to adverse selection of the borrowers. Therefore, a lender shall\nensure at the time of credit appraisal that debt of the parent company is not infused as\nequity capital of the subsidiary / Special Purpose Vehicle (SPV).\n10. A bank shall review their extant sectoral exposure limits for consumer credit and put\nin place, if not already there, Board approved limits in respect of various sub-segments\nunder consumer credit as may be considered necessary by the Boards as part of\nprudent risk management. In particular, limits shall be prescribed for all unsecured\nconsumer credit exposures. The limits so fixed shall be strictly adhered to and\nmonitored on an ongoing basis by the Risk Management Committee.\n11. A bank shall include in their loan policies / credit appraisal processes, suitable\nprovisions for obtaining Credit Information Reports (CIRs) from one or more Credit\nInformation Companies (CICs) so that the credit decisions are based on credit\ninformation available in the system.",
+        "section_inferred": "Chapter III - Credit Risk Evaluation",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 12,
+        "raw_content": "12. A bank shall be guided by DoS.CO.PPG.BC.1/11.01.005/2020-21 dated August 21,\n2020 for \u2018Ad-hoc/ Short Review / Renewal of Credit Facilities\u2019 and\nDBS.CO.PPD.BC.No. 5/11.01.005/2010-11 dated January 14, 2011 on \u2018End Use of\nFunds \u2013 Monitoring'.\n1112A. Credit assessments carried out by a bank shall suitably factor in the possible impact\nof calamities on borrowers who may be impacted by such events.\n11 Inserted with effect from July 01, 2026 vide Reserve Bank of India (Commercial Banks \u2013 Credit Risk Management)\nThird Amendment Directions, 2026 dated April 29, 2026.",
+        "section_inferred": "Chapter III - Credit Risk Evaluation",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 13,
+        "raw_content": "Chapter IV - Statutory Restrictions\nA. Advances against Bank\u2019s own Shares\n13. In terms of Section 20(1)(a) of the Banking Regulation Act (BR Act), 1949, a bank\ncannot grant any loans and advances on the security of its own shares.\nB. Advances to Bank\u2019s Directors\n14. In terms of Section 20(1)(b) of the BR Act, 1949, a bank is prohibited from\nentering into any commitment for granting any loans or advances to or on behalf\nof any of its directors, or any firm in which any of its directors is interested as\npartner, manager, employee or guarantor, or any company [not being a\nsubsidiary of the banking company or a company registered under Section 8 of\nthe Companies Act, 2013, or a Government company] of which, or the subsidiary\nor the holding company of which any of the directors of the bank is a director,\nmanaging agent, manager, employee or guarantor or in which he holds\nsubstantial interest, or any individual in respect of whom any of its directors is a\npartner or guarantor.\nB.1 Clarifications on Applicability of Section 20(1)(b) of BR Act\n15. 12[*****]\n13[15A. In exercise of the powers conferred by clause (a) of the Explanation under sub-\nsection 4 of Section 20 of the Banking Regulation Act, 1949, the following\nexplanations are provided:\n(1) The sanction or grant of credit facilities to companies in India by a foreign bank\nhaving branches in India shall be in compliance with the spirit of Section 20 of the\nBanking Regulation Act, 1949. Accordingly, a foreign bank branch in India shall\nnot lend to a firm / company in India, if a director in the foreign bank\u2019s Board abroad\n12Deleted with effect from April 01, 2026 vide Reserve Bank of India (Commercial Banks \u2013 Credit Risk Management) \u2013\nAmendment Directions, 2026 dated January 05, 2026.\n13Inserted with effect from April 01, 2026 vide Reserve Bank of India (Commercial Banks \u2013 Credit Risk Management)\n\u2013 Amendment Directions, 2026 dated January 05, 2026.",
+        "section_inferred": "Chapter IV - Statutory Restrictions",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 14,
+        "raw_content": "has an interest in the firm / company or if the company is a subsidiary of any Indian\n/ foreign parent in which the director is interested.\n(2) Provisions of paragraph 14 above would not apply in the following cases:\n(i) Credit facilities granted or commitment made by a bank to a company where a\ndirector of the bank has substantial interest, if the advance was granted, or\ncommitment was made, prior to the appointment of the said director on the Board\nof the bank.\nProvided that, till the director relinquishes the directorship of either the bank or the\ncompany, the bank shall not further renew such a facility on or after its contracted\nmaturity or renewal date; enhance the limit; or change any of the terms of the\nfacility before its maturity.\n(ii) Advances to a public trust, where a trustee is also a director of the lending bank.\n(iii) Loans and advances to a director against government securities, life insurance\npolicies or fixed deposit, where loan-to-value is not in excess of 100 per cent of the\nrealisable value of such securities or in adherence to specifically prescribed LTV\nratio and valuation norms for loans against such a primary security by relevant\nDirections of the RBI, if any.\n(iv) Such personal loans and advances to a director, other than loans for\ninvestment in financial assets, as permitted to an employee in terms of the\napproved policy, or that form part of the approved compensation / remuneration\npackage of the director, where applicable. The interest rate charged on all such\nloans shall not be lower than the rate charged to the employees.\n(v) Non-Fund Based (NFB) facility on behalf of a director or his/her related party,\nprovided that all such facilities shall be fully secured by cash collateral of equivalent\nor higher value.",
+        "section_inferred": "Chapter IV - Statutory Restrictions",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 15,
+        "raw_content": "Provided that, cash collateral would not be mandatory in exposures arising on\naccount of derivative transactions.\n(vi) Line of credit / overdraft facility extended by settlement bankers to a qualifying\ncentral counterparty (QCCP) which is licensed to operate as a CCP (including a\nlicense granted by way of confirming an exemption) and is permitted by the\nappropriate regulator / overseer to operate as such with respect to the products\noffered, if such QCCP is classified as a related party.]\n14[B.2 *****\n16. *****\n17. *****\n18. *****\n19. *****]\nB.3 Restrictions on Power to Remit Debts\n20. Section 20A(1) of the BR Act, 1949 stipulates that a bank shall not, except\nwith the prior approval of the Reserve Bank, remit in whole or in part any\ndebt due to it by -\n(1) any of its directors, or\n(2) any firm or company in which any of its directors is interested as\ndirector, partner, managing agent or guarantor, or\n(3) any individual, if any of its directors is their partner or guarantor.\n21. In terms of Section 20A (2) of the Act ibid, any remission made in contravention\n14Deleted with effect from April 01, 2026 vide Reserve Bank of India (Commercial Banks \u2013 Credit Risk Management) \u2013\nAmendment Directions, 2026 dated January 05, 2026.",
+        "section_inferred": "Chapter IV - Statutory Restrictions",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 16,
+        "raw_content": "of the provisions of sub-section (1) above shall be void and of no effect.\nC. Restrictions on Holding Shares in Companies\n22. While granting loans and advances against shares, statutory provisions\ncontained in Sections 19(2) and 19(3) of the BR Act, 1949 shall be strictly\nobserved.\nD. Restrictions on Credit to Companies for Buy-back of their Securities\n23. In terms of provisions of the Companies Act, 2013, companies are permitted to\npurchase their own shares or other specified securities out of their\n(1) free reserves, or\n(2) securities premium account, or\n(3) the proceeds of any shares or other specified securities,\nsubject to compliance of various conditions specified therein. Therefore, a bank shall\nnot provide loans to companies for buy-back of shares / securities.",
+        "section_inferred": "Chapter IV - Statutory Restrictions",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 17,
+        "raw_content": "Chapter V - Regulatory Restrictions\n15[A. *****\n24. *****\nA.1 *****\n25. *****\n26. *****\n27. *****\n28. *****\n29. *****\n30. *****\n31. *****\n32. *****\n33. *****\n34. *****\n35. *****\n36. *****\n37. *****\nB. *****\n38. *****\n39. *****\n15Deleted with effect from April 01, 2026 vide Reserve Bank of India (Commercial Banks \u2013 Credit Risk Management) \u2013\nAmendment Directions, 2026 dated January 05, 2026.",
+        "section_inferred": "Chapter V - Regulatory Restrictions",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 18,
+        "raw_content": "40. *****\n41. *****\n42. *****]\n16[B.1 Lending to Related Parties\nB.1.1. General Principles\n42A. This Section sets out general principles and procedures to be followed for prudent\nrisk management of loans to related parties, wherever allowed.\n42B. The Board shall have the overall responsibility of ensuring that suitable mechanisms\nare put in place for implementation of the policy on lending to related parties by the\nbank.\n42C. The credit policy (hereinafter called the policy) of a bank, as required in terms of the\nextant Directions, shall contain specific provisions relating to \u2018lending to related\nparties\u2019 in accordance with the provisions of these Directions. The policy shall\nprescribe, inter alia, additional safeguards to address the risks emanating from\nlending to related parties.\n42D. The policy shall also have specific provisions for lending to \u2019specified employees\u2019\nof the bank and their relatives.\n42E. Further, the policy shall, as a part of the whistleblowing mechanism, encourage\nemployees to communicate confidentially and without the risk of reprisal, legitimate\nconcerns, if any, about irregular, unethical, or questionable loans to related parties;\nand eliminate quid pro quo arrangements, if any.\n16Inserted with effect from April 01, 2026 vide Reserve Bank of India (Commercial Banks \u2013 Credit Risk Management)\n\u2013 Amendment Directions, 2026 dated January 05, 2026.",
+        "section_inferred": "Chapter V - Regulatory Restrictions",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 19,
+        "raw_content": "42F. The policy shall specify aggregate limits for loans towards related parties. Within this\naggregate limit, there shall be sub-limits for loans to a single related party and a\ngroup of related parties. These limits shall be within the extant prudential exposure\nlimits prescribed by the Reserve Bank.\nB.1.2 Regulatory Prohibitions\n42G. Provisions of paragraph 14 in Chapter IV shall also apply to grant of loans and\nadvances to spouse and minor / dependent children of the directors of banks.\nHowever, banks may grant loan or advance to or on behalf of spouses of their\ndirectors in cases where the spouse has his / her own independent source of\nincome arising out of his / her employment or profession and the facility so granted\nis based on standard procedures and norms for assessing the creditworthiness of\nthe borrower. Such facility should be extended on commercial terms, conforming\nto arms-length principle.\n42H. In addition to the restrictions placed on loans and advances by a bank to its directors\nand the companies in which its directors are interested under Section 20 of the\nBanking Regulation Act, 1949, a bank shall not have any exposure (including\ninvestments in the equity / debt capital instruments) to its promoters and their\nrelatives; shareholders with shareholding of 10 per cent or more in the paid-up\nequity capital of the bank; as also the entities in which they (promoters, their\nrelatives and shareholders as stated above) have significant influence or control\n(as defined under Accounting Standards Ind AS 28 and Ind AS 110).\nProvided that, nothing in paragraph 42H above shall apply in cases where a\nfinancial institution, a scheduled commercial bank, a foreign portfolio investor or a\nmutual fund holds ten per cent or more of the equity share capital of the bank as\nnon-strategic investment and without any control of the bank.",
+        "section_inferred": "Chapter V - Regulatory Restrictions",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 20,
+        "raw_content": "B.1.3 Materiality Threshold\n42I. Loans to related parties, which are not prohibited in terms of provisions of Chapter\nIV or this Chapter of these Directions, or which have been permitted under power\nexercised by the Reserve Bank under clause (a) of the Explanation under Section\n20(4) of the Banking Regulation Act, 1949, except (i) credit facilities fully secured\nby cash or liquid securities and in accordance to prescribed LTV and valuation\nnorms for such securities and (ii) Interbank loans, shall be subject to a materiality\nthreshold as per the credit policy, which shall not be higher than the following\nceilings:\n42J. Materiality thresholds may vary for different categories of loans to related parties as\nper the bank\u2019s policy.\n42K. All loans above the prescribed materiality threshold shall be sanctioned either by the\nBoard or by the \u2018Committee on Lending to Related Parties\u2019 of the bank. As regards\nloans below the materiality threshold, the same can be sanctioned by appropriate\nauthority in terms of powers delegated to them.\nB.1.4 Recusal of Interested Parties\n42L. Directors, KMP, or \u2018specified employees\u2019 shall recuse themselves from deliberations\nand decision on loan proposals, or contracts and arrangements, involving\nthemselves or their related parties. Such recusal shall also extend to deliberations\nand decisions relating to any subsequent material changes to the terms of such",
+        "section_inferred": "Chapter V - Regulatory Restrictions",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "table",
+        "page_number": 20,
+        "raw_content": [
+            [
+                "Asset Size of the bank (in \u20b9 crore)",
+                "Materiality Threshold Ceilings"
+            ],
+            [
+                "> 10,00,000",
+                "\u20b925 crore"
+            ],
+            [
+                "\u2265 1,00,000 to up to 10,00,000",
+                "\u20b910 crore"
+            ],
+            [
+                "Less than 100,000",
+                "\u20b95 crore"
+            ],
+            [
+                "Asset size based on the last audited balance sheet.\nFor loans, materiality threshold shall apply at individual transaction level.",
+                ""
+            ]
+        ],
+        "section_inferred": "Chapter V - Regulatory Restrictions",
+        "source_document": "credit_Risk_RBI.pdf",
+        "table_index": 1
+    },
+    {
+        "content_type": "text",
+        "page_number": 21,
+        "raw_content": "loans, including one-time settlements, write-offs, waivers, enforcement of security,\nimplementation of resolution plans, etc.\nB.1.5 Monitoring of Loans to Related Parties\n42M. A bank shall put in place a suitable mechanism for maintaining and periodically\nupdating the list of all the related persons, and the related parties thereof, as well\nas the loans sanctioned by the bank to such related persons and related parties.\n42N. Credit facilities sanctioned to 'specified employees\u2019 and their relatives shall be\nreported to the Board on an annual basis.\n42O. Periodic reviews shall be conducted at quarterly or shorter intervals by internal\nauditors to check, inter alia, whether guidelines and procedures in relation to loans\nto related parties are being adhered to or not.\n42P. Any deviation from the policy relating to lending to related parties and reasons\ntherefor shall be reported to the Audit Committee of the Board.\n42Q. Any product, entity or structure formed with the objective of circumventing these\nDirections through various means, such as reciprocal lending or quid pro quo\narrangements, and identified as such by the auditors of the bank or by the\nsupervisory authority and investigating agencies shall always be treated as lending\nto related party.\nB.1.6 Others\n42R. In addition to the provisions of Chapter V on lending to related parties, listed banks\nshall continue to comply with the applicable provisions of the Securities and\nExchange Board of India (Listing Obligations and Disclosure Requirements)\nRegulations, 2015, as amended from time to time.\n42S. Banks shall also adhere to instructions placed in terms of Chapter VI- Prudential\nLimits on Intra-Group Transactions and Exposure of Reserve Bank of India",
+        "section_inferred": "Chapter V - Regulatory Restrictions",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 22,
+        "raw_content": "(Commercial Banks - Concentration Risk Management) Directions, 2025 for\ntransactions with their group entities.\nB.1.7 Enforcement Actions\n42T. Any non-compliance with and circumvention of these Directions shall result in\nsupervisory and enforcement actions as deemed appropriate by the Reserve\nBank. These actions may include imposition of monetary penalty, requirement of\nfull provisioning, directions to conduct staff accountability exercises, forensic\naudits, and restrictions or any other supervisory and enforcement actions as\ndeemed fit.]\nC. Restrictions on Grant of Financial Assistance to Industries Producing /\nConsuming Ozone Depleting Substances (ODS)\n43. A bank shall not extend finance for setting up of new units consuming /\nproducing the Ozone Depleting Substances (ODS). No financial assistance\nshall be extended to small / medium scale units engaged in the manufacture\nof the aerosol units using chlorofluorocarbons (CFC) and no refinance would\nbe extended to any project assisted in this sector.",
+        "section_inferred": "Chapter V - Regulatory Restrictions",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 23,
+        "raw_content": "Chapter VI - Country Risk Management\nA. Policy & Procedures\n44. A bank shall formulate appropriate, well documented, and clearly defined 'Country\nRisk Management' policy within the Credit Risk Management policy prescribed in\nChapter II of these Directions, with the approval of its Board. \u2019Country Risk\nManagement\u2019 policy shall address the issues of identifying, measuring, monitoring,\nand controlling country exposure risks. The policy shall specify the responsibility and\naccountability of the various levels for the country risk management decisions. The\nbank shall also put in place procedures for ensuring that necessary steps are taken\nin accordance with the policy. The policy shall be periodically reviewed by the Board\non the basis of the experience gained.\n45. A bank shall institute appropriate procedures for dealing with country risk problems.\nThey shall have in place contingency plans and clear exit strategies, which would be\nactivated at times of crisis. Appropriate systems and procedures shall be laid down\nwith the approval of the Board to handle situations involving significant changes in\nconditions in any country. For the present, only in respect of the country, where a\nbank\u2019s net funded exposure is one per cent or more of its total assets, the bank is\nrequired to formulate the Country Risk Management policy for dealing with the\ncountry risk problems.\n46. The Country Risk Management policy shall stipulate rigorous application of the 'Know\nYour Customer' (KYC) principle in international activities which shall not be\ncompromised by availability of collateral or shortening of maturities. Country risk\nelement shall be explicitly recognised while assessing the counter-party risk.\nB. Scope\n47. A bank shall reckon both funded and non-funded exposures from their domestic as\nwell as foreign branches while identifying, measuring, monitoring, and controlling\ncountry risks. In the case of foreign banks operating in India, the scope shall be\nconfined to their branches in India. A bank shall refer to Reserve Bank of India",
+        "section_inferred": "Chapter VI - Country Risk Management",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 24,
+        "raw_content": "(Commercial Banks \u2013 Credit Facilities) Directions, 2025 for permissible Non-Fund\nbased credit facilities. An illustrative list of funded and non-funded exposures is\nfurnished below:\n48. A bank shall take into account indirect country risk. For example, exposures to a\ndomestic commercial borrower with a large economic dependence on a certain\ncountry shall be considered as subject to indirect country risk.\nC. Ratings\n49. A bank shall put in place appropriate systems to move over to internal assessment of\ncountry risk and shall evolve sound systems for measuring and monitoring country\nrisk. The system shall be able to identify the full dimensions of country risk as well as\nincorporating features that acknowledge the links between credit and market risk. A\nbank shall use a variety of internal and external sources as a means to measure\ncountry risk. A bank shall not rely solely on rating agencies or other external sources\nas their only country risk-monitoring tool and shall also incorporate information from\nthe relevant country managers of their foreign branches into their country risk\nassessments. However, the rating accorded by a bank to any country shall not be",
+        "section_inferred": "Chapter VI - Country Risk Management",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "table",
+        "page_number": 24,
+        "raw_content": [
+            [
+                "",
+                "Funded Exposures",
+                "",
+                "",
+                "Non-Funded Exposures",
+                ""
+            ],
+            [
+                "\u2022 Cash balances\n\u2022 Bank balances\n\u2022 Deposit placements\n\u2022 Investments\n\u2022 Loans and advances\n\u2022 Trade credits/receivables\n\u2022 Overdraft in Vostro Account\n\u2022 Remittances honoured under\ndrawing arrangement\n\u2022 Other monetary assets",
+                "\u2022 Cash balances",
+                "",
+                "",
+                "\u2022 Letters of Credit",
+                ""
+            ],
+            [
+                "",
+                "\u2022 Bank balances",
+                "",
+                "",
+                "\u2022 Committed lines of credit",
+                ""
+            ],
+            [
+                "",
+                "\u2022 Deposit placements",
+                "",
+                "",
+                "\u2022 Guarantees",
+                ""
+            ],
+            [
+                "",
+                "\u2022 Investments",
+                "",
+                "",
+                "\u2022 Performance bonds, bid",
+                ""
+            ],
+            [
+                "",
+                "\u2022 Loans and advances",
+                "",
+                "",
+                "bonds, warranties.",
+                ""
+            ],
+            [
+                "",
+                "\u2022 Trade credits/receivables",
+                "",
+                "",
+                "\u2022 Confirmation of LCs issued",
+                ""
+            ],
+            [
+                "",
+                "\u2022 Overdraft in Vostro Account",
+                "",
+                "",
+                "by foreign banks.",
+                ""
+            ],
+            [
+                "",
+                "\u2022 Remittances honoured under",
+                "",
+                "",
+                "\u2022 Commitments undertaken",
+                ""
+            ],
+            [
+                "",
+                "drawing arrangement",
+                "",
+                "",
+                "against the counter-",
+                ""
+            ],
+            [
+                "",
+                "\u2022 Other monetary assets",
+                "",
+                "",
+                "guarantees of foreign",
+                ""
+            ],
+            [
+                "",
+                "",
+                "",
+                "",
+                "banks.",
+                ""
+            ]
+        ],
+        "section_inferred": "Chapter VI - Country Risk Management",
+        "source_document": "credit_Risk_RBI.pdf",
+        "table_index": 2
+    },
+    {
+        "content_type": "text",
+        "page_number": 25,
+        "raw_content": "better than the rating of that country by an international rating agency. For the present,\nonly in respect of the country, where a bank\u2019s net funded exposure is one per cent or\nmore of its total assets, the bank is required to undertake internal assessment of\ncountry risk rating.\n50. The frequency of periodic reviews of country risk ratings shall be at least once a year\nwith a provision to review the rating of specific country, based on any major events in\nthat country, where bank exposure is high, even before the next periodical review of\nthe ratings is due.\n51. Till such time, as banks move over to internal rating system, a bank may use the\nseven-category classification followed by Export Credit Guarantee Corporation of\nIndia Ltd. (ECGC) for the purpose of classification and making provisions for country\nrisk exposures. ECGC shall provide to a bank, on request, quarterly updates of their\ncountry classifications and shall also inform all banks in case of any sudden major\nchanges in country classification in the interim period.\nD. Monitoring of exposures\n52. A bank shall monitor their country exposures on a real time basis.\n53. Management of country risk shall incorporate stress testing as one method to monitor\nactual and potential risks. Stress testing shall include an assessment of the impact of\nalternative outcomes to important underlying assumptions.\n54. Boards shall review the country risk exposures at quarterly intervals. The review shall\ninclude progress in establishing internal country rating systems, compliance with the\nregulatory and the internal limits, results of stress tests and the exit options available\nto the banks in respect of countries belonging to \u2018high risk & above\u2019 categories. In\ncase, any significant deterioration takes place in respect of any particular country risk\nor overall exposure, banks shall report to the Board such developments in its next\nmeeting, without waiting for the quarterly review by the Board.\n55. Country risk management processes employed by a bank shall require adequate",
+        "section_inferred": "Chapter VI - Country Risk Management",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 26,
+        "raw_content": "internal controls that include audits or other appropriate oversight mechanisms to\nensure the integrity of the information used by senior officials in overseeing\ncompliance with policies and limits.",
+        "section_inferred": "Chapter VI - Country Risk Management",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 27,
+        "raw_content": "Chapter VII - Unhedged Foreign Currency Exposure (UFCE)\n56. A bank shall assess and monitor the Unhedged Foreign Currency Exposure\n(UCFE) of entities and maintain adequate provisioning / capital for the same, as\nper the instructions provided in this Chapter. An explanatory note providing the\nbackground of these instructions is furnished in Annex I.",
+        "section_inferred": "Chapter VII - Unhedged Foreign Currency Exposure (UFCE)",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 27,
+        "raw_content": "57. Computation of UFCE\n(1) A bank shall ascertain the Foreign Currency Exposure (FCE) of all entities at\nleast on an annual basis. A bank shall compute the FCE following the relevant\naccounting standard applicable for the entity.\nExplanation:\n(i) The requirement in paragraph 57(1) would not be applicable for entities which\nare already submitting the information on UFCE as per paragraph 57(2).\n(ii) To ascertain the FCE, a bank shall consider the items maturing or having cash\nflows over the period of next five years.\nNote: For arriving at the foreign currency exposure of entities, their exposure from\nall sources including foreign currency borrowings and External Commercial\nBorrowings shall be taken into account.\n(2) A bank shall assess the Unhedged Foreign Currency Exposure (UFCE) of\nentities with FCE by obtaining information on UFCE from the concerned entity.\nProvided that the information on UFCE shall be obtained from entities on a\nquarterly basis based on statutory audit, internal audit, or self-declaration by the\nconcerned entity.\nProvided further that UFCE information shall be audited and certified by the\nstatutory auditors of the entity, at least on an annual basis.",
+        "section_inferred": "57. Computation of UFCE",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 28,
+        "raw_content": "58. Provisioning and Capital Requirements\n(1) A bank shall determine the potential loss to an entity from UFCE using the\nlargest annual volatility in the USD-INR exchange rates during the last 10 years.\nExplanation: A bank shall use the data published by FEDAI on largest annual\nvolatility of USD-INR rate over a period of last 10 years and the same shall be\nused for computation of potential loss by multiplying it with UFCE.\nNote: The UFCE in currencies other than USD shall be converted into USD using\nthe current market rates for determining the potential loss from UFCE.\n(2) A bank shall determine the susceptibility of the entity to adverse exchange rate\nmovements by computing the ratio of the potential loss to entity from UFCE and\nthe entity\u2019s EBID over the last four quarters as per the latest quarterly results\ncertified by the statutory auditors.\nExplanation: For the purpose of this paragraph, there is no differentiation between\nlimited audited results and full audited results.\nNote: (i) In cases where a bank is not in a position to obtain information on UFCE\nor EBID from listed entities for the latest quarter due to restrictions on disclosure\nof such information prior to finalisation of accounts, the bank shall have the option\nto use data pertaining to the immediately preceding last four quarters for\ncomputing capital and provisioning requirements.\n(ii) In case of unlisted entities where the audited results of the last quarter are not\navailable, the latest audited quarterly or annual results available shall be used.\nThe annual EBID figure used shall at least be of the last financial year.\n(3) Accordingly, a bank shall apply incremental capital and provisioning\nrequirements to all exposures to such entities as under:",
+        "section_inferred": "58. Provisioning and Capital Requirements",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 29,
+        "raw_content": "Explanation:\n(i) Incremental provisioning and capital requirements shall be over and above the\npresent requirements i.e., general provision for standard assets and applicable\ncredit risk weights as per Reserve Bank of India (Commercial Banks \u2013 Income\nRecognition, Asset Classification and Provisioning) Directions, 2025 and Reserve\nBank of India (Commercial Banks \u2013 Prudential Norms on Capital Adequacy)\nDirections, 2025, respectively.\n(ii) As an example for the 25 per centage point increase in the risk weight in case\nof Potential Loss / EBID exceeding 75 per cent, for an entity which otherwise\nattracts a risk weight of 50 per cent, the applicable risk weight would become 75\nper cent.\nNote: The incremental provisioning for UFCE shall be based on the total exposure\namount which is used for computing standard asset provisioning and the\nincremental capital requirements for UFCE shall be based on the total exposure\namount which is used for computing credit risk capital requirements.\n(4) A bank shall calculate the incremental provisioning and capital requirements",
+        "section_inferred": "58. Provisioning and Capital Requirements",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "table",
+        "page_number": 29,
+        "raw_content": [
+            [
+                "Table 1: Incremental Provisioning and Capital Requirements for UFCE",
+                "",
+                ""
+            ],
+            [
+                "Potential Loss / EBID\n(per cent)",
+                "Incremental\nProvisioning\nRequirement (basis\npoints)",
+                "Incremental Capital\nRequirement"
+            ],
+            [
+                "Upto 15 per cent",
+                "0",
+                "0"
+            ],
+            [
+                "More than 15 per cent\nand upto 30 per cent",
+                "20bps",
+                "0"
+            ],
+            [
+                "More than 30 per cent\nand upto 50 per cent",
+                "40bps",
+                "0"
+            ],
+            [
+                "More than 50 percent and\nupto 75 per cent",
+                "60bps",
+                "0"
+            ],
+            [
+                "More than 75 per cent",
+                "80bps",
+                "25 per centage\npoint increase in the risk\nweight"
+            ]
+        ],
+        "section_inferred": "58. Provisioning and Capital Requirements",
+        "source_document": "credit_Risk_RBI.pdf",
+        "table_index": 3
+    },
+    {
+        "content_type": "text",
+        "page_number": 30,
+        "raw_content": "at a minimum on a quarterly basis.\n(5) For projects under implementation and for new entities, a bank shall calculate\nthe incremental provisioning and capital requirements based on projected\naverage annual EBID for the three years from the date of commencement of\ncommercial operations.\nProvided that the incremental provisioning requirement shall be subjected to a\nminimum floor of 20 bps of provisioning requirement.\n(6) In cases where a bank is not able to get sufficient data to assess UFCE and\ncompute incremental capital and provisioning requirements except for the smaller\nentities covered under the alternative method provided in paragraph 58(7) below,\nthe bank shall take a conservative view and place the exposure to the entity at\nthe last bucket (in Table 1 above) which requires incremental provisioning of\n80bps and a 25 per centage point increase in risk weight.\n(7) A bank shall have the option to follow an alternative method for exposures to\nsmaller entities which are having foreign currency exposures and are not in\nposition to provide information on their UFCE as per paragraph 57(2). Under this\nalternative method, a bank shall apply an incremental provisioning of 10 bps over\nand above extant standard asset provisioning instead of computing incremental\ncapital and provisioning requirements as provided in paragraphs 58(1) to 58(5).\n(8) The incremental provision requirement for UFCE shall be treated as general\nprovision for disclosures and inclusion in Tier 2 capital.",
+        "section_inferred": "58. Provisioning and Capital Requirements",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 30,
+        "raw_content": "59. Systems and Controls\n(1) A bank shall incorporate the risk of UFCE of entities in their internal credit rating\nsystem and credit risk management policies and procedures.\n(2) A bank shall stipulate internal limits for UFCE within the overall Board approved\nrisk policy of the bank.",
+        "section_inferred": "59. Systems and Controls",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 31,
+        "raw_content": "60. Consortium Lending\nIn the case of consortium / Multiple Banking Arrangements (MBAs), the\nconsortium leader / bank having the largest exposure shall have the lead role in\nmonitoring the unhedged foreign exchange exposure of entities.\nNote: A banks shall put in place a system for information sharing and\ndissemination in terms of Reserve Bank of India (Commercial Banks \u2013 Transfer\nand Distribution of Credit Risk) Directions, 2025.",
+        "section_inferred": "60. Consortium Lending",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 31,
+        "raw_content": "61. Exemption / Relaxation\nA bank shall have the option to exclude the following exposures from the\ncalculation of UFCE:\n(1) Exposures to entities classified as sovereign, banks, and individuals;\nExplanation:\n(i) For this purpose, \u2018sovereign\u2019 shall include domestic and foreign sovereign\nas provided in Reserve Bank of India (Commercial Banks \u2013 Prudential\nNorms on Capital Adequacy) Directions, 2025.\n(ii) For this purpose, the RBI regulated Financial Institutions, Bank of\nInternational Settlement (BIS), International Monetary Fund (IMF) and\neligible Multilateral Development Banks (MDBs) listed in Reserve Bank of\nIndia (Commercial Banks \u2013 Prudential Norms on Capital Adequacy)\nDirections, 2025 shall also be considered as \u2018bank\u2019.\n(2) Exposures classified as Non-Performing Assets;\n(3) Intra-group foreign currency exposures of Multinational Corporations (MNCs)\nincorporated outside India; and\nProvided that the bank is satisfied that such foreign currency exposures are\nappropriately hedged or managed robustly by the parent.\nExplanation: For example, an Indian subsidiary of an MNC incorporated outside",
+        "section_inferred": "61. Exemption / Relaxation",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 32,
+        "raw_content": "India may have borrowed from its parent.\n(4) Exposures arising from derivative transactions and / or factoring transactions\nwith entities, provided such entities have no other exposures to banks in India.",
+        "section_inferred": "61. Exemption / Relaxation",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 32,
+        "raw_content": "62. Overseas Branches / Subsidiaries\n(1) The provisions of this Chapter shall also be applicable to overseas branches\n/ subsidiaries of a bank subject to the following:\n(i) With respect to the exposure to entities incorporated outside India, information\non UFCE shall be obtained from such entities on a quarterly basis based on\ninternal audit or self-declaration and the requirement of certificate from statutory\nauditors on annual basis, as provided in paragraph 57(2), may not be insisted\nupon. In cases where a bank is not able to obtain information on UFCE from\nconcerned entities, the treatment provided in paragraph 58(6) shall apply.\n(ii) A bank shall compute the potential loss due to UFCE by replacing INR with\nthe domestic currency of that jurisdiction and USD with the foreign currency (i.e.,\ncurrency other than domestic currency of that jurisdiction) in which the entity has\nmaximum exposure in paragraph 58(1).\nNote: A bank shall compute the largest annual volatility over a period of last 10\nyears in the following manner: First, daily changes in the foreign exchange rates\nshall be computed as a log return of today's rate over the previous day's rate.\nSecond, daily volatility shall be computed as standard deviation of these returns\nover a period of one year (250 observations). Third, this daily volatility shall be\nannualised by multiplying it by square root of 250. This computation shall be\nperformed on a daily basis for all the days in the last 10 years. The largest annual\nvolatility thus computed shall be used for the computation of the potential loss by\nmultiplying it with the UFCE.",
+        "section_inferred": "62. Overseas Branches / Subsidiaries",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 33,
+        "raw_content": "Chapter VIII - Legal Entity Identifier (LEI) for Borrowers\n63. The Legal Entity Identifier code is conceived as a key measure to improve the quality\nand accuracy of financial data systems for better risk management post the Global\nFinancial Crisis. LEI is a 20-digit unique code to identify parties to financial\ntransactions worldwide.\n64. A bank shall ensure that non-individual borrowers with aggregate exposure of \u20b95\ncrore and above from banks (Scheduled Commercial Banks (excluding Regional\nRural Banks), Local Area Banks, Small Finance Banks, and Primary (Urban) Co-\noperative Banks) and Financial Institutions (All India Financial Institutions and\nNBFCs (including HFCs)) obtain LEI codes.\nExplanation: 'Exposure' for this purpose shall include all fund based and non-fund\nbased (credit as well as investment) exposure of banks / FIs to the borrower.\nAggregate sanctioned limit or outstanding balance, whichever is higher, shall be\nreckoned for the purpose. Lenders shall ascertain the position of aggregate\nexposure based on information available either with them, or Central Repository of\nInformation on Large Credits (CRILC) database or declaration obtained from the\nborrower.\n65. Borrowers who fail to obtain LEI codes from an authorised Local Operating Unit (LOU)\nshall not be sanctioned any new exposure nor shall they be granted renewal /\nenhancement of any existing exposure. However, Departments / Agencies of Central\nand State Governments (not Public Sector Undertakings registered under Companies\nAct or established as Corporation under the relevant statute) shall be exempted from\nthis provision.\nExplanation: A government agency is an administrative set up of the government,\nresponsible for certain area/s of activity, e.g., ISRO, BIS, DGCA, etc.\n66. A bank shall encourage large borrowers to obtain LEI for their parent entity as well as\nall subsidiaries and associates.",
+        "section_inferred": "Chapter VIII - Legal Entity Identifier (LEI) for Borrowers",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 34,
+        "raw_content": "67. Entities can obtain LEI from any of the LOUs accredited by the Global Legal Entity\nIdentifier Foundation (GLEIF) \u2013 the entity tasked to support the implementation and\nuse of LEI. In India, LEI code may be obtained from Legal Entity Identifier India Ltd\n(LEIIL), a subsidiary of the Clearing Corporation of India Limited (CCIL), which has\nbeen recognised by the Reserve Bank as issuer of LEI under the Payment and\nSettlement Systems Act, 2007 and is accredited by the GLEIF as the Local Operating\nUnit (LOU) in India for issuance and management of LEI. The rules, procedure and\ndocumentation requirements may be ascertained from LEIIL.\n68. After obtaining LEI code, a bank shall also ensure that borrowers renew the codes as\nper GLEIF guidelines.",
+        "section_inferred": "Chapter VIII - Legal Entity Identifier (LEI) for Borrowers",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 35,
+        "raw_content": "Chapter IX - Valuation of Properties - Empanelment of Valuers\n69. A bank shall be guided by the following aspects while formulating a policy on valuation\nof properties and appointment of valuers.\n70. Policy for valuation of properties\n(1) A bank shall have a Board approved policy in place for valuation of properties\nincluding collaterals accepted for their exposures.\n(2) The valuation shall be done by professionally qualified independent valuers\ni.e. the valuer shall not have a direct or indirect interest.\n(3) A bank shall obtain minimum two Independent valuation reports for properties\nvalued at \u20b950 crore or above.\n71. Revaluation of bank\u2019s own properties\nIn addition to the above, banks may keep the following aspects in view while\nformulating policy for revaluation of their own properties:\n(1) As a bank is permitted to include revaluation reserves as part of Capital in terms\nof Reserve Bank of India (Commercial Banks - Prudential Norms on Capital\nAdequacy) Directions, 2025, it is necessary that revaluation reserves represent\ntrue appreciation in the market value of the properties and banks have in place a\ncomprehensive policy for revaluation of fixed assets owned by them. Such a policy\nshall inter alia cover procedure for identification of assets for revaluation,\nmaintenance of separate set of records for such assets, the frequency of\nrevaluation, depreciation policy for such assets, policy for sale of such revalued\nassets etc. The policy shall also cover the disclosure required to be made in the\n'Notes on Account' regarding the details of revaluation such as the original cost of\nthe fixed assets subject to revaluation and accounting treatment for appreciation /\ndepreciation etc.\n(2) As the revaluation shall reflect the change in the fair value of the fixed asset, the\nfrequency of revaluation shall be determined based on the observed volatility in\nthe prices of the assets in the past. Further, any change in the method of",
+        "section_inferred": "Chapter IX - Valuation of Properties - Empanelment of Valuers",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 36,
+        "raw_content": "depreciation shall reflect the change in the expected pattern of consumption of the\nfuture economic benefits of the assets. A bank shall adhere to these principles\nmeticulously while changing the frequency of revaluation / method of depreciation\nfor a particular class of asset and shall make proper disclosures in this regard.\n72. Policy for Empanelment of Independent valuers\n(1) A bank shall have a procedure for empanelment of professional valuers and\nmaintain a register / record of 'approved list of valuers'.\n(2) A bank may prescribe a minimum qualification for empanelment of valuers.\nDifferent qualifications may be prescribed for different classes of assets (e.g. land\nand building, plant and machinery, agricultural land, etc.). While prescribing the\nqualification, the bank shall take into consideration the qualifications prescribed\nunder Section 34AB (Rule 8A) of the Wealth Tax Act, 1957.\n73. A bank shall also be guided by the relevant Accounting Standard issued by the\nInstitute of Chartered Accountants of India.",
+        "section_inferred": "Chapter IX - Valuation of Properties - Empanelment of Valuers",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 37,
+        "raw_content": "Chapter X - Filing of Security Interest relating to Immovable (other than equitable\nmortgage), Movable, and Intangible Assets in CERSAI\n74. The Central Registry of Securitisation Asset Reconstruction and Security Interest of\nIndia (CERSAI), a Government company licensed under section 8 of the Companies\nAct 2013 has been incorporated for the purpose of operating and maintaining the\nCentral Registry under the provisions of the Securitisation and Reconstruction of\nFinancial Assets and Enforcement of Security Interest Act, 2002 (SARFAESI Act).\n75. It is to be noted that initially transactions relating to securitization and reconstruction\nof financial assets and those relating to mortgage by deposit of title deeds to secure\nany loan or advances granted by banks and financial institutions, as defined under\nthe SARFAESI Act, are to be registered in the Central Registry. The records\nmaintained by the Central Registry shall be available for search by any lender or any\nother person desirous of dealing with the property. Availability of such records would\nprevent frauds involving multiple lending against the security of same property as well\nas fraudulent sale of property without disclosing the security interest over such\nproperty. It may be noted that under the provisions of Section 23 of the SARFAESI\nAct, every transaction of security interest is required to be filed with the Registry.\n76. The Government of India has issued a Gazette Notification dated January 22, 2016\nfor filing of the following types of security interest on the CERSAI portal:\n(1) Particulars of creation, modification or satisfaction of security interest in immovable\nproperty by mortgage other than mortgage by deposit of title deeds.\n(2) Particulars of creation, modification or satisfaction of security interest in\nhypothecation of plant and machinery, stocks, debts including book debts or\nreceivables, whether existing or future.\n(3) Particulars of creation, modification or satisfaction of security interest in intangible\nassets, being know how, patent, copyright, trademark, license, franchise or any\nother business or commercial right of similar nature.",
+        "section_inferred": "Chapter X - Filing of Security Interest relating to Immovable (other than equitable",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 38,
+        "raw_content": "(4) Particulars of creation, modification or satisfaction of security interest in any \u2018under\nconstruction\u2019 residential or commercial or a part thereof by an agreement or\ninstrument other than mortgage.\n77. A bank is advised to file the charges relating to all current transactions with CERSAI\non an ongoing basis.",
+        "section_inferred": "Chapter X - Filing of Security Interest relating to Immovable (other than equitable",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 39,
+        "raw_content": "17[",
+        "section_inferred": "Chapter X - Filing of Security Interest relating to Immovable (other than equitable",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 39,
+        "raw_content": "Chapter XI - [Deleted]\n78. *****\n79. *****\n80. *****\n81. *****\n82. *****\n83. *****\n84. *****\n85. *****\n86. *****\n87. *****\n88. *****\n89. *****\n90. *****\n91. *****]\n17 Deleted with effect from April 01, 2026 vide Reserve Bank of India (Commercial Banks - Credit Risk Management)\nAmendment Directions, 2025 dated December 11, 2025.",
+        "section_inferred": "Chapter XI - [Deleted]",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 40,
+        "raw_content": "18[\nChapter XIA - Maintenance of Cash Credit Accounts, Current Accounts and\nOverdraft Accounts by Banks\n91A. Current Accounts, Cash Credit Accounts (CC), and Overdraft Accounts (OD) may\nall be used as transaction accounts by the customers, which raises concerns relating\nto credit monitoring by the lenders. With a view to strengthening credit discipline and\nfacilitating better monitoring of transactions and utilisation of funds, this Chapter\nprovides a framework for maintaining such accounts by banks.\nA. Cash Credit Accounts\n91B. CC account is operationally different from a current account or OD account, given\nits primary nature as a working capital facility linked to the value of the borrower's\ncurrent assets. A bank may provide such cash credit facilities as per the needs of the\ncustomer, without any restriction under this Chapter.\nB. Current Accounts and OD Accounts\n91C. A bank may maintain current account or OD account without any restriction in case\nof customers where the aggregate exposure of the banking system to the customer\nis less than \u20b910 crore.\nExplanation (1): \u2018Banking System\u2019 for the purpose of this Chapter shall include\nCommercial Banks (including Small Finance Banks, Local Area Banks, and Regional\nRural Banks, but excluding Payments Banks), Urban Co-operative Banks and Rural\nCo-operative Banks (State Co-operative Banks and Central Co-operative Banks).\nExplanation (2): \u2018Exposure\u2019 for the purpose of this Chapter means the sum of all\nsanctioned fund-based credit facilities and non-fund-based facilities availed by the\nborrower from the banking system.\n18Inserted with effect from April 01, 2026 vide Reserve Bank of India (Commercial Banks - Credit Risk Management)\nAmendment Directions, 2025 dated December 11, 2025.",
+        "section_inferred": "Chapter XI - [Deleted]",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 41,
+        "raw_content": "91D. In case of customers to whom the exposure of the banking system is \u20b910 crore or\nmore:\n(1) A bank may maintain current accounts or OD accounts as per the needs of the\ncustomer provided that the bank has either:\n(i) A minimum 10 per cent share in banking system\u2019s aggregate exposure to the\nborrower; or\n(ii) A minimum 10 per cent share in banking system\u2019s aggregate fund-based\nexposure to the borrower.\nProvided that, in case no bank within the banking system meets the above criteria,\nor only one bank meets the above criteria, two banks from the banking system\nhaving the largest exposures to the borrower may maintain current accounts or\nOD accounts.\nProvided further that, in case where only one bank within the banking system has\nany exposure to the borrower, one more bank of the customer\u2019s choice within the\nbanking system may maintain current accounts, subject to furnishing of a no-\nobjection certificate (NOC) from the bank that has the exposure to the borrower.\nProvided further that, in case where no Scheduled Commercial Bank (SCB) meets\nthe above criteria, but the borrower nevertheless desires to have a current account\nwith an SCB, such borrowers may maintain current accounts with any one SCB\nof their choice, subject to furnishing of NOCs from all lending banks within the\nbanking system.\n(2) A bank, not meeting the eligibility criteria at paragraph (1) above , may maintain\nonly collection accounts.\nExplanation: \u2018Collection Account\u2019 for the purpose of this Chapter means a current\naccount or OD account used primarily for receipts of cash inflows of the account\nholder. Restricted payments / cash outflows from such account shall be subject to\nthe conditions outlined in paragraph 91F of these Directions.",
+        "section_inferred": "Chapter XI - [Deleted]",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 42,
+        "raw_content": "91E. With a view to ensuring credit discipline, lenders may include additional covenants\nas per their policies in their loan agreements in mutual agreement with borrowers.\nC. Collection Accounts\n91F. Funds credited into a collection account shall be remitted within two working days\nof receipt of such funds to a CC account, current account, or OD account maintained\nwith any bank in the banking system and designated by the borrower for this purpose\n(hereinafter referred to as \u2018designated account\u2019 in this Chapter). Any disbursement of\noverdraft limit from an OD account, which is in the nature of a collection account, shall\nbe through the designated account only.\nProvided that statutory dues such as taxes, and dues, if any, to the bank maintaining\nthe collection account may be debited before remitting the funds.\nD. Exemptions\n91G. The restrictions placed in terms of paragraph 91D(1) of these Directions shall not\nbe applicable to the accounts mentioned below:\n(1) Accounts opened as per the provisions of Foreign Exchange Management Act,\n1999 (FEMA) and notifications issued thereunder, including accounts mandated\nfor ensuring compliance under the FEMA framework.\n(2) Specific accounts or transactions which are stipulated under a statute or a specific\ninstruction of a financial sector regulator, or the Central Government or a State\nGovernment.\nExplanation: \u2018Financial sector regulator\u2019 for the purpose of this Chapter refers to\nthe Reserve Bank of India (RBI), the Securities and Exchange Board of India\n(SEBI), the Insurance Regulatory and Development Authority of India (IRDAI) and\nthe Pension Fund Regulatory and Development Authority (PFRDA).\n(3) Accounts of entities regulated by a financial sector regulator, used for the purpose\nof carrying out their regulated activities.\nProvided that banks operating the above-mentioned exempted accounts shall\nensure that transactions in such accounts are used only for the permitted /",
+        "section_inferred": "Chapter XI - [Deleted]",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 43,
+        "raw_content": "specified purposes. Surplus funds, if any, in such accounts shall be remitted to\nthe designated account.\n91H. Banks, in certain cases, offer products or services that inherently require routing\ntransactions through a current account maintained with themselves. In such cases,\nbanks which are otherwise not eligible to maintain accounts in terms of paragraph\n91D(1) of these Directions may also maintain current accounts, subject to the\nconditions specified below:\n(1) Such accounts shall only be opened in accordance with a Board-approved policy\nfor the product / service, which shall detail and justify, inter alia, the necessity of\noperating these accounts.\n(2) Transactions in such accounts shall be limited for the specified purpose(s). Cash\ntransactions, debits at the discretion of customers, and issuance of instruments\nlike electronic cards and cheque books shall not be permitted in such accounts.\nSurplus funds, if any, in such accounts shall be remitted to the designated\naccount.\n(3) Banks shall implement adequate safeguards to ensure that such accounts are not\nused as substitutes for current accounts, or employed to circumvent restrictions\nplaced on current accounts, or misused for activities such as fund diversion or\nfraud.\nE. Compliance Monitoring\n91I. For the purpose of ensuring ongoing compliance with this Chapter, all banks shall\nmonitor accounts maintained with them on a regular basis, and in any case at least\nonce every half-year.\n91J. In case it is observed that a bank is no longer eligible to maintain a current account\nor OD account opened in terms of:\n(1) paragraph 91C due to increase in exposure of banking system to the borrower up\nto or beyond the specified threshold of \u20b910 crore; or",
+        "section_inferred": "Chapter XI - [Deleted]",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 44,
+        "raw_content": "(2) paragraph 91D(1), due to changes in the bank\u2019s share in banking system\u2019s\naggregate exposure or in aggregate fund-based exposure to the borrower; or due\nto non-availability of NOC from banks that have exposure to the borrower;\nthen the bank shall notify the customer(s) concerned promptly, and in any case within\none month from the date of observing such ineligibility, that the account must either\nbe converted to a collection account or closed. The conversion or closure process, as\nthe case may be, shall be completed within three months of observing such\nineligibility.\n91K. Accounts opened in terms of these Directions shall be appropriately flagged in the\nbank\u2019s core banking solution (CBS) to ensure clear identification and to facilitate\neffective monitoring. Banks maintaining multiple accounts for a borrower shall ensure\nthat such accounts and transactions and cashflows therein are monitored at the\nborrower level as also at the account level.\nF. Other Provisions\n91L. A bank shall ensure that an accountholder utilise their account solely for\ntransactions related to their authorised business or activities. These accounts shall\nnot, under any circumstances, be used as pass-through channels for facilitating third-\nparty transactions.\nProvided that entities expressly licensed or authorised by a financial sector regulator\nto facilitate third-party transactions may continue to do so. However, such activities\nshall strictly be limited to the specific transactions they are authorised to do and shall\nnot extend beyond that scope. Any account that has been permitted to carry out such\nthird-party transactions shall be appropriately flagged in the bank\u2019s CBS to ensure\nclear identification and to facilitate effective monitoring.\n91M. A bank shall ensure that an accountholder, who is not licensed or authorised by\nthe Reserve Bank to accept deposits or to provide payment services, do not engage\nin such activities through accounts maintained with them.\n91N. Robust monitoring systems shall be implemented to detect the above prohibited\nusage, including mechanisms to flag accounts exhibiting unusually high transaction",
+        "section_inferred": "Chapter XI - [Deleted]",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 45,
+        "raw_content": "volumes, frequent pass-through activities, or inconsistencies between the\naccountholder\u2019s stated line of business and transactions carried out through the\naccount.\n91O. Term loans sanctioned by the bank shall preferably be remitted directly to the\nintended beneficiary\u2019s account(s) or for the specified end-use, where such beneficiary\nis identifiable, rather than routing the funds through the borrower\u2019s account.]",
+        "section_inferred": "Chapter XI - [Deleted]",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 46,
+        "raw_content": "Chapter XII - Loan System for Delivery of Bank Credit\n92. With a view to enhance credit discipline among the larger borrowers enjoying\nworking capital facility from the banking system, delivery of bank credit for such\nborrowers shall be as under:\n(1) Minimum level of \u2018loan component\u2019\nIn respect of borrowers having aggregate fund based working capital limit (WCL) of\n\u20b9150 crore and above from the banking system (excluding intra-day credit facilities),\nthe outstanding \u2018loan component\u2019 (Working Capital Loan) must be equal to at least\n60 per cent of the sanctioned fund based working capital limit, including ad hoc limits\nand TODs. Hence, for such borrowers, drawings up to 60 per cent of the total fund\nbased working capital limits shall only be allowed from the \u2018loan component\u2019.\nDrawings in excess of the minimum \u2018loan component\u2019 threshold may be allowed in\nthe form of cash credit / overdraft facility. The bifurcation of the working capital limit\ninto loan and cash credit / overdraft components shall be effected after excluding the\nexport credit limits (pre-shipment and post-shipment) and bills limit for inland sales\nfrom the working capital limit. Investment by the bank in the commercial papers issued\nby the borrower shall form part of the loan component, provided the investment is\nsanctioned as part of the working capital limit.\nThe above instructions on minimum loan component shall not be applicable on the\nfollowing:\n(i) Intra-day credit facilities.\n(ii) Credit facilities extended through the Food Credit Consortium.\n(iii) Credit facilities extended to Central Counterparties.\n(iv) Credit facilities extended by overseas branches of the bank.\n(2) Sharing of Working Capital Finance\nBifurcation of working capital facility into loan component and cash credit / overdraft\ncomponent shall be maintained at individual bank level in all cases, including\nconsortium lending.",
+        "section_inferred": "Chapter XII - Loan System for Delivery of Bank Credit",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 47,
+        "raw_content": "(3) Amount and tenor of the loan\nThe amount and tenor of the loan component may be fixed by banks in consultation\nwith the borrowers, subject to the tenor being not less than seven days. Banks may\ndecide to split the loan component into WCLs with different maturity periods as per\nthe needs of the borrowers.\n(4) Repayment / Renewal / Rollover of Loan Component\nBanks / consortia / syndicates will have the discretion to stipulate repayment of the\nWCLs in instalments or by way of a 'bullet' repayment, subject to Reserve Bank of\nIndia (Commercial Banks \u2013 Income Recognition, Asset Classification and\nProvisioning) Directions, 2025. A bank may consider rollover of the WCLs at the\nrequest of the borrower, subject to compliance with the directions ibid.\n(5) For credit conversion factor for undrawn portion of working capital limits\nsanctioned to the aforesaid large borrowers, a bank shall refer to Reserve\nBank of India (Commercial Banks - Prudential Norms on Capital Adequacy)\nDirections, 2025.",
+        "section_inferred": "Chapter XII - Loan System for Delivery of Bank Credit",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 48,
+        "raw_content": "Chapter XIII - Repeal and other provisions\nA. Repeal and saving\n93. With the issue of these Directions, the existing Directions, instructions, and\nguidelines relating to Credit Risk Management as applicable to commercial banks\nstand repealed, as communicated vide circular DOR.RRC.REC.302/33-01-\n010/2025-26 dated November 28, 2025. The Directions, instructions and guidelines\nrepealed prior to the issuance of these Directions shall continue to remain repealed.\n94. Notwithstanding such repeal, any action taken or purported to have been taken, or\ninitiated under the repealed Directions, instructions, or guidelines shall continue to\nbe governed by the provisions thereof. All approvals or acknowledgments granted\nunder these repealed lists shall be deemed as governed by these Directions.\nFurther, the repeal of these directions, instructions, or guidelines shall not in any\nway prejudicially affect:\n(1) any right, obligation or liability acquired, accrued, or incurred thereunder;\n(2) any, penalty, forfeiture, or punishment incurred in respect of any\ncontravention committed thereunder;\n(3) any investigation, legal proceeding, or remedy in respect of any such right,\nprivilege, obligation, liability, penalty, forfeiture, or punishment as aforesaid;\nand any such investigation, legal proceedings or remedy may be instituted,\ncontinued, or enforced and any such penalty, forfeiture or punishment may\nbe imposed as if those directions, instructions, or guidelines had not been\nrepealed.\nB. Application of other laws not barred\n95. The provisions of these Directions shall be in addition to, and not in derogation of\nthe provisions of any other laws, rules, regulations, or directions, for the time being\nin force.",
+        "section_inferred": "Chapter XIII - Repeal and other provisions",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 49,
+        "raw_content": "C. Interpretations\n96. For the purpose of giving effect to the provisions of these Directions or in order to\nremove any difficulties in the application or interpretation of the provisions of these\nDirections, the Reserve Bank may, if it considers necessary, issue necessary\nclarifications in respect of any matter covered herein and the interpretation of any\nprovision of these Directions given by the Reserve Bank shall be final and binding.\n(Vaibhav Chaturvedi)\nChief General Manager",
+        "section_inferred": "Chapter XIII - Repeal and other provisions",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 50,
+        "raw_content": "Annex I\nExplanatory Note to Chapter on Unhedged Foreign Currency Exposure\nIntroduction\n1. Unhedged foreign currency exposures of any entity are an area of concern not\nonly for the individual entity but also to the entire financial system. Entities which do not\nhedge their foreign currency exposures can incur significant losses during the period\nof heightened volatility in foreign exchange rates. These losses may reduce their\ncapacity to service the loans taken from the banking system and increase their\nprobability of default thereby affecting the health of the banking system.\nBackground and Rationale\n2. The Reserve Bank first introduced the concept in October 1999 as part of risk\nmanagement systems after it was observed during the economic crises in some\ncountries that banks bear additional credit risk on entities which have unhedged foreign\ncurrency risk. Accordingly, banks were advised to evolve a suitable framework for\nregular monitoring of foreign currency risk exposure of entities which do not have\nnatural hedge and to factor such unhedged exposures of entities into the risk rating\nsystem for taking credit decisions.\n3. The aim of the framework was that the banks shall price the risk from Unhedged\nForeign Currency Exposure (UFCE) as credit risk premium which may nudge entities\nto hedge their foreign currency exposures in the market. To this end, banks were further\nadvised though a series of instructions to a) regularly monitor the unhedged portion of\nlarge foreign currency exposures of entities; b) have a Board approved policy on\nhedging of foreign currency loans; and c) have a mechanism for information sharing on\nUFCE in case of consortium lending. However, a sizeable portion of entities\u2019 foreign\ncurrency exposures remained unhedged resulting in significant but avoidable risks to\nentities\u2019 balance sheets, in turn, impacting the quality of bank\u2019s assets.\n4. To address the risk on bank\u2019s books, banks were advised to maintain\nincremental provisioning and capital requirements for their exposures to entities with\nUFCE. The process of computing incremental provisioning and capital requirements",
+        "section_inferred": "Annex I",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 51,
+        "raw_content": "can be summarised in following steps:\n(1) Step 1: Assess the foreign currency exposure (FCE) of the entity.\n(2) Step 2: Ascertain the amount of UFCE from entities\u2019 FCE taking into account\ntwo types of hedges \u2013 natural hedge and financial hedge.\n(3) Step 3: Estimate the potential loss to the entity from UFCE exposure of entity\ndue to exchange rate movements.\n(4) Step 4: Maintain incremental provisioning and capital requirements against\nbanks\u2019 exposure to the entity based on impact of likely / potential loss on entity\u2019s\noverall profitability.\n5. Based on banks\u2019 feedback, a few amendments were made to the guidelines for\noperational clarity and accuracy of information obtained. These included, inter alia,\nallowing collection of information on UFCE directly from entities (through self-certified /\naudited UFCE certificates); clarification on capital treatment of incremental provisioning\nrequirement for UFCE; and treatment in case bank is unable to obtain information on\nUFCE from entity. Banks were also given an option to follow an alternative method for\ntheir exposure to smaller entities. Under this alternative method, instead of obtaining\ninformation on UFCE from smaller entities, bank could maintain incremental\nprovisioning of 10 bps for such exposures.\n6. Further, some exposures were excluded from the ambit of these instructions,\nnamely, inter-bank exposures, intra-group exposures of Multinational Corporations\nincorporated outside India and exposure to entities which have not borrowed from\nIndian banking system.",
+        "section_inferred": "Annex I",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 52,
+        "raw_content": "Annex II\n19[*****]\n19Deleted with effect from April 01, 2026 vide Reserve Bank of India (Commercial Banks - Credit Risk Management)\nAmendment Directions, 2025 dated December 11, 2025.",
+        "section_inferred": "Annex II",
+        "source_document": "credit_Risk_RBI.pdf"
+    },
+    {
+        "content_type": "text",
+        "page_number": 53,
+        "raw_content": "Annex III\n20[*****]\n20Deleted with effect from April 01, 2026 vide Reserve Bank of India (Commercial Banks - Credit Risk Management)\nAmendment Directions, 2025 dated December 11, 2025.",
+        "section_inferred": "Annex III",
+        "source_document": "credit_Risk_RBI.pdf"
+    }
+]

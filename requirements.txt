@@ -2,6 +2,16 @@
 pdfplumber==0.11.10
 reportlab
 pydantic==2.13.4
+pydantic-settings
+
+# API runtime
+fastapi
+uvicorn
+SQLAlchemy
+python-jose
+passlib
+bcrypt
+python-multipart
 
 # Vector and sparse indexes
 chromadb==1.5.9
@@ -23,4 +33,3 @@ ragas==0.4.3
 langchain-community==0.4.1
 langchain-groq
 langchain-ollama
-pydantic-settings
