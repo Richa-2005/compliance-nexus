@@ -30,11 +30,13 @@ class Settings(BaseSettings):
 
     @property
     def cors_origins(self) -> list[str]:
-        return [
-            origin.strip()
+        origins = {
+            origin.strip().rstrip("/")
             for origin in self.BACKEND_CORS_ORIGINS.split(",")
             if origin.strip()
-        ]
+        }
+        origins.add("https://compliance-nexus.vercel.app")
+        return sorted(origins)
 
     NODE_TO_DOC: ClassVar[dict[str, str]] = {
         "Apple SEC Filings": "apple-SEC.pdf",
