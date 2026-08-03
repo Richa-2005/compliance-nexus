@@ -10,7 +10,7 @@ uvicorn
 SQLAlchemy
 python-jose
 passlib
-bcrypt
+bcrypt==4.3.0
 python-multipart
 
 # Sparse index
