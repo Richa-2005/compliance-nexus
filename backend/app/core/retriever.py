@@ -1,12 +1,17 @@
-import chromadb
 import json
+import os
 import re
 from functools import lru_cache
 from pathlib import Path
 from rank_bm25 import BM25Okapi
 
 CHROMA_DIR = "data/processed/chroma_db/"
-chroma_client = chromadb.PersistentClient(path=CHROMA_DIR)
+CHROMA_ENABLED = os.getenv("CHROMA_ENABLED", "false").lower() == "true"
+chroma_client = None
+if CHROMA_ENABLED:
+    import chromadb
+
+    chroma_client = chromadb.PersistentClient(path=CHROMA_DIR)
 
 def clean_metadata(metadata):
     return {
@@ -18,12 +23,14 @@ def clean_metadata(metadata):
 class Retriever:
     def __init__(self, child_token_path: str):
         global chroma_client
-        self.chroma_collec = chroma_client.get_or_create_collection(name="compliance_nexus_chunks")
+        self.chroma_collec = None
+        if chroma_client is not None:
+            self.chroma_collec = chroma_client.get_or_create_collection(name="compliance_nexus_chunks")
         self.child_token_path = Path(child_token_path)
 
         self.json_data = self._load_child_chunks()
         self.bm25 = self._build_bm25(self.json_data)
-        if self.chroma_collec.count() == 0:
+        if self.chroma_collec is not None and self.chroma_collec.count() == 0:
             self.chroma_collection()
         self.child_to_parent = {
             child["child_id"]: child["parent_id"]
@@ -57,6 +64,8 @@ class Retriever:
     
     def chroma_collection(self):
         """Upsert child chunks during ingestion, not during query handling."""
+        if self.chroma_collec is None:
+            return
         ind = []
         metadata = []
         docs = []
@@ -82,6 +91,8 @@ class Retriever:
         self.bm25 = self._build_bm25(self.json_data)
 
     def semantic_search(self, query_text: str, n_results: int = 10):
+        if self.chroma_collec is None:
+            return {"ids": [[]]}
         return self.chroma_collec.query(
             query_texts=[query_text],
             n_results=n_results

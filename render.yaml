@@ -12,6 +12,8 @@ services:
         value: http://localhost:11434
       - key: JWT_ALGORITHM
         value: HS256
+      - key: CHROMA_ENABLED
+        value: "false"
       - key: BACKEND_CORS_ORIGINS
         sync: false
       - key: JWT_SECRET_KEY

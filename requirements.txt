@@ -16,7 +16,6 @@ python-multipart
 # Vector and sparse indexes
 chromadb==1.5.9
 rank-bm25==0.2.2
-sentence-transformers==5.6.0
 
 # Topological analysis
 networkx==3.6.1
@@ -29,8 +28,5 @@ langchain-core==1.4.8
 langchain-groq==1.1.3
 langchain-ollama==1.1.0
 
-# Evaluation framework
-ragas==0.4.3
-
-# Ragas compatibility: 0.4.2 removed the Vertex AI import used by Ragas 0.4.3
+# LangChain compatibility
 langchain-community==0.4.1
