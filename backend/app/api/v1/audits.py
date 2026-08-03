@@ -154,14 +154,17 @@ async def evaluate_transaction(
 
     try:
         graph_output = audit_graph.invoke({"query": query_text})
-    except Exception:
+    except Exception as e:
         await manager.broadcast(
             {
                 "event": "AUDIT_EVALUATION_FAILED",
                 "query": query_text,
             }
         )
-        raise
+        raise HTTPException(
+            status_code=502,
+            detail=f"Audit evaluation failed: {str(e)}",
+        )
 
     extracted = graph_output.get("extracted_metrics", {})
     status_verdict = compute_status(
