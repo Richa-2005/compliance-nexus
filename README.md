@@ -1,5 +1,7 @@
 # ComplianceNexus
-
+<p align="center">
+  <a href="https://compliance-nexus.vercel.app/"><b>Open the live demo</b></a>
+</p>
 <p align="center">
   <img src="./docs/assets/hero.svg" alt="ComplianceNexus RAG-powered audit architecture" width="100%">
 </p>
@@ -24,6 +26,8 @@ The core design principle is simple:
 </p>
 
 <p align="center">
+  <a href="https://compliance-nexus.vercel.app/"><b>Open the live demo</b></a>
+  ·
   <a href="https://www.loom.com/share/689b10c3cd7f424fb1eb36cd0efe5216"><b>Watch the full demo video</b></a>
 </p>
 
@@ -197,7 +201,7 @@ The seeded demo covers multiple audit outcomes:
 | Auth | JWT demo personas |
 | Agent orchestration | LangGraph |
 | LLM providers | Ollama or Groq |
-| Retrieval | ChromaDB, BM25, sentence-transformers |
+| Retrieval | BM25 fallback in hosted demo; ChromaDB / sentence-transformers support for local and evaluation workflows |
 | Knowledge graph | NetworkX |
 | PDF reports | ReportLab |
 | Persistence | SQLite |
