@@ -4,10 +4,6 @@
   <img src="./docs/assets/hero.svg" alt="ComplianceNexus RAG-powered audit architecture" width="100%">
 </p>
 
-<p align="center">
-  <img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&size=22&duration=3000&pause=1100&color=FFFFFF&center=true&vCenter=true&width=900&lines=Cross-border+transactions+need+traceable+evidence;RAG+retrieves+policy+context+from+source+documents;Deterministic+checks+decide+PASS+%2F+FAIL+%2F+REVIEW;Every+audit+ends+with+citations%2C+rationale%2C+and+a+PDF" alt="ComplianceNexus animated value proposition">
-</p>
-
 ComplianceNexus is a RegTech audit workspace for evaluating
 cross-border transaction compliance. It combines document retrieval,
 graph-guided context expansion, LangGraph agent orchestration, deterministic
@@ -18,6 +14,18 @@ The core design principle is simple:
 
 > The LLM explains from retrieved evidence, but deterministic checks decide the
 > verdict.
+
+## Demo
+
+<p align="center">
+  <a href="https://www.loom.com/share/689b10c3cd7f424fb1eb36cd0efe5216">
+    <img src="./docs/demo-thumbnail.png" alt="Watch the ComplianceNexus demo walkthrough" width="900">
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://www.loom.com/share/689b10c3cd7f424fb1eb36cd0efe5216"><b>Watch the full demo video</b></a>
+</p>
 
 ## Why This Exists
 
