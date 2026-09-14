@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     
     LLM_PROVIDER: str
     GROQ_API_KEY: SecretStr  # Hides the value when printed or dumped to logs
+    GROQ_MODEL: str = "qwen/qwen3.6-27b"
     OLLAMA_BASE_URL: str
     JWT_SECRET_KEY : SecretStr
     JWT_ALGORITHM:str

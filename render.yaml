@@ -8,6 +8,8 @@ services:
     envVars:
       - key: LLM_PROVIDER
         value: GROQ
+      - key: GROQ_MODEL
+        value: qwen/qwen3.6-27b
       - key: OLLAMA_BASE_URL
         value: http://localhost:11434
       - key: JWT_ALGORITHM

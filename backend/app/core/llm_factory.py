@@ -14,7 +14,7 @@ def get_chat_model(temperature: float = 0.0) -> BaseChatModel:
     
     if provider == "GROQ":
         return ChatGroq(
-            model="llama-3.3-70b-versatile",
+            model=settings.GROQ_MODEL,
             temperature=temperature,
             api_key=settings.GROQ_API_KEY
         )
