@@ -105,6 +105,9 @@ class AgentState(TypedDict):
 
     audit_verdict: str
     citations: List[str]
+    evaluation_mode: str
+    llm_status: str
+    llm_error_type: str
     retry_count: int
     citation_status: str
     error_feedback: str

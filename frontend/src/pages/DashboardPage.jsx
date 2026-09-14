@@ -662,7 +662,10 @@ function StructuredAuditReport({ audit }) {
         <span className="report-index">1</span>
         <div>
           <h3>Official Compliance Verdict</h3>
-          <Status value={audit.status} />
+          <div className="verdict-line">
+            <Status value={audit.status} />
+            <EvaluationModeBadge audit={audit} />
+          </div>
           <p>{rationale.executive_summary || firstParagraph(audit.verdict) || "No executive summary returned."}</p>
         </div>
       </div>
@@ -725,6 +728,15 @@ function StructuredAuditReport({ audit }) {
         </div>
       </div>
     </section>
+  );
+}
+
+function EvaluationModeBadge({ audit }) {
+  const isFallback = audit.evaluationMode === "DETERMINISTIC_FALLBACK";
+  return (
+    <span className={`evaluation-mode ${isFallback ? "fallback" : "llm"}`} title={audit.llmStatus || ""}>
+      {isFallback ? "Deterministic fallback" : "LLM-assisted"}
+    </span>
   );
 }
 
@@ -1116,6 +1128,7 @@ function normalizeAudit(record, persona) {
   const amount = Number(record.transaction_value ?? record.amount ?? 0);
   const ceiling = Number(record.allowed_ceiling ?? record.ceiling ?? 0);
   const transactionId = String(record.transaction_id || record.id || "");
+  const auditRationale = parseObject(record.audit_rationale ?? record.audit_rationale_json);
 
   return {
     id: record.id || transactionId,
@@ -1132,7 +1145,10 @@ function normalizeAudit(record, persona) {
     citations: parseCitations(record.citations ?? record.citations_json),
     selectedEvidence: parseCitations(record.selected_evidence_items ?? record.selected_evidence_json),
     auditChecks: parseCitations(record.audit_checks ?? record.audit_checks_json),
-    auditRationale: parseObject(record.audit_rationale ?? record.audit_rationale_json),
+    auditRationale,
+    evaluationMode: record.evaluation_mode || auditRationale.evaluation_mode || "LLM_ASSISTED",
+    llmStatus: record.llm_status || auditRationale.llm_status || "OK",
+    llmErrorType: record.llm_error_type || auditRationale.llm_error_type || "",
     verdict: record.audit_verdict_markdown || "",
     delta: amount - ceiling,
   };
