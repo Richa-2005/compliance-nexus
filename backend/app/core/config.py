@@ -7,6 +7,12 @@ class Settings(BaseSettings):
     
     LLM_PROVIDER: str
     GROQ_API_KEY: SecretStr  # Hides the value when printed or dumped to logs
+    GROQ_MODEL: str = "openai/gpt-oss-20b"
+    GROQ_EXTRACTION_API_KEY: SecretStr | None = None
+    GROQ_EXTRACTION_MODEL: str | None = None
+    GROQ_RATIONALE_API_KEY: SecretStr | None = None
+    GROQ_RATIONALE_MODEL: str | None = None
+    GROQ_REASONING_FORMAT: str = "hidden"
     OLLAMA_BASE_URL: str
     JWT_SECRET_KEY : SecretStr
     JWT_ALGORITHM:str

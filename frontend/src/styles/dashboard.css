@@ -606,6 +606,36 @@ button.audit-row:hover {
   line-height: 1.55;
 }
 
+.verdict-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.evaluation-mode {
+  border: 1px solid rgba(244, 241, 234, 0.14);
+  border-radius: 999px;
+  padding: 5px 9px;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.evaluation-mode.fallback {
+  border-color: rgba(215, 168, 75, 0.4);
+  color: var(--amber);
+  background: rgba(215, 168, 75, 0.08);
+}
+
+.evaluation-mode.llm {
+  border-color: rgba(50, 214, 125, 0.28);
+  color: var(--green);
+  background: rgba(50, 214, 125, 0.07);
+}
+
 .facts-grid {
   display: grid;
   grid-template-columns: repeat(5, minmax(130px, 1fr));
