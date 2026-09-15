@@ -6,16 +6,31 @@
   <img src="./docs/assets/hero.svg" alt="ComplianceNexus RAG-powered audit architecture" width="100%">
 </p>
 
-ComplianceNexus is a RegTech audit workspace for evaluating
-cross-border transaction compliance. It combines document retrieval,
+ComplianceNexus is a RegTech audit workspace for evaluating cross-border
+transaction compliance. It combines retrieval over policy documents,
 graph-guided context expansion, LangGraph agent orchestration, deterministic
-compliance checks, citation validation, structured dashboard reports,
-downloadable PDF certificates, and a lightweight L1/L2 follow-up flow.
+rule checks, citation validation, Kafka-backed document intake, structured
+dashboard reports, downloadable PDF certificates, and a lightweight L1/L2
+review flow.
 
 The core design principle is simple:
 
-> The LLM explains from retrieved evidence, but deterministic checks decide the
-> verdict.
+> The LLM extracts and explains from retrieved evidence; deterministic checks
+> decide the verdict.
+
+## Engineering Highlights
+
+- **Measured retrieval quality:** offline benchmark with Recall@K, MRR,
+  NDCG@10, p95 latency, seeded audit correctness, and citation/source coverage.
+- **Hybrid retrieval evaluation:** BM25, dense retrieval, hybrid RRF, and
+  reranked hybrid pipelines are compared in reproducible scripts.
+- **Asynchronous ingestion:** Kafka document intake uses consumer groups,
+  idempotent document IDs, retry metadata, dead-letter handling, and visible
+  document readiness state.
+- **Deterministic safety boundary:** compliance verdicts come from structured
+  checks rather than generated prose.
+- **Reproducible local stack:** Docker Compose starts frontend, backend, Kafka,
+  topic initialization, and the ingestion worker.
 
 ## Demo
 
@@ -55,20 +70,30 @@ The system turns a natural-language audit request into:
 ComplianceNexus includes a zero-cost offline evaluation harness under
 [`evaluation/`](./evaluation/). It benchmarks retrieval quality, seeded audit
 correctness, citation grounding, and retrieval latency without paid
-LLM-as-judge APIs.
+LLM-as-judge APIs, which keeps the evaluation runnable in CI or on a laptop.
+
+Evaluation artifacts:
+
+- [Latest benchmark report](./evaluation/results/summary.md)
+- [Evaluation harness README](./evaluation/README.md)
+- [Golden query set](./evaluation/golden_queries.json)
 
 Current benchmark summary:
 
+- Golden queries: `16`
 - Retrieval Recall@10: `96.9%`
 - Retrieval MRR: `1.000`
 - Retrieval NDCG@10: `0.958`
+- Retrieval p95 latency: `5.49 ms`
 - BM25 Recall@10: `100.0%`
 - Hybrid RRF Recall@10: `100.0%`
 - Seeded status accuracy: `100.0%`
 - Expected source coverage: `100.0%`
 
-See [`evaluation/results/summary.md`](./evaluation/results/summary.md) for the
-latest report.
+The latest benchmark report includes lower-scoring diagnostics such as
+primary-source selection and citation/evidence overlap. Those diagnostics are
+kept visible because they define the next provenance-hardening targets instead
+of being hidden behind a single success number.
 
 ## Architecture
 
@@ -233,12 +258,12 @@ The seeded demo covers multiple audit outcomes:
 | Auth | JWT demo personas |
 | Agent orchestration | LangGraph |
 | LLM providers | Ollama or Groq |
-| Async ingestion | Kafka, background worker, idempotent document status store |
+| Async ingestion | Kafka, topic initializer, background worker, idempotent document status store |
 | Retrieval | BM25 fallback in hosted demo; ChromaDB / sentence-transformers support for local and evaluation workflows |
 | Knowledge graph | NetworkX |
 | PDF reports | ReportLab |
 | Persistence | SQLite |
-| Evaluation tooling | Offline retrieval, citation, seeded-audit, and optional RAGAS-style benchmark scripts |
+| Evaluation tooling | Offline retrieval, citation, seeded-audit, hybrid retrieval comparison, and optional RAGAS-style benchmark scripts |
 
 ## Demo Accounts
 
@@ -292,6 +317,48 @@ npm run dev
 ```
 
 Open the Vite URL and sign in with one of the demo accounts.
+
+## Docker Compose
+
+For a reproducible local stack with Kafka, backend, worker, and frontend:
+
+```bash
+docker compose up --build
+```
+
+Open:
+
+```text
+http://localhost:5173
+```
+
+The compose stack starts:
+
+- `backend` on `http://localhost:8000`
+- `frontend` on `http://localhost:5173`
+- `kafka` and `zookeeper`
+- `kafka-init` to create ingestion topics
+- `worker` to consume document ingestion events
+
+For Groq-backed Docker runs, pass environment variables before starting:
+
+```bash
+LLM_PROVIDER=GROQ GROQ_API_KEY=your-groq-api-key docker compose up --build
+```
+
+Runtime document uploads are stored in a Docker named volume. Generated
+certificates remain container-local in this compose profile unless a certificate
+volume is added.
+
+Verified smoke checks for this profile:
+
+```bash
+docker compose config --quiet
+docker compose build backend worker frontend
+docker compose up -d
+curl http://localhost:8000/docs
+curl http://localhost:5173
+```
 
 ## Regenerating Seed Audit PDFs
 
@@ -371,6 +438,8 @@ The local Phase 2 workflow supports:
 - Uploaded evidence nodes in the transaction topology graph.
 - Report badges showing whether the rationale was `LLM-assisted` or generated
   by deterministic fallback.
+- Docker Compose startup for Kafka, topic initialization, backend, worker, and
+  frontend.
 
 See [`docs/kafka-ingestion.md`](./docs/kafka-ingestion.md) for topics,
 idempotency, retry, DLQ behavior, Docker Compose startup, and local worker
@@ -418,7 +487,8 @@ compliance decisions.
 - citation-aware audit reporting
 - PDF certificate generation
 - role-based human review workflow
-- evaluation-ready RAG artifacts
+- measurable offline evaluation results
+- Docker Compose reproducible deployment profile
 
 ---
 
