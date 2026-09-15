@@ -106,3 +106,7 @@ data/processed/certificates/*
 
 output/
 tmp/
+
+# Generated evaluation outputs
+evaluation/results/*.json
+!evaluation/results/.gitkeep
