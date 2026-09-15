@@ -1,0 +1,46 @@
+.git
+.DS_Store
+**/.DS_Store
+
+# Secrets and local env
+.env
+.env.*
+backend/.env
+backend/.env.*
+!.env.example
+!*.env.example
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Node
+frontend/node_modules/
+frontend/dist/
+node_modules/
+
+# Runtime outputs
+data/ingestion/
+data/raw/
+data/processed/chroma_db/
+data/processed/compliance.db
+data/processed/eval_progress.json
+data/processed/eval_states.json
+data/processed/certificates/TX_*.pdf
+!data/processed/certificates/TX_1001.pdf
+!data/processed/certificates/TX_1002.pdf
+!data/processed/certificates/TX_1003.pdf
+!data/processed/certificates/TX_1004.pdf
+!data/processed/certificates/TX_1005.pdf
+!data/processed/certificates/TX_1006.pdf
+!data/processed/certificates/TX_1007.pdf
+!data/processed/certificates/TX_1008.pdf
+
+# Tooling output
+output/
+tmp/
+evaluation/results/*.json
+!evaluation/results/.gitkeep

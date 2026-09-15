@@ -16,6 +16,7 @@ confluent-kafka>=2.3.0
 
 # Sparse index
 rank-bm25==0.2.2
+tiktoken
 
 # Topological analysis
 networkx==3.6.1

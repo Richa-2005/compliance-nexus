@@ -48,6 +48,12 @@ Start Kafka locally:
 docker compose -f docker-compose.kafka.yml up
 ```
 
+Or start the full reproducible stack:
+
+```bash
+docker compose up --build
+```
+
 Add these values to `backend/.env` only when running the async ingestion path:
 
 ```env
