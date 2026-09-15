@@ -8,6 +8,14 @@ services:
     envVars:
       - key: LLM_PROVIDER
         value: GROQ
+      - key: GROQ_MODEL
+        value: openai/gpt-oss-20b
+      - key: GROQ_EXTRACTION_MODEL
+        value: openai/gpt-oss-20b
+      - key: GROQ_RATIONALE_MODEL
+        value: openai/gpt-oss-20b
+      - key: GROQ_REASONING_FORMAT
+        value: hidden
       - key: OLLAMA_BASE_URL
         value: http://localhost:11434
       - key: JWT_ALGORITHM
@@ -19,4 +27,8 @@ services:
       - key: JWT_SECRET_KEY
         generateValue: true
       - key: GROQ_API_KEY
+        sync: false
+      - key: GROQ_EXTRACTION_API_KEY
+        sync: false
+      - key: GROQ_RATIONALE_API_KEY
         sync: false
