@@ -93,6 +93,9 @@ class AuditRationaleSchema(BaseModel):
 
 class AgentState(TypedDict):
     query: str
+    use_seeded_sources: bool
+    include_ingested_sources: bool
+    selected_document_ids: List[str]
     retrieved_child_ids: List[str]
     context_blocks: list
     graph_entities: str

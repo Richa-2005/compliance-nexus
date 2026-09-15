@@ -81,6 +81,96 @@ def normalize_extracted_metrics(metrics: dict, query: str) -> dict:
     return normalized
 
 
+def _query_amounts(query: str) -> list[float]:
+    amounts = []
+    for raw in re.findall(r"\$?\s*([0-9][0-9,]*(?:\.\d+)?)", query):
+        try:
+            amounts.append(float(raw.replace(",", "")))
+        except ValueError:
+            continue
+    return amounts
+
+
+def _infer_currency(query: str) -> str:
+    match = re.search(r"\b(USD|INR|EUR|GBP)\b", query, flags=re.IGNORECASE)
+    return match.group(1).upper() if match else "USD"
+
+
+def _infer_source_doc(query: str) -> str:
+    text = _normalize(query)
+    if _contains_any(text, ("kyc", "wire", "beneficiary", "originator", "wallet", "crypto", "cryptocurrency", "anonymous")):
+        return "RBI KYC"
+    if _contains_any(text, ("director", "promoter", "credit", "loan", "advance", "lending")):
+        return "RBI Credit Risk"
+    if _contains_any(text, ("foreign investment", "fdi", "equity", "acquisition", "approval-route", "approval route", "capital")):
+        return "Foreign Investment"
+    return "Internal Policy"
+
+
+def _infer_transaction_type(query: str) -> str:
+    text = _normalize(query)
+    if _contains_any(text, ("crypto", "cryptocurrency", "digital wallet")):
+        return "digital asset treasury transfer"
+    if _contains_any(text, ("equity", "acquisition", "capital")):
+        return "foreign equity acquisition"
+    if _contains_any(text, ("wire", "beneficiary", "originator", "kyc")):
+        return "cross-border wire transfer"
+    if _contains_any(text, ("cloud", "infrastructure", "service fee")):
+        return "cloud service remittance"
+    if _contains_any(text, ("advance", "credit", "loan")):
+        return "vendor credit advance"
+    return "technology software licensing remittance"
+
+
+def _infer_origin_entity(query: str) -> str:
+    match = re.search(r"\bfrom\s+(?P<origin>Nexus\s+[A-Za-z ]+?)\s+to\b", query, flags=re.IGNORECASE)
+    if match:
+        return " ".join(match.group("origin").split())
+    if re.search(r"\bNexus Global\b", query, flags=re.IGNORECASE):
+        return "Nexus Global"
+    if re.search(r"\bNexus India\b", query, flags=re.IGNORECASE):
+        return "Nexus India"
+    return "Nexus India"
+
+
+def fallback_extraction_metrics(state: AgentState, error: Exception) -> dict:
+    query = state["query"]
+    amounts = _query_amounts(query)
+    transaction_value = amounts[0] if amounts else 0.0
+    source_doc = _infer_source_doc(query)
+    currency = _infer_currency(query)
+    transaction_type = _infer_transaction_type(query)
+
+    return {
+        "transaction_value": transaction_value,
+        "allowed_ceiling": 1500000.0,
+        "lineage": "Deterministic fallback used the retrieved topology context because LLM structured extraction was unavailable.",
+        "source_doc": source_doc,
+        "transaction_type": transaction_type,
+        "origin_entity": _infer_origin_entity(query),
+        "destination_entity_or_type": _infer_destination_from_query(query),
+        "jurisdiction": "India outbound remittance" if _contains_any(_normalize(query), ("overseas", "foreign", "offshore", "outbound", "cross-border")) else "Unspecified jurisdiction",
+        "payment_purpose": transaction_type,
+        "currency": currency,
+        "applicable_rules": [
+            {
+                "rule_name": f"{source_doc} deterministic fallback rule",
+                "source_doc": source_doc,
+                "threshold": "1500000",
+                "condition": "Applied when LLM structured extraction fails.",
+                "why_applicable": "Selected from transaction keywords and retrieved policy context.",
+            }
+        ],
+        "risk_factors": [
+            {
+                "factor": "LLM structured extraction unavailable",
+                "source": type(error).__name__,
+            }
+        ],
+        "primary_evidence_summary": "Selected from retrieved evidence using deterministic keyword routing.",
+    }
+
+
 def _query_terms(query: str) -> set[str]:
     return {
         term
@@ -565,7 +655,7 @@ def normalize_rationale_findings(
 
 def extract_audit_json(state: AgentState) -> AgentState:
     """Invokes the environment factory model strictly for structured metrics extraction."""
-    raw_llm = get_chat_model(temperature=0.0)
+    raw_llm = get_chat_model(temperature=0.0, task="extraction")
     structured_extractor = raw_llm.with_structured_output(ComplianceExtractionSchema)
 
     formatted_context = rank_context_blocks_for_extraction(
@@ -626,28 +716,32 @@ def extract_audit_json(state: AgentState) -> AgentState:
 
     try:
         extracted_data = structured_extractor.invoke(messages)
+        if extracted_data is None:
+            raise ValueError("Structured extraction returned no data.")
+        state["evaluation_mode"] = "LLM_ASSISTED"
+        state["llm_status"] = "OK"
+        state["llm_error_type"] = ""
+        extracted_metrics = {
+            "transaction_value": extracted_data.transaction_value,
+            "allowed_ceiling": extracted_data.allowed_ceiling,
+            "lineage": extracted_data.corporate_lineage_summary,
+            "source_doc": extracted_data.source_doc,
+            "transaction_type" : extracted_data.transaction_type,
+            "origin_entity" : extracted_data.origin_entity,
+            "destination_entity_or_type" :extracted_data.destination_entity_or_type,
+            "jurisdiction":extracted_data.jurisdiction,
+            "payment_purpose":extracted_data.payment_purpose,
+            "currency":extracted_data.currency,
+            "applicable_rules" : extracted_data.applicable_rules,
+            "risk_factors" :extracted_data.risk_factors,
+            "primary_evidence_summary": extracted_data.primary_evidence_summary,
+        }
     except Exception as error:
-        retry_messages = [
-            SystemMessage(content="Your previous structured tool call was invalid. Return one valid ComplianceExtractionSchema tool call only. Do not duplicate fields. Close every string."),
-            HumanMessage(content=f"{extraction_prompt}\n\nPrevious tool-call error: {type(error).__name__}: {error}")
-        ]
-        extracted_data = structured_extractor.invoke(retry_messages)
-    
-    extracted_metrics = {
-        "transaction_value": extracted_data.transaction_value,
-        "allowed_ceiling": extracted_data.allowed_ceiling,
-        "lineage": extracted_data.corporate_lineage_summary,
-        "source_doc": extracted_data.source_doc,
-        "transaction_type" : extracted_data.transaction_type,
-        "origin_entity" : extracted_data.origin_entity,
-        "destination_entity_or_type" :extracted_data.destination_entity_or_type,
-        "jurisdiction":extracted_data.jurisdiction,
-        "payment_purpose":extracted_data.payment_purpose,
-        "currency":extracted_data.currency,
-        "applicable_rules" : extracted_data.applicable_rules,
-        "risk_factors" :extracted_data.risk_factors,
-        "primary_evidence_summary": extracted_data.primary_evidence_summary,
-    }
+        state["evaluation_mode"] = "DETERMINISTIC_FALLBACK"
+        state["llm_status"] = "FAILED_STRUCTURED_EXTRACTION"
+        state["llm_error_type"] = type(error).__name__
+        extracted_metrics = fallback_extraction_metrics(state, error)
+
     state["extracted_metrics"] = normalize_extracted_metrics(
         extracted_metrics,
         state["query"],
@@ -674,7 +768,7 @@ def extract_audit_json(state: AgentState) -> AgentState:
 
 
 def generate_audit_rationale(state: AgentState) -> AgentState:
-    raw_llm = get_chat_model(temperature=0.0)
+    raw_llm = get_chat_model(temperature=0.0, task="rationale")
     structured_rationale = raw_llm.with_structured_output(AuditRationaleSchema)
     selected_evidence = select_relevant_evidence(
         state.get("evidence_items", []),
@@ -704,6 +798,36 @@ def generate_audit_rationale(state: AgentState) -> AgentState:
         check.get("result") == "REVIEW"
         for check in state.get("audit_checks", [])
     )
+
+    if state.get("evaluation_mode") == "DETERMINISTIC_FALLBACK":
+        recommended_action = (
+            "BLOCK_REMITTANCE"
+            if has_failed_check
+            else "REQUEST_MORE_EVIDENCE"
+            if has_review_check or not selected_evidence
+            else "APPROVE"
+        )
+        state["audit_rationale"] = {
+            "executive_summary": (
+                "Deterministic fallback generated this rationale because LLM structured extraction was unavailable. "
+                "The verdict is based on parsed transaction facts, retrieved evidence, and deterministic compliance checks."
+            ),
+            "rule_application_reasoning": build_rule_application_reasoning(
+                state.get("extracted_metrics", {})
+            ),
+            "evidence_summary": "Evidence was selected from retrieved source documents and attached to deterministic audit checks.",
+            "deficiency_findings": normalize_rationale_findings(
+                [],
+                state.get("audit_checks", []),
+                selected_evidence,
+            ),
+            "recommended_action": recommended_action,
+            "evaluation_mode": "DETERMINISTIC_FALLBACK",
+            "llm_status": state.get("llm_status", "FAILED_STRUCTURED_EXTRACTION"),
+            "llm_error_type": state.get("llm_error_type", ""),
+        }
+        state["audit_verdict"] = build_audit_verdict(state)
+        return state
 
     prompt = f"""
     You are a compliance audit rationale writer.
@@ -737,10 +861,46 @@ def generate_audit_rationale(state: AgentState) -> AgentState:
     - If evidence is weak or missing, say that human review is needed.
     """
 
-    result = structured_rationale.invoke([
-        SystemMessage(content="You write concise, evidence-backed audit reasoning. You do not invent facts."),
-        HumanMessage(content=prompt)
-    ])
+    try:
+        result = structured_rationale.invoke([
+            SystemMessage(content="You write concise, evidence-backed audit reasoning. You do not invent facts."),
+            HumanMessage(content=prompt)
+        ])
+        if result is None:
+            raise ValueError("Structured rationale returned no data.")
+    except Exception as error:
+        if state.get("evaluation_mode") != "DETERMINISTIC_FALLBACK":
+            state["evaluation_mode"] = "DETERMINISTIC_FALLBACK"
+        state["llm_status"] = "FAILED_RATIONALE_GENERATION"
+        state["llm_error_type"] = type(error).__name__
+        metrics = state.get("extracted_metrics", {})
+        findings = normalize_rationale_findings(
+            [],
+            state.get("audit_checks", []),
+            selected_evidence,
+        )
+        recommended_action = (
+            "BLOCK_REMITTANCE"
+            if has_failed_check
+            else "REQUEST_MORE_EVIDENCE"
+            if has_review_check or not selected_evidence
+            else "APPROVE"
+        )
+        state["audit_rationale"] = {
+            "executive_summary": (
+                "Deterministic fallback generated this rationale because LLM rationale generation was unavailable. "
+                f"The transaction was evaluated against {metrics.get('source_doc', 'the selected source')} using retrieved evidence and deterministic checks."
+            ),
+            "rule_application_reasoning": build_rule_application_reasoning(metrics),
+            "evidence_summary": "Evidence was selected from retrieved source documents and attached to deterministic audit checks.",
+            "deficiency_findings": findings,
+            "recommended_action": recommended_action,
+            "evaluation_mode": state.get("evaluation_mode", "DETERMINISTIC_FALLBACK"),
+            "llm_status": state.get("llm_status", "FAILED_RATIONALE_GENERATION"),
+            "llm_error_type": state.get("llm_error_type", type(error).__name__),
+        }
+        state["audit_verdict"] = build_audit_verdict(state)
+        return state
 
     recommended_action = result.recommended_action
     if has_failed_check:
@@ -762,6 +922,9 @@ def generate_audit_rationale(state: AgentState) -> AgentState:
             selected_evidence,
         ),
         "recommended_action": recommended_action,
+        "evaluation_mode": state.get("evaluation_mode", "LLM_ASSISTED"),
+        "llm_status": state.get("llm_status", "OK"),
+        "llm_error_type": state.get("llm_error_type", ""),
     }
     state["audit_verdict"] = build_audit_verdict(state)
 

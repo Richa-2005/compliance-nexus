@@ -5,6 +5,8 @@ from functools import lru_cache
 from pathlib import Path
 from rank_bm25 import BM25Okapi
 
+from app.ingestion.status_store import ready_parent_chunk_paths
+
 CHROMA_DIR = "data/processed/chroma_db/"
 CHROMA_ENABLED = os.getenv("CHROMA_ENABLED", "false").lower() == "true"
 chroma_client = None
@@ -21,14 +23,33 @@ def clean_metadata(metadata):
     }
 
 class Retriever:
-    def __init__(self, child_token_path: str):
+    def __init__(
+        self,
+        child_token_path: str,
+        parent_token_path: str = "data/processed/parent_chunks.json",
+        include_seeded_sources: bool = True,
+        include_ingested_sources: bool = False,
+        selected_document_ids: set[str] | None = None,
+    ):
         global chroma_client
         self.chroma_collec = None
         if chroma_client is not None:
             self.chroma_collec = chroma_client.get_or_create_collection(name="compliance_nexus_chunks")
         self.child_token_path = Path(child_token_path)
+        self.parent_token_path = Path(parent_token_path)
+        self.include_seeded_sources = include_seeded_sources
+        self.include_ingested_sources = include_ingested_sources
+        self.selected_document_ids = selected_document_ids
 
-        self.json_data = self._load_child_chunks()
+        self.json_data = self._load_child_chunks() if self.include_seeded_sources else []
+        parent_chunks = self._load_parent_chunks() if self.include_seeded_sources else []
+        if self.include_ingested_sources:
+            ingested_child_chunks, ingested_parent_chunks = self._load_ready_ingested_chunks(
+                self.selected_document_ids
+            )
+            self.json_data.extend(ingested_child_chunks)
+            parent_chunks.extend(ingested_parent_chunks)
+
         self.bm25 = self._build_bm25(self.json_data)
         if self.chroma_collec is not None and self.chroma_collec.count() == 0:
             self.chroma_collection()
@@ -36,11 +57,6 @@ class Retriever:
             child["child_id"]: child["parent_id"]
             for child in self.json_data
         }
-
-        with Path("data/processed/parent_chunks.json").open(
-            "r", encoding="utf-8"
-        ) as file:
-            parent_chunks = json.load(file)
 
         self.parent_by_id = {
             parent["parent_id"]: parent
@@ -51,11 +67,42 @@ class Retriever:
         with self.child_token_path.open("r", encoding="utf-8") as file:
             return json.load(file)
 
+    def _load_parent_chunks(self):
+        with self.parent_token_path.open("r", encoding="utf-8") as file:
+            return json.load(file)
+
+    def _load_ready_ingested_chunks(self, selected_document_ids: set[str] | None = None):
+        child_chunks = []
+        parent_chunks = []
+        for parent_path in ready_parent_chunk_paths(selected_document_ids):
+            document_dir = parent_path.parent
+            child_path = document_dir / "child_chunks.json"
+
+            with parent_path.open("r", encoding="utf-8") as file:
+                document_parent_chunks = json.load(file)
+            for chunk in document_parent_chunks:
+                chunk.setdefault("metadata", {})
+                chunk["metadata"]["source_type"] = "uploaded_document"
+
+            if child_path.exists():
+                with child_path.open("r", encoding="utf-8") as file:
+                    document_child_chunks = json.load(file)
+                for chunk in document_child_chunks:
+                    chunk.setdefault("metadata", {})
+                    chunk["metadata"]["source_type"] = "uploaded_document"
+                child_chunks.extend(document_child_chunks)
+
+            parent_chunks.extend(document_parent_chunks)
+
+        return child_chunks, parent_chunks
+
     @staticmethod
     def _tokenize(text: str):
         return re.findall(r"\b\w+\b", text.lower())
 
     def _build_bm25(self, child_chunks):
+        if not child_chunks:
+            return None
         tokenized_contents = [
             self._tokenize(chunk["text_content"])
             for chunk in child_chunks
@@ -99,6 +146,8 @@ class Retriever:
         )
 
     def bm25_search(self, query_text: str, n_results: int = 10):
+        if self.bm25 is None:
+            return []
         return self.bm25.get_top_n(
             self._tokenize(query_text),
             self.json_data,
@@ -176,11 +225,28 @@ class Retriever:
 
 
 @lru_cache(maxsize=1)
-def get_retriever(
+def get_seeded_retriever(
     child_token_path: str = "data/processed/child_chunks.json",
 ) -> Retriever:
-    """Return the process-wide retriever used by request handlers."""
+    """Return the process-wide seeded retriever used by default request handlers."""
     return Retriever(child_token_path)
+
+
+def get_retriever(
+    child_token_path: str = "data/processed/child_chunks.json",
+    include_seeded_sources: bool = True,
+    include_ingested_sources: bool = False,
+    selected_document_ids: set[str] | None = None,
+) -> Retriever:
+    """Return a retriever for seeded docs, optionally merged with ready uploads."""
+    if include_ingested_sources or not include_seeded_sources:
+        return Retriever(
+            child_token_path,
+            include_seeded_sources=include_seeded_sources,
+            include_ingested_sources=True,
+            selected_document_ids=selected_document_ids,
+        )
+    return get_seeded_retriever(child_token_path)
     
 if __name__ == "__main__":
     ret = get_retriever()

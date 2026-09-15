@@ -102,6 +102,8 @@ data/processed/certificates/*
 !data/processed/certificates/TX_1007.pdf
 !data/processed/certificates/TX_1008.pdf
 !data/processed/eval_ground_truth.json
+!data/ingestion/
+data/ingestion/*
 
 
 output/

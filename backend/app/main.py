@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.seed import seed_database_if_empty
 from app.api.v1.auth import auth_router
 from app.api.v1.audits import audits_router
+from app.api.v1.documents import documents_router
 from app.api.v1.websockets import ws_router
 from app.core.config import settings
 
@@ -30,4 +31,5 @@ app.add_middleware(
 
 app.include_router(auth_router, prefix=settings.API_V1_PREFIX, tags=["Auth"])
 app.include_router(audits_router, prefix=settings.API_V1_PREFIX, tags=["Audit Engine"])
+app.include_router(documents_router, prefix=settings.API_V1_PREFIX, tags=["Async Documents"])
 app.include_router(ws_router, tags=["WebSocket Live Feed"])

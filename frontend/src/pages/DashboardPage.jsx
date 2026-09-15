@@ -7,8 +7,10 @@ import {
   Loader2,
   Network,
   Radio,
+  RefreshCw,
   SearchCheck,
   ShieldCheck,
+  Upload,
   X,
   Zap,
 } from "lucide-react";
@@ -22,8 +24,10 @@ import {
   getAssignmentOutbox,
   getAuditHistory,
   getAuditTopology,
+  getDocuments,
   getLiveFeedUrl,
   getPdfUrl,
+  uploadDocument,
   updateAssignment,
 } from "../utils/api";
 
@@ -51,7 +55,7 @@ const GUIDE_COPY = {
   },
   new: {
     title: "Run a fresh compliance evaluation.",
-    text: "Start with a sample scenario or write a transaction request. ComplianceNexus parses the request, retrieves policy evidence, evaluates the ceiling, and returns an audit certificate.",
+    text: "Start with a sample scenario or write a transaction request. Choose whether retrieval should use the seeded policy corpus, officer-uploaded PDFs, or both before generating an audit certificate.",
   },
   graph: {
     title: "Inspect the entity-policy topology behind a verdict.",
@@ -348,6 +352,8 @@ export function DashboardPage({ role = "analyst" }) {
           {activeTab === "queue" && (
             <AuditQueue
               audits={filteredAudits}
+              token={activeToken}
+              role={activeRole}
               assignments={activeRole === "analyst" ? assignments : []}
               returnedAssignments={activeRole === "officer" ? officerAssignments.filter((assignment) => assignment.status === "RESOLVED") : []}
               counts={counts}
@@ -357,12 +363,14 @@ export function DashboardPage({ role = "analyst" }) {
               onResolveAssignment={resolveAssignment}
               onCloseReturnedAssignment={closeReturnedAssignment}
               onSelect={openAuditDetail}
+              onNotice={setNotice}
             />
           )}
 
           {activeTab === "new" && (
             <NewAuditWorkspace
               token={activeToken}
+              role={activeRole}
               latestAudit={latestAudit}
               activeAuditRun={activeAuditRun}
               onAuditStart={setActiveAuditRun}
@@ -416,7 +424,71 @@ function TelemetryPill({ telemetry }) {
   );
 }
 
-function AuditQueue({ audits, assignments, returnedAssignments, counts, filter, loading, onFilter, onResolveAssignment, onCloseReturnedAssignment, onSelect }) {
+function AuditQueue({ audits, token, role, assignments, returnedAssignments, counts, filter, loading, onFilter, onResolveAssignment, onCloseReturnedAssignment, onSelect, onNotice }) {
+  const [documents, setDocuments] = React.useState([]);
+  const [documentsLoading, setDocumentsLoading] = React.useState(false);
+  const [uploading, setUploading] = React.useState(false);
+  const canUploadDocuments = role === "officer";
+
+  const loadDocuments = React.useCallback(async () => {
+    if (!token || !canUploadDocuments) return;
+    setDocumentsLoading(true);
+    try {
+      const result = await getDocuments(token);
+      setDocuments(result.documents || []);
+    } catch (error) {
+      onNotice(`Unable to load uploaded documents. ${error.message || ""}`.trim());
+    } finally {
+      setDocumentsLoading(false);
+    }
+  }, [token, canUploadDocuments, onNotice]);
+
+  React.useEffect(() => {
+    loadDocuments();
+  }, [loadDocuments]);
+
+  async function handleUpload(event) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file || !token || uploading) return;
+
+    setUploading(true);
+    onNotice("");
+    try {
+      const queued = await uploadDocument(token, file);
+      await loadDocuments();
+      onNotice("Document queued. Kafka is parsing and chunking it.");
+      watchDocumentUntilReady(queued.document_id);
+    } catch (error) {
+      onNotice(`Document upload failed. ${error.message || "Confirm Kafka is enabled and running locally."}`.trim());
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function watchDocumentUntilReady(documentId, attempt = 0) {
+    if (!documentId || attempt >= 12) return;
+    window.setTimeout(async () => {
+      try {
+        const result = await getDocuments(token);
+        const nextDocuments = result.documents || [];
+        setDocuments(nextDocuments);
+        const current = nextDocuments.find((document) => document.document_id === documentId);
+        if (current?.status === "ready") {
+          onNotice(`${current.original_filename || "Document"} is ready for audit retrieval.`);
+          return;
+        }
+        if (current?.status === "dead_lettered" || current?.status === "publish_failed") {
+          onNotice(`${current.original_filename || "Document"} ingestion failed.`);
+          return;
+        }
+        watchDocumentUntilReady(documentId, attempt + 1);
+      } catch {
+        watchDocumentUntilReady(documentId, attempt + 1);
+      }
+    }, 2500);
+  }
+
   return (
     <section className="tab-page audit-queue-page">
       <div className="section-head">
@@ -439,6 +511,17 @@ function AuditQueue({ audits, assignments, returnedAssignments, counts, filter, 
 
       {returnedAssignments.length > 0 && (
         <ReturnedFollowUps assignments={returnedAssignments} onClose={onCloseReturnedAssignment} />
+      )}
+
+      {canUploadDocuments && (
+        <DocumentIngestionPanel
+          documents={documents}
+          loading={documentsLoading}
+          uploading={uploading}
+          canUpload
+          onUpload={handleUpload}
+          onRefresh={loadDocuments}
+        />
       )}
 
       <div className="audit-table" role="table" aria-label="Audit records">
@@ -535,9 +618,42 @@ function ReturnedFollowUps({ assignments, onClose }) {
   );
 }
 
-function NewAuditWorkspace({ token, latestAudit, activeAuditRun, onAuditStart, onAuditComplete, onNotice }) {
+function NewAuditWorkspace({ token, role, latestAudit, activeAuditRun, onAuditStart, onAuditComplete, onNotice }) {
   const [query, setQuery] = React.useState("");
+  const [documents, setDocuments] = React.useState([]);
+  const [documentsLoading, setDocumentsLoading] = React.useState(false);
+  const [sourceMode, setSourceMode] = React.useState("seeded");
+  const [selectedDocumentIds, setSelectedDocumentIds] = React.useState([]);
   const loading = Boolean(activeAuditRun);
+  const readyDocumentCount = documents.filter((document) => document.status === "ready").length;
+  const includeIngestedSources = sourceMode !== "seeded";
+  const useSeededSources = sourceMode !== "uploaded";
+
+  const loadDocuments = React.useCallback(async () => {
+    if (!token) return;
+    setDocumentsLoading(true);
+    try {
+      const result = await getDocuments(token);
+      const nextDocuments = result.documents || [];
+      setDocuments(nextDocuments);
+      const readyIds = nextDocuments
+        .filter((document) => document.status === "ready")
+        .map((document) => document.document_id);
+      setSelectedDocumentIds((current) => (
+        current.length
+          ? current.filter((documentId) => readyIds.includes(documentId))
+          : readyIds
+      ));
+    } catch (error) {
+      onNotice(`Unable to load uploaded documents. ${error.message || ""}`.trim());
+    } finally {
+      setDocumentsLoading(false);
+    }
+  }, [token, onNotice]);
+
+  React.useEffect(() => {
+    loadDocuments();
+  }, [loadDocuments]);
 
   async function submitAudit(event) {
     event.preventDefault();
@@ -547,7 +663,11 @@ function NewAuditWorkspace({ token, latestAudit, activeAuditRun, onAuditStart, o
     onAuditStart({ query: trimmed, startedAt: Date.now() });
     onNotice("");
     try {
-      const result = await evaluateAudit(token, trimmed);
+      const result = await evaluateAudit(token, trimmed, {
+        includeIngestedSources,
+        useSeededSources,
+        selectedDocumentIds: includeIngestedSources ? selectedDocumentIds : [],
+      });
       onAuditComplete(result);
       setQuery("");
     } catch {
@@ -576,6 +696,47 @@ function NewAuditWorkspace({ token, latestAudit, activeAuditRun, onAuditStart, o
           placeholder="Enter a transaction query for the compliance agents..."
           required
         />
+        <div className="knowledge-controls" aria-label="Knowledge source selection">
+          <label className="source-option">
+            <input
+              type="radio"
+              name="source-mode"
+              checked={sourceMode === "seeded"}
+              onChange={() => setSourceMode("seeded")}
+              disabled={loading}
+            />
+            <span>Seeded corpus</span>
+          </label>
+          <label className="source-option">
+            <input
+              type="radio"
+              name="source-mode"
+              checked={sourceMode === "combined"}
+              onChange={() => setSourceMode("combined")}
+              disabled={!readyDocumentCount || loading}
+            />
+            <span>Seeded + selected uploads</span>
+          </label>
+          <label className="source-option">
+            <input
+              type="radio"
+              name="source-mode"
+              checked={sourceMode === "uploaded"}
+              onChange={() => setSourceMode("uploaded")}
+              disabled={!readyDocumentCount || loading}
+            />
+            <span>Selected uploads only</span>
+            <em>{readyDocumentCount} ready</em>
+          </label>
+        </div>
+        <DocumentIngestionPanel
+          documents={documents}
+          loading={documentsLoading}
+          selectedDocumentIds={selectedDocumentIds}
+          selectable
+          onSelectionChange={setSelectedDocumentIds}
+          onRefresh={loadDocuments}
+        />
         <div className="sample-queries" aria-label="Sample audit prompts">
           <h2>Try audit scenarios</h2>
           {SAMPLE_QUERIES.map((sample) => (
@@ -593,6 +754,87 @@ function NewAuditWorkspace({ token, latestAudit, activeAuditRun, onAuditStart, o
         {!loading && !latestAudit && <div className="result-placeholder">Audit results will appear here.</div>}
       </div>
     </section>
+  );
+}
+
+function DocumentIngestionPanel({
+  documents,
+  loading,
+  uploading = false,
+  canUpload = false,
+  selectable = false,
+  selectedDocumentIds = [],
+  onSelectionChange,
+  onUpload,
+  onRefresh,
+}) {
+  const visibleDocuments = documents.slice(0, 4);
+  const selectedSet = new Set(selectedDocumentIds);
+
+  function toggleDocument(documentId) {
+    if (!onSelectionChange) return;
+    if (selectedSet.has(documentId)) {
+      onSelectionChange(selectedDocumentIds.filter((id) => id !== documentId));
+    } else {
+      onSelectionChange([...selectedDocumentIds, documentId]);
+    }
+  }
+
+  return (
+    <div className="document-ingestion-panel">
+      <div className="document-panel-head">
+        <div>
+          <h2>Uploaded knowledge sources</h2>
+          <p>
+            {canUpload
+              ? "Upload policy PDFs here; Kafka parses them into retrievable evidence."
+              : "Select ready officer-uploaded PDFs to include in this audit."}
+          </p>
+          <small>{documents.length ? `${documents.length} document${documents.length === 1 ? "" : "s"} tracked` : "No uploaded documents yet."}</small>
+        </div>
+        <div className="document-actions">
+          <button type="button" onClick={onRefresh} disabled={loading}>
+            {loading ? <Loader2 className="spin" size={15} /> : <RefreshCw size={15} />}
+            <span>Refresh</span>
+          </button>
+          {canUpload && (
+            <label className="upload-button">
+              {uploading ? <Loader2 className="spin" size={15} /> : <Upload size={15} />}
+              <span>Upload</span>
+              <input type="file" accept="application/pdf,.pdf" onChange={onUpload} disabled={uploading} />
+            </label>
+          )}
+        </div>
+      </div>
+      <div className="document-list">
+        {visibleDocuments.length ? visibleDocuments.map((document) => (
+          <button
+            className={`document-row ${selectable && selectedSet.has(document.document_id) ? "selected" : ""}`}
+            type="button"
+            onClick={() => selectable && document.status === "ready" && toggleDocument(document.document_id)}
+            disabled={selectable && document.status !== "ready"}
+            key={document.document_id}
+          >
+            {selectable && (
+              <input
+                type="checkbox"
+                checked={selectedSet.has(document.document_id)}
+                onChange={() => toggleDocument(document.document_id)}
+                onClick={(event) => event.stopPropagation()}
+                disabled={document.status !== "ready"}
+              />
+            )}
+            <FileText size={16} />
+            <span title={document.original_filename}>{document.original_filename || document.document_id}</span>
+            <em>{document.status}</em>
+          </button>
+        )) : (
+          <div className="document-empty">
+            {canUpload ? "Upload a PDF to queue Kafka ingestion." : "No ready uploaded sources are available yet."}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -655,6 +897,7 @@ function StructuredAuditReport({ audit }) {
   const evidence = audit.selectedEvidence || [];
   const rationale = audit.auditRationale || {};
   const findings = Array.isArray(rationale.deficiency_findings) ? rationale.deficiency_findings : [];
+  const modeLabel = audit.evaluationMode === "DETERMINISTIC_FALLBACK" ? "Fallback generated" : "LLM-assisted";
 
   return (
     <section className="structured-report" aria-label="Audit report">
@@ -662,7 +905,12 @@ function StructuredAuditReport({ audit }) {
         <span className="report-index">1</span>
         <div>
           <h3>Official Compliance Verdict</h3>
-          <Status value={audit.status} />
+          <div className="verdict-heading">
+            <Status value={audit.status} />
+            <span className={`generation-badge ${audit.evaluationMode === "DETERMINISTIC_FALLBACK" ? "fallback" : ""}`}>
+              {modeLabel}
+            </span>
+          </div>
           <p>{rationale.executive_summary || firstParagraph(audit.verdict) || "No executive summary returned."}</p>
         </div>
       </div>
@@ -879,6 +1127,7 @@ function AuthorityActions({ audit, token, analysts, onAssignmentCreated, onOffic
 }
 
 function MetricStrip({ audit }) {
+  const modeLabel = audit.evaluationMode === "DETERMINISTIC_FALLBACK" ? "Fallback" : "LLM-assisted";
   return (
     <div className="metric-strip">
       <div>
@@ -896,6 +1145,10 @@ function MetricStrip({ audit }) {
       <div>
         <span>Status</span>
         <Status value={audit.status} />
+      </div>
+      <div>
+        <span>Generation</span>
+        <strong>{modeLabel}</strong>
       </div>
     </div>
   );
@@ -1134,6 +1387,8 @@ function normalizeAudit(record, persona) {
     auditChecks: parseCitations(record.audit_checks ?? record.audit_checks_json),
     auditRationale: parseObject(record.audit_rationale ?? record.audit_rationale_json),
     verdict: record.audit_verdict_markdown || "",
+    evaluationMode: parseObject(record.audit_rationale ?? record.audit_rationale_json).evaluation_mode || "LLM_ASSISTED",
+    llmStatus: parseObject(record.audit_rationale ?? record.audit_rationale_json).llm_status || "OK",
     delta: amount - ceiling,
   };
 }
@@ -1293,6 +1548,7 @@ function nodeColor(node) {
   const group = String(node.group || "").toLowerCase();
   const id = String(node.id || "").toLowerCase();
   if (group.includes("warning") || group.includes("action") || group.includes("breach") || id.includes("action_required")) return "#dc3f4d";
+  if (group.includes("uploaded")) return "#d7a84b";
   if (group.includes("policy") || id.endsWith(".pdf") || id.includes("rbi")) return "#d7a84b";
   return "#4e9cff";
 }
