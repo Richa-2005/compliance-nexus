@@ -78,6 +78,7 @@ def parse_json_field(value: str | None, fallback):
 
 
 def serialize_audit_record(rec: AuditRecord, include_user: bool = False) -> dict:
+    audit_rationale = parse_json_field(rec.audit_rationale_json, {})
     data = {
         "id": rec.id,
         "transaction_id": rec.transaction_id,
@@ -91,7 +92,10 @@ def serialize_audit_record(rec: AuditRecord, include_user: bool = False) -> dict
         "evidence_items": parse_json_field(rec.evidence_json, []),
         "selected_evidence_items": parse_json_field(rec.selected_evidence_json, []),
         "audit_checks": parse_json_field(rec.audit_checks_json, []),
-        "audit_rationale": parse_json_field(rec.audit_rationale_json, {}),
+        "audit_rationale": audit_rationale,
+        "evaluation_mode": audit_rationale.get("evaluation_mode", "LLM_ASSISTED"),
+        "llm_status": audit_rationale.get("llm_status", "OK"),
+        "llm_error_type": audit_rationale.get("llm_error_type", ""),
         "pdf_path": rec.pdf_path,
         "created_at": rec.timestamp.isoformat()
         if rec.timestamp
@@ -202,6 +206,18 @@ async def evaluate_transaction(
     selected_evidence_items = graph_output.get("selected_evidence_items", [])
     audit_checks = graph_output.get("audit_checks", [])
     audit_rationale = graph_output.get("audit_rationale", {})
+    audit_rationale.setdefault(
+        "evaluation_mode",
+        graph_output.get("evaluation_mode", "LLM_ASSISTED"),
+    )
+    audit_rationale.setdefault(
+        "llm_status",
+        graph_output.get("llm_status", "OK"),
+    )
+    audit_rationale.setdefault(
+        "llm_error_type",
+        graph_output.get("llm_error_type", ""),
+    )
 
     new_audit = AuditRecord(
         transaction_id=transaction_id,
@@ -542,6 +558,9 @@ def serialize_assignment(assignment: AuditAssignment, audit: AuditRecord | None)
             "selected_evidence_items": audit.selected_evidence,
             "audit_checks": audit.audit_checks,
             "audit_rationale": audit.audit_rationale,
+            "evaluation_mode": audit.audit_rationale.get("evaluation_mode", "LLM_ASSISTED"),
+            "llm_status": audit.audit_rationale.get("llm_status", "OK"),
+            "llm_error_type": audit.audit_rationale.get("llm_error_type", ""),
             "created_at": audit.timestamp.isoformat() if audit.timestamp else "",
         }
         if audit
