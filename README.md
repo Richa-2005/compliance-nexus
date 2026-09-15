@@ -50,6 +50,26 @@ The system turns a natural-language audit request into:
 - a PDF audit certificate,
 - and optional L1/L2 follow-up notes.
 
+## Evaluation Benchmark
+
+ComplianceNexus includes a zero-cost offline evaluation harness under
+[`evaluation/`](./evaluation/). It benchmarks retrieval quality, seeded audit
+correctness, citation grounding, and retrieval latency without paid
+LLM-as-judge APIs.
+
+Current benchmark summary:
+
+- Retrieval Recall@10: `96.9%`
+- Retrieval MRR: `1.000`
+- Retrieval NDCG@10: `0.958`
+- BM25 Recall@10: `100.0%`
+- Hybrid RRF Recall@10: `100.0%`
+- Seeded status accuracy: `100.0%`
+- Expected source coverage: `100.0%`
+
+See [`evaluation/results/summary.md`](./evaluation/results/summary.md) for the
+latest report.
+
 ## Architecture
 
 <p align="center">
@@ -289,11 +309,22 @@ data/processed/certificates/
 
 ## Evaluation
 
-RAGAS evaluation is intentionally kept outside the product UI. The app is the
+Evaluation is intentionally kept outside the product UI. The app is the
 operational audit experience; evaluation belongs in reproducible engineering
 artifacts.
 
-Planned evaluation metrics:
+The offline benchmark under `evaluation/` currently measures:
+
+| Metric | What It Checks |
+| --- | --- |
+| Recall@5 / Recall@10 | Whether retrieval surfaces expected compliance sources. |
+| MRR / NDCG@10 | Whether expected sources are ranked early enough to be useful. |
+| Status accuracy | Whether seeded scenarios resolve to the expected compliance outcome. |
+| Citation/source coverage | Whether citations and selected evidence cover expected sources. |
+| p95 retrieval latency | Whether retrieval remains fast enough for interactive audit use. |
+
+RAGAS judge-based evaluation remains optional for environments with available
+LLM judge capacity:
 
 | Metric | What It Checks |
 | --- | --- |
@@ -309,8 +340,6 @@ backend/app/utils/eval_collect_states.py
 backend/app/utils/eval_runner.py
 backend/app/utils/eval_summarizer.py
 ```
-
-Final RAGAS scores will be added here after the judge LLM run is completed.
 
 ## Project Structure
 

@@ -1,0 +1,162 @@
+[
+  {
+    "id": "q001",
+    "query": "Verify if a technology software licensing transaction of $1,800,000 USD initiated by Nexus India to an overseas vendor violates internal cross-border limits.",
+    "expected_status": "NON_COMPLIANT",
+    "expected_transaction_value": 1800000,
+    "expected_allowed_ceiling": 1500000,
+    "expected_sources": ["nexus_holdings_global_inc.pdf", "foreign_Investement_rbi.pdf"],
+    "expected_primary_source": "Internal Policy",
+    "expected_rule_terms": ["ceiling", "cross-border", "limit", "remittance"]
+  },
+  {
+    "id": "q002",
+    "query": "Audit an outbound technology software fee remittance of $400,000 USD from Nexus India to an authorized overseas vendor under the single-transaction licensing ceiling.",
+    "expected_status": "COMPLIANT",
+    "expected_transaction_value": 400000,
+    "expected_allowed_ceiling": 1500000,
+    "expected_sources": ["nexus_holdings_global_inc.pdf", "foreign_Investement_rbi.pdf"],
+    "expected_primary_source": "Internal Policy",
+    "expected_rule_terms": ["software", "licensing", "ceiling", "remittance"]
+  },
+  {
+    "id": "q003",
+    "query": "Review a $750,000 USD cross-border wire transfer from Nexus India to a newly onboarded overseas supplier where beneficiary KYC and originator information must be verified.",
+    "expected_status": "ACTION_REQUIRED",
+    "expected_transaction_value": 750000,
+    "expected_allowed_ceiling": 1500000,
+    "expected_sources": ["kyc_rbi.pdf", "nexus_holdings_global_inc.pdf"],
+    "expected_primary_source": "RBI KYC",
+    "expected_rule_terms": ["kyc", "beneficiary", "originator", "wire transfer"]
+  },
+  {
+    "id": "q004",
+    "query": "Audit a $250,000 USD operational advance from Nexus India to an active vendor where a Nexus Holdings executive director owns a 3.1% promoter stake.",
+    "expected_status": "NON_COMPLIANT",
+    "expected_transaction_value": 250000,
+    "expected_allowed_ceiling": 1500000,
+    "expected_sources": ["credit_Risk_RBI.pdf", "nexus_holdings_global_inc.pdf"],
+    "expected_primary_source": "RBI Credit Risk",
+    "expected_rule_terms": ["director", "promoter", "credit", "exposure"]
+  },
+  {
+    "id": "q005",
+    "query": "Verify if a $12,500,000 USD equity capital remittance from Nexus India to acquire 45% of an overseas payment-processing fintech subsidiary requires approval-route treatment.",
+    "expected_status": "NON_COMPLIANT",
+    "expected_transaction_value": 12500000,
+    "expected_allowed_ceiling": 1500000,
+    "expected_sources": ["foreign_Investement_rbi.pdf", "nexus_holdings_global_inc.pdf"],
+    "expected_primary_source": "Foreign Investment",
+    "expected_rule_terms": ["foreign investment", "equity", "acquisition", "approval"]
+  },
+  {
+    "id": "q006",
+    "query": "Verify an outbound cloud infrastructure service fee remittance of $150,000 USD from Nexus India to AWS US East region.",
+    "expected_status": "COMPLIANT",
+    "expected_transaction_value": 150000,
+    "expected_allowed_ceiling": 1500000,
+    "expected_sources": ["nexus_holdings_global_inc.pdf"],
+    "expected_primary_source": "Internal Policy",
+    "expected_rule_terms": ["cloud", "service", "remittance", "ceiling"]
+  },
+  {
+    "id": "q007",
+    "query": "Audit an outbound software consultancy payment of $850,000 USD to a foreign vendor when cumulative quarterly technology remittances have already reached $4,600,000 USD.",
+    "expected_status": "NON_COMPLIANT",
+    "expected_transaction_value": 850000,
+    "expected_allowed_ceiling": 1500000,
+    "expected_sources": ["nexus_holdings_global_inc.pdf"],
+    "expected_primary_source": "Internal Policy",
+    "expected_rule_terms": ["cumulative", "quarterly", "technology", "threshold"]
+  },
+  {
+    "id": "q008",
+    "query": "Evaluate a cross-border cryptocurrency treasury transfer of $900,000 USD initiated by Nexus Global to an anonymous offshore digital wallet with no verified beneficiary identity.",
+    "expected_status": "ACTION_REQUIRED",
+    "expected_transaction_value": 900000,
+    "expected_allowed_ceiling": 1500000,
+    "expected_sources": ["kyc_rbi.pdf", "nexus_holdings_global_inc.pdf"],
+    "expected_primary_source": "RBI KYC",
+    "expected_rule_terms": ["beneficiary", "digital wallet", "kyc", "anonymous"]
+  },
+  {
+    "id": "q009",
+    "query": "Does a $1,490,000 USD cross-border software licensing payment from Nexus India to an overseas vendor remain within the approved corporate ceiling?",
+    "expected_status": "COMPLIANT",
+    "expected_transaction_value": 1490000,
+    "expected_allowed_ceiling": 1500000,
+    "expected_sources": ["nexus_holdings_global_inc.pdf", "foreign_Investement_rbi.pdf"],
+    "expected_primary_source": "Internal Policy",
+    "expected_rule_terms": ["ceiling", "software", "licensing", "vendor"]
+  },
+  {
+    "id": "q010",
+    "query": "Assess whether a $1,510,000 USD software remittance from Nexus India to a foreign vendor breaches the cross-border transaction cap.",
+    "expected_status": "NON_COMPLIANT",
+    "expected_transaction_value": 1510000,
+    "expected_allowed_ceiling": 1500000,
+    "expected_sources": ["nexus_holdings_global_inc.pdf", "foreign_Investement_rbi.pdf"],
+    "expected_primary_source": "Internal Policy",
+    "expected_rule_terms": ["cap", "ceiling", "cross-border", "foreign vendor"]
+  },
+  {
+    "id": "q011",
+    "query": "Check a new overseas supplier payment where the beneficiary owner is unresolved and originator details are incomplete.",
+    "expected_status": "ACTION_REQUIRED",
+    "expected_transaction_value": 0,
+    "expected_allowed_ceiling": 1500000,
+    "expected_sources": ["kyc_rbi.pdf"],
+    "expected_primary_source": "RBI KYC",
+    "expected_rule_terms": ["beneficial owner", "originator", "kyc", "customer"]
+  },
+  {
+    "id": "q012",
+    "query": "Review a vendor credit advance to a company connected to a promoter director with ownership above 2.5 percent.",
+    "expected_status": "NON_COMPLIANT",
+    "expected_transaction_value": 0,
+    "expected_allowed_ceiling": 1500000,
+    "expected_sources": ["credit_Risk_RBI.pdf", "nexus_holdings_global_inc.pdf"],
+    "expected_primary_source": "RBI Credit Risk",
+    "expected_rule_terms": ["director", "promoter", "ownership", "credit"]
+  },
+  {
+    "id": "q013",
+    "query": "Determine whether acquisition of a 45 percent overseas fintech subsidiary should use approval route foreign investment treatment.",
+    "expected_status": "NON_COMPLIANT",
+    "expected_transaction_value": 0,
+    "expected_allowed_ceiling": 1500000,
+    "expected_sources": ["foreign_Investement_rbi.pdf"],
+    "expected_primary_source": "Foreign Investment",
+    "expected_rule_terms": ["acquisition", "foreign investment", "approval route", "equity"]
+  },
+  {
+    "id": "q014",
+    "query": "Review routine AWS cloud service remittance by Nexus India under the internal technology payment ceiling.",
+    "expected_status": "COMPLIANT",
+    "expected_transaction_value": 0,
+    "expected_allowed_ceiling": 1500000,
+    "expected_sources": ["nexus_holdings_global_inc.pdf"],
+    "expected_primary_source": "Internal Policy",
+    "expected_rule_terms": ["cloud", "technology", "payment", "ceiling"]
+  },
+  {
+    "id": "q015",
+    "query": "Inspect a quarterly technology remittance series where previous payments total $4,600,000 USD and the new payment is $850,000 USD.",
+    "expected_status": "NON_COMPLIANT",
+    "expected_transaction_value": 850000,
+    "expected_allowed_ceiling": 1500000,
+    "expected_sources": ["nexus_holdings_global_inc.pdf"],
+    "expected_primary_source": "Internal Policy",
+    "expected_rule_terms": ["quarterly", "cumulative", "technology", "5,000,000"]
+  },
+  {
+    "id": "q016",
+    "query": "Evaluate whether an anonymous offshore digital wallet can receive a cross-border crypto treasury transfer without verified beneficiary identity.",
+    "expected_status": "ACTION_REQUIRED",
+    "expected_transaction_value": 0,
+    "expected_allowed_ceiling": 1500000,
+    "expected_sources": ["kyc_rbi.pdf", "nexus_holdings_global_inc.pdf"],
+    "expected_primary_source": "RBI KYC",
+    "expected_rule_terms": ["anonymous", "wallet", "beneficiary", "verified"]
+  }
+]
