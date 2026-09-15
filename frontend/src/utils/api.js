@@ -39,16 +39,42 @@ export async function getAuditHistory(token) {
   return response.json();
 }
 
-export async function evaluateAudit(token, query) {
+export async function evaluateAudit(token, query, options = {}) {
   const response = await fetch(`${API_BASE}/api/v1/audits/evaluate`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ query }),
+    body: JSON.stringify({
+      query,
+      include_ingested_sources: Boolean(options.includeIngestedSources),
+      use_seeded_sources: options.useSeededSources !== false,
+      selected_document_ids: options.selectedDocumentIds || [],
+    }),
   });
-  if (!response.ok) throw new Error("Audit evaluation failed");
+  if (!response.ok) throw new Error(await response.text() || "Audit evaluation failed");
+  return response.json();
+}
+
+export async function getDocuments(token) {
+  const response = await fetch(`${API_BASE}/api/v1/documents`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) throw new Error(await response.text() || "Document list unavailable");
+  return response.json();
+}
+
+export async function uploadDocument(token, file) {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await fetch(`${API_BASE}/api/v1/documents`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData,
+  });
+  if (!response.ok) throw new Error(await response.text() || "Document upload failed");
   return response.json();
 }
 

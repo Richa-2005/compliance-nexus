@@ -121,6 +121,19 @@ def citation_nodes(citations_json: str | None) -> set[str]:
     return nodes
 
 
+def uploaded_evidence_nodes(audit: AuditRecord) -> set[str]:
+    evidence_items = parse_json_field(audit.selected_evidence_json, [])
+    evidence_items.extend(parse_json_field(audit.evidence_json, []))
+    nodes = set()
+    for item in evidence_items:
+        if not isinstance(item, dict):
+            continue
+        source_document = item.get("source_document")
+        if source_document and source_document not in DOC_TO_GRAPH_NODE:
+            nodes.add(str(source_document))
+    return nodes
+
+
 def transaction_focus_nodes(G, audit: AuditRecord) -> set[str]:
     focus = {"Nexus Holdings", "Nexus India"}
     if audit.source_doc in GRAPH_NODE_TO_DOC:
@@ -157,7 +170,12 @@ async def evaluate_transaction(
     transaction_id = f"TX_{tx_timestamp}"
 
     try:
-        graph_output = audit_graph.invoke({"query": query_text})
+        graph_output = audit_graph.invoke({
+            "query": query_text,
+            "use_seeded_sources": payload.get("use_seeded_sources", True) is not False,
+            "include_ingested_sources": bool(payload.get("include_ingested_sources", False)),
+            "selected_document_ids": payload.get("selected_document_ids") or [],
+        })
     except Exception as e:
         await manager.broadcast(
             {
@@ -426,6 +444,7 @@ def get_topology(
             G = pickle.load(f)
 
         focus_nodes = transaction_focus_nodes(G, audit)
+        uploaded_nodes = uploaded_evidence_nodes(audit)
         if audit.source_doc and audit.source_doc not in G:
             focus_nodes.add(audit.source_doc)
 
@@ -434,6 +453,10 @@ def get_topology(
             {"id": str(n), "group": node_group(str(n), audit)}
             for n in G.nodes()
             if n in focus_nodes
+        )
+        nodes.extend(
+            {"id": node, "group": "UPLOADED_SOURCE"}
+            for node in sorted(uploaded_nodes)
         )
 
         edges = []
@@ -459,6 +482,14 @@ def get_topology(
                     "source": audit.transaction_id,
                     "target": audit.source_doc,
                     "label": audit.status or "EVALUATED_AGAINST",
+                }
+            )
+        for uploaded_node in uploaded_nodes:
+            edges.append(
+                {
+                    "source": "Nexus India" if "Nexus India" in focus_nodes else audit.transaction_id,
+                    "target": uploaded_node,
+                    "label": "USES_UPLOADED_EVIDENCE",
                 }
             )
 

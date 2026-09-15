@@ -16,22 +16,29 @@ def fetch_context(state : AgentState) -> AgentState:
         state["error_feedback"] = ""  
 
     query = state["query"]
-    chroma_results, bm25_results = (
-        retriever.vector_semantic_results(query)
+    selected_document_ids = set(state.get("selected_document_ids") or [])
+    active_retriever = get_retriever(
+        include_seeded_sources=bool(state.get("use_seeded_sources", True)),
+        include_ingested_sources=bool(state.get("include_ingested_sources", False)),
+        selected_document_ids=selected_document_ids or None,
     )
 
-    state["retrieved_child_ids"] = retriever.rrf(chroma_results, bm25_results)
+    chroma_results, bm25_results = (
+        active_retriever.vector_semantic_results(query)
+    )
+
+    state["retrieved_child_ids"] = active_retriever.rrf(chroma_results, bm25_results)
 
     parent_ids = {
-        retriever.child_to_parent[child_id]
+        active_retriever.child_to_parent[child_id]
         for child_id in state["retrieved_child_ids"]
-        if child_id in retriever.child_to_parent
+        if child_id in active_retriever.child_to_parent
     }
 
     state["context_blocks"] = [
-        retriever.parent_by_id[parent_id]
+        active_retriever.parent_by_id[parent_id]
         for parent_id in parent_ids
-        if parent_id in retriever.parent_by_id
+        if parent_id in active_retriever.parent_by_id
     ]
 
     return state

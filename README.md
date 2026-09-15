@@ -103,6 +103,17 @@ based on rule language, transaction facts, source match, and threshold match.
 </td>
 <td width="50%" valign="top">
 
+### Kafka Document Intake
+
+L2 users can upload new policy PDFs. Kafka queues parsing and chunking work,
+then ready documents can be selected as seeded-only, uploaded-only, or combined
+retrieval sources during audit execution.
+
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+
 ### LangGraph Audit Pipeline
 
 Runs a multi-step agent graph for context retrieval, topology traversal,
@@ -110,8 +121,6 @@ structured extraction, deterministic evaluation, rationale generation, and
 citation validation.
 
 </td>
-</tr>
-<tr>
 <td width="50%" valign="top">
 
 ### Deterministic Verdict Engine
@@ -125,6 +134,8 @@ Final statuses are driven by structured checks:
 The verdict does not depend on prose generation alone.
 
 </td>
+</tr>
+<tr>
 <td width="50%" valign="top">
 
 ### Structured Audit Reports
@@ -134,16 +145,17 @@ evidence, rationale, citations, and recommended action. PDFs are generated from
 the same audit state.
 
 </td>
-</tr>
-<tr>
 <td width="50%" valign="top">
 
 ### Dynamic Knowledge Graph
 
 Each transaction can be inspected through a focused topology graph showing the
-relevant corporate entities, policy sources, and audit relationships.
+relevant corporate entities, policy sources, uploaded evidence sources, and
+audit relationships.
 
 </td>
+</tr>
+<tr>
 <td width="50%" valign="top">
 
 ### L1/L2 Follow-Up Review
@@ -221,11 +233,12 @@ The seeded demo covers multiple audit outcomes:
 | Auth | JWT demo personas |
 | Agent orchestration | LangGraph |
 | LLM providers | Ollama or Groq |
+| Async ingestion | Kafka, background worker, idempotent document status store |
 | Retrieval | BM25 fallback in hosted demo; ChromaDB / sentence-transformers support for local and evaluation workflows |
 | Knowledge graph | NetworkX |
 | PDF reports | ReportLab |
 | Persistence | SQLite |
-| Evaluation tooling | RAGAS-ready scripts |
+| Evaluation tooling | Offline retrieval, citation, seeded-audit, and optional RAGAS-style benchmark scripts |
 
 ## Demo Accounts
 
@@ -341,6 +354,28 @@ backend/app/utils/eval_runner.py
 backend/app/utils/eval_summarizer.py
 ```
 
+## Async Document Ingestion
+
+Kafka-backed document ingestion is available as an optional Phase 2 path and is
+disabled by default. It adds `POST /api/v1/documents` for queueing PDF
+ingestion, while the live audit endpoint remains safe by default.
+
+The local Phase 2 workflow supports:
+
+- L2-only PDF uploads from the Audit Queue.
+- Kafka events for `document.ingested`, `document.parsed`,
+  `embedding.created`, and `document.dead_letter`.
+- Worker-side parsing, chunking, retry, idempotency, and DLQ handling.
+- Document readiness/status visibility in the dashboard.
+- Audit retrieval modes for seeded corpus, selected uploads, or both.
+- Uploaded evidence nodes in the transaction topology graph.
+- Report badges showing whether the rationale was `LLM-assisted` or generated
+  by deterministic fallback.
+
+See [`docs/kafka-ingestion.md`](./docs/kafka-ingestion.md) for topics,
+idempotency, retry, DLQ behavior, Docker Compose startup, and local worker
+commands.
+
 ## Project Structure
 
 ```text
@@ -349,6 +384,7 @@ backend/
     agents/          LangGraph audit nodes and schemas
     api/             FastAPI routes, auth, WebSocket feed
     core/            config, database, graph builder, retriever, models
+    ingestion/       optional Kafka producer, worker, events, and status store
     utils/           PDF generation, seed generation, evaluation helpers
 
 frontend/

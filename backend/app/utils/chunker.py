@@ -52,9 +52,10 @@ def store_buffer(
     return sec + 1
 
 class Chunker:
-    def __init__(self, file_path : str):
+    def __init__(self, file_path : str, output_dir: str | Path = "data/processed"):
         global encoder
         self.file_path = file_path
+        self.output_dir = Path(output_dir)
         self.parent_tokens = {}
         self.child_tokens = []
 
@@ -122,7 +123,7 @@ class Chunker:
             )
 
     def store_parent_chunks(self):
-        output_path = Path("data/processed/parent_chunks.json")
+        output_path = self.output_dir / "parent_chunks.json"
         output_path.parent.mkdir(parents=True, exist_ok=True)
         if output_path.exists():
             with output_path.open("r", encoding="utf-8") as file:
@@ -180,7 +181,7 @@ class Chunker:
 
                 self.child_tokens.append(store_data)
         
-        output_path = Path("data/processed/child_chunks.json")
+        output_path = self.output_dir / "child_chunks.json"
         output_path.parent.mkdir(parents=True, exist_ok=True)
         if output_path.exists():
             with output_path.open("r", encoding="utf-8") as file:

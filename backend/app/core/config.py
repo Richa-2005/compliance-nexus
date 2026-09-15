@@ -5,17 +5,17 @@ from typing import ClassVar
 
 class Settings(BaseSettings):
     
-    LLM_PROVIDER: str
-    GROQ_API_KEY: SecretStr  # Hides the value when printed or dumped to logs
+    LLM_PROVIDER: str = "OLLAMA"
+    GROQ_API_KEY: SecretStr = SecretStr("")  # Hides the value when printed or dumped to logs
     GROQ_MODEL: str = "openai/gpt-oss-20b"
     GROQ_EXTRACTION_API_KEY: SecretStr | None = None
     GROQ_EXTRACTION_MODEL: str | None = None
     GROQ_RATIONALE_API_KEY: SecretStr | None = None
     GROQ_RATIONALE_MODEL: str | None = None
     GROQ_REASONING_FORMAT: str = "hidden"
-    OLLAMA_BASE_URL: str
-    JWT_SECRET_KEY : SecretStr
-    JWT_ALGORITHM:str
+    OLLAMA_BASE_URL: str = "http://localhost:11434"
+    JWT_SECRET_KEY : SecretStr = SecretStr("local-development-secret")
+    JWT_ALGORITHM:str = "HS256"
     BACKEND_CORS_ORIGINS: str = "http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174,https://compliance-nexus.vercel.app"
     model_config = SettingsConfigDict(
         env_file=Path(__file__).resolve().parents[2] / ".env",
@@ -33,6 +33,18 @@ class Settings(BaseSettings):
     REPORT_OUTPUT_FILE : Path = PROJECT_ROOT / "data" / "processed" / "eval_results.md"
 
     API_V1_PREFIX: str = "/api/v1"
+
+    KAFKA_ENABLED: bool = False
+    KAFKA_BOOTSTRAP_SERVERS: str = "localhost:9092"
+    KAFKA_CONSUMER_GROUP: str = "compliance-nexus-ingestion"
+    KAFKA_DOCUMENT_INGESTED_TOPIC: str = "document.ingested"
+    KAFKA_DOCUMENT_PARSED_TOPIC: str = "document.parsed"
+    KAFKA_EMBEDDING_CREATED_TOPIC: str = "embedding.created"
+    KAFKA_AUDIT_REQUESTED_TOPIC: str = "audit.requested"
+    KAFKA_AUDIT_COMPLETED_TOPIC: str = "audit.completed"
+    KAFKA_DEAD_LETTER_TOPIC: str = "document.dead_letter"
+    KAFKA_MAX_RETRIES: int = 3
+    INGESTION_DIR: Path = PROJECT_ROOT / "data" / "ingestion"
 
     @property
     def cors_origins(self) -> list[str]:
